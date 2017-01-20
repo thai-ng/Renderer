@@ -2,10 +2,20 @@
 #include "client.h"
 #include "lineRenderer.h"
 #include "rect.h"
+#include "line.h"
 
 Client::Client(Drawable *drawable)
 {
     this->drawable = drawable;
+}
+
+void doDrawing(Rect& panel, Drawable* drawable)
+{
+	Line l1{ Point{ 10, 20 }, Point{ 20, 150 }, &panel };
+	Line l2{ Point{ 20, 20 }, Point{ 30, 150 }, &panel };
+
+	renderLine(l1, drawable, 0xffffffff, DDALineRenderer);
+	renderLine(l2, drawable, 0xffffff00, BresenhamLineRenderer);
 }
 
 void Client::nextPage() {
@@ -31,8 +41,11 @@ void Client::nextPage() {
 		Rect panel4{ 400, 400, 300, 300 };
 		draw_rect(panel4.x, panel4.y, panel4.right(), panel4.bottom(), 0xff000000);
 
-        renderLine(Point{50, 60}, Point{60, 200}, drawable, 0xffffffff, DDALineRenderer);
-        renderLine(Point{60, 60}, Point{70, 200}, drawable, 0xffffff00, BresenhamLineRenderer);
+		doDrawing(panel1, drawable);
+		doDrawing(panel2, drawable);
+		doDrawing(panel3, drawable);
+		doDrawing(panel4, drawable);
+
         drawable->updateScreen();   // you must call this to make the display change.
 	} break;
     case 2:
