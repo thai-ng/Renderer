@@ -25,7 +25,8 @@ HEADERS  += \
     renderarea361.h \
     lineRenderer.h \
     point.h \
-    rect.h
+    rect.h \
+    line.h
 
 
 win32: LIBS += -lshell32
