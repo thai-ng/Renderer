@@ -9,13 +9,12 @@ Client::Client(Drawable *drawable)
     this->drawable = drawable;
 }
 
-void doDrawing(Rect& panel, Drawable* drawable)
+template <typename F>
+void doDrawing(Rect& panel, Drawable* drawable, F renderAlgorithm)
 {
 	Line l1{ Point{ 10, 20 }, Point{ 20, 150 }, &panel };
-	Line l2{ Point{ 20, 20 }, Point{ 30, 150 }, &panel };
 
-	renderLine(l1, drawable, 0xffffffff, DDALineRenderer);
-	renderLine(l2, drawable, 0xffffff00, BresenhamLineRenderer);
+	renderLine(l1, drawable, 0xffffffff, renderAlgorithm);
 }
 
 void Client::nextPage() {
@@ -30,7 +29,7 @@ void Client::nextPage() {
         draw_rect(bg.x, bg.y, bg.right(), bg.bottom(), 0xffffffff);
 
 		Rect panel1{ 50, 50, 300, 300 };
-        draw_rect( panel1.x, panel1.y, panel1.right(), panel1.bottom(), 0xff000000);
+        draw_rect(panel1.x, panel1.y, panel1.right(), panel1.bottom(), 0xff000000);
 
 		Rect panel2{ 400, 50, 300, 300 };
 		draw_rect(panel2.x, panel2.y, panel2.right(), panel2.bottom(), 0xff000000);
@@ -41,10 +40,8 @@ void Client::nextPage() {
 		Rect panel4{ 400, 400, 300, 300 };
 		draw_rect(panel4.x, panel4.y, panel4.right(), panel4.bottom(), 0xff000000);
 
-		doDrawing(panel1, drawable);
-		doDrawing(panel2, drawable);
-		doDrawing(panel3, drawable);
-		doDrawing(panel4, drawable);
+		doDrawing(panel1, drawable, DDALineRenderer);
+		doDrawing(panel2, drawable, BresenhamLineRenderer);
 
         drawable->updateScreen();   // you must call this to make the display change.
 	} break;

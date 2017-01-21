@@ -1,6 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include <memory>
 #include <QWidget>
 #include <QPushButton>
 #include "pageturner.h"
@@ -13,14 +14,14 @@ class Window361 : public QWidget
 
 public:
     Window361();
-    ~Window361();
+    //~Window361();
     Drawable *getDrawable();
     void setPageTurner(PageTurner *pageTurner);
 
 private:
-    RenderArea361 *renderArea;
-    QPushButton *nextPageButton;
-    PageTurner *pageTurner;
+    std::unique_ptr<RenderArea361> renderArea;
+    std::unique_ptr<QPushButton> nextPageButton;
+    PageTurner* pageTurner;
 
 
 private slots:
