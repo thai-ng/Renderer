@@ -1,8 +1,23 @@
 #pragma once
+#include "rect.h"
+
 struct Point
 {
 	int x;
 	int y;
+	Rect* parent;
+
+	auto toGlobalCoordinate() const
+	{
+		if (parent)
+		{
+			return Point{ parent->x + x, parent->y + y };
+		}
+		else
+		{
+			return Point{ x, y };
+		}
+	}
 };
 
 Point operator+(const Point& p1, const Point& p2)
