@@ -26,7 +26,9 @@ HEADERS  += \
     lineRenderer.h \
     point.h \
     rect.h \
-    line.h
+    polygon.h \
+    polygonRenderer.h \
+    primitives.h
 
 
 win32: LIBS += -lshell32

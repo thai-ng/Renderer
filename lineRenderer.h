@@ -1,8 +1,7 @@
 #include <cmath>
 #include <utility>
 #include "drawable.h"
-#include "point.h"
-#include "line.h"
+#include "primitives.h"
 
 enum class Octant
 {
@@ -158,7 +157,7 @@ void renderLine(Point p1, Point p2, Drawable* surface, unsigned int color, F fun
 }
 
 template <typename F>
-void renderLine(const Line& l, Drawable* surface, unsigned int color, F function)
+void renderLine(const Line& l, Drawable* surface, F function)
 {
 	auto points = l.toGlobalCoordinate();
 	auto p1 = std::get<0>(points);
@@ -167,7 +166,7 @@ void renderLine(const Line& l, Drawable* surface, unsigned int color, F function
 	auto originalOctant = getOctant(p2 - p1);
 	auto converted_p1 = toFirstOctant(originalOctant, p1);
 	auto converted_p2 = toFirstOctant(originalOctant, p2);
-	function(converted_p1, converted_p2, originalOctant, surface, color);
+	function(converted_p1, converted_p2, originalOctant, surface, l.color);
 }
 
 
