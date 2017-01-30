@@ -145,6 +145,55 @@ auto generateRandomLines()
 	return lines;
 }
 
+void drawCircularTriangles(Rect& panel, Drawable* drawable)
+{
+	auto lines = generateStarburstLines(90, 125, panel);
+	std::random_device device;
+	std::mt19937 gen(device());
+	std::uniform_int_distribution<> colorDis(0x00000000, 0x00ffffff);
+	for (auto it = lines.begin(); it != lines.end(); ++it)
+	{
+		decltype(lines.begin()) nextIt;
+		if (it == std::prev(lines.end()))
+		{
+			nextIt = lines.begin();
+		}
+		else
+		{
+			nextIt = std::next(it);
+		}
+
+		auto triangle = Triangle(*it, *nextIt);
+		auto color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+		renderTriangle(triangle, drawable, color);
+	}
+}
+
+void drawRandomTriangles(Rect& panel, Drawable* drawable)
+{
+	std::random_device device;
+	std::mt19937 gen(device());
+	std::uniform_int_distribution<> dist(0, 299);
+	std::uniform_int_distribution<> colorDis(0x00000000, 0x00ffffff);
+
+	std::vector<Triangle> triangles;
+	triangles.reserve(20);
+
+	std::generate_n(std::back_inserter(triangles), 20, [&dist, &gen, &panel]
+	{
+		auto p1 = Point{ dist(gen), dist(gen) };
+		auto p2 = Point{ dist(gen), dist(gen) };
+		auto p3 = Point{ dist(gen), dist(gen) };
+		return Triangle(std::array<Point, 3>{p1, p2, p3}, &panel);
+	});
+
+	std::for_each(triangles.begin(), triangles.end(), [&colorDis, &gen, drawable](auto& triangle)
+	{
+		auto color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+		renderTriangle(triangle, drawable, color);
+	});
+}
+
 void Client::nextPage() {
     static int pageNumber = 0;
     pageNumber++;
@@ -192,37 +241,11 @@ void Client::nextPage() {
 		} break;
 		case 4:
 		{
-			std::random_device device;
-			std::mt19937 gen(device());
-			std::uniform_int_distribution<> colorDis(0x00000000, 0x00ffffff);
-			auto count = 1;
-			auto lines = generateStarburstLines(90, 125, panel1);
-			for (auto it = lines.begin(); it != lines.end(); ++it)
-			{
-				decltype(lines.begin()) nextIt;
-				if (it == std::prev(lines.end()))
-				{
-					nextIt = lines.begin();
-				}
-				else
-				{
-					nextIt = std::next(it);
-				}
+			// Panel 1
+			drawCircularTriangles(panel1, drawable);
 
-				auto triangle = Triangle(*it, *nextIt);
-				auto vertices = triangle.vertices();
-				auto color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
-				renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, static_cast<unsigned int>(color));
-				std::cout << "Printing triangle: " << count++ << " ";
-				for (auto vertex : vertices)
-				{
-					std::cout << vertex.x << ":" << vertex.y << "   ";
-				}
-				std::cout << "\n";
-			}
-			auto triangle = Triangle(Line(Point{ 150, 150, &panel2 }, Point{ 145, 4, &panel2 }), Line(Point{ 150, 150, &panel2 }, Point{ 155, 4, &panel2 }));
-			auto vertices = triangle.vertices();
-			renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, 0xffffffff);
+			// Panel 4
+			drawRandomTriangles(panel4, drawable);
 		} break;
 		// fall through...
 		default:

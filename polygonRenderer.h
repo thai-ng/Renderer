@@ -31,19 +31,36 @@ template<typename T, typename F>
 std::tuple<T, T> splitVertices(const T& vertices, F sortComp)
 {
 	auto frontPoint = vertices.front();
+	auto backPoint = vertices.back();
 	std::vector<Point> leftChain = { vertices.front(), vertices.back() };
 	std::vector<Point> rightChain = { vertices.front(), vertices.back() };
+	// TODO: fix this hack, this has dependency on sortComp
+    auto allLeftOfTop = std::all_of(std::next(vertices.begin()), vertices.end(), [&frontPoint](auto& point) {return (point.y > frontPoint.y) && (point.x > frontPoint.x); });
 	auto endIt = std::prev(vertices.end());
 	for (auto currentIt = std::next(vertices.begin()); currentIt != endIt; currentIt = std::next(currentIt))
 	{
 		auto currentPoint = *currentIt;
-		if (currentPoint.x <= frontPoint.x)
+		if (!allLeftOfTop)
 		{
-			leftChain.push_back(currentPoint);
+			if (currentPoint.x <= frontPoint.x)
+			{
+				leftChain.push_back(currentPoint);
+			}
+			else
+			{
+				rightChain.push_back(currentPoint);
+			}
 		}
 		else
 		{
-			rightChain.push_back(currentPoint);
+			if (currentPoint.x <= backPoint.x)
+			{
+				leftChain.push_back(currentPoint);
+			}
+			else
+			{
+				rightChain.push_back(currentPoint);
+			}
 		}
 	}
 
@@ -76,12 +93,13 @@ double getXSlope(Line line)
 
 void renderPolygon(const std::vector<Point>& points, Drawable* drawable, unsigned int color)
 {
-	auto vertexChains = splitVertices(points, comparePoints);
+	auto sortedVertices = sortVertices(points, comparePoints);
+	auto vertexChains = splitVertices(sortedVertices, comparePoints);
 	auto leftChain = std::get<0>(vertexChains);
 	auto rightChain = std::get<1>(vertexChains);
 
-	auto topPoint = points.front();
-	auto bottomPoint = points.back();
+	auto topPoint = sortedVertices.front();
+	auto bottomPoint = sortedVertices.back();
 
 	auto leftIter = std::next(leftChain.begin());
 	Line leftLine{ leftChain.front(), *leftIter };
@@ -123,6 +141,11 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, unsigne
 
 void renderPolygon(const Polygon& polygon, Drawable* drawable, unsigned int color)
 {
-	auto sortedVertices = sortVertices(polygon.vertices(), comparePoints);
-    renderPolygon(sortedVertices, drawable, color);
+    renderPolygon(polygon.vertices(), drawable, color);
+}
+
+void renderTriangle(const Triangle& triangle, Drawable* drawable, unsigned int color)
+{
+	auto vertices = triangle.vertices();
+	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, static_cast<unsigned int>(color));
 }
