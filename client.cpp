@@ -192,8 +192,8 @@ void Client::nextPage() {
 		} break;
 		case 4:
 		{
-			Polygon polygon{ std::vector<Point>{Point{ 50, 10 }, Point{ 10, 50 }, Point{ 90, 50 }, Point{ 60, 100 }}, &panel1 };
-			renderPolygon(polygon, drawable);
+			auto lines = generateStarburstLines(90, 125, panel1);
+
 		} break;
 		// fall through...
 		default:
@@ -207,7 +207,8 @@ void Client::nextPage() {
 
 }
 
-void Client::draw_rect(int x1, int y1, int x2, int y2, unsigned int color) {
+void Client::draw_rect(int x1, int y1, int x2, int y2, unsigned int color) 
+{
     for(int x = x1; x<x2; x++) 
 	{
         for(int y=y1; y<y2; y++) 

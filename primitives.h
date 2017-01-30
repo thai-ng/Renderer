@@ -1,6 +1,8 @@
 #pragma once
 #include <cmath>
 #include <tuple>
+#include <vector>
+#include <array>
 
 struct Rect
 {
@@ -31,6 +33,11 @@ struct Point
 		{
 			return Point{ x, y };
 		}
+	}
+
+	bool operator==(const Point& other) const
+	{
+		return (x == other.x) && (y == other.y) && (parent == other.parent);
 	}
 };
 
@@ -78,6 +85,38 @@ struct Line
 		p1.parent = parent;
 		p2.parent = parent;
 	}
+
+	bool connected(const Line& other) const
+	{
+		return (p1 == other.p1 || p1 == other.p2 || p2 == other.p1 || p2 == other.p2);
+	}
+
+	std::array<Point, 3> getTriangleVertices(const Line& other) const
+	{
+		if (connected(other))
+		{
+			if (p1 == other.p1)
+			{
+				return std::array<Point, 3>{p1, p2, other.p2};
+			}
+			else if (p1 == other.p2)
+			{
+				return std::array<Point, 3>{other.p1, p2, other.p2};
+			}
+			else if (p2 == other.p1)
+			{
+				return std::array<Point, 3>{p1, p2, other.p2};
+			}
+			else
+			{
+				return std::array<Point, 3>{p1, p2, other.p1};
+			}
+		}
+		else
+		{
+			throw std::invalid_argument("Lines must connect.");
+		}
+	}
 };
 
 class Polygon
@@ -97,3 +136,32 @@ private:
 	Rect* _parent;
 };
 
+class Triangle
+{
+public:
+	Triangle(const std::array<Point, 3>& vertices, Rect* parent = nullptr) : _vertices(vertices), _parent(parent) 
+	{
+		std::for_each(_vertices.begin(), _vertices.end(), [](auto& vertex) {vertex.parent = _parent; });
+	}
+
+	Triangle(const Line& line1, const Line& line2)
+	{
+		if (line1.connected(line2))
+		{
+			_vertices = line1.getTriangleVertices(line2);
+			_parent = line1.p1.parent;
+		}
+		else
+		{
+			throw std::invalid_argument("Lines must connect.");
+		}
+	}
+
+	auto vertices() const
+	{
+		return _vertices;
+	}
+private:
+	Rect* _parent;
+	std::array<Point, 3> _vertices;
+};
