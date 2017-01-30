@@ -40,4 +40,5 @@ QSize RenderArea361::sizeHint() const
 void RenderArea361::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.drawImage(0, 0, image);
+    event->accept();
 }

@@ -22,8 +22,8 @@ Drawable *Window361::getDrawable() {
 //Window361::~Window361() {
 //}
 
-void Window361::setPageTurner(PageTurner *pageTurner) {
-    this->pageTurner = pageTurner;
+void Window361::setPageTurner(PageTurner *inPageTurner) {
+    this->pageTurner = inPageTurner;
     pageTurner->nextPage();     // give them the change for the first page.
 }
 

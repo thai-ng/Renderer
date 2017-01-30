@@ -141,7 +141,7 @@ class Triangle
 public:
 	Triangle(const std::array<Point, 3>& vertices, Rect* parent = nullptr) : _vertices(vertices), _parent(parent) 
 	{
-		std::for_each(_vertices.begin(), _vertices.end(), [](auto& vertex) {vertex.parent = _parent; });
+        std::for_each(_vertices.begin(), _vertices.end(), [parent](auto& vertex) {vertex.parent = parent; });
 	}
 
 	Triangle(const Line& line1, const Line& line2)

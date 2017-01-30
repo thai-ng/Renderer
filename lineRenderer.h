@@ -58,6 +58,11 @@ Point toFirstOctant(Octant octant, Point p)
 		{
 			return Point{p.x, -p.y};
 		} break;
+
+        default:
+        {
+            throw std::invalid_argument("Invalid octant");
+        }
     }
 }
 
@@ -104,6 +109,11 @@ Point fromFirstOctant(Octant octant, Point p)
 		{
 			return Point{ p.x, -p.y };
 		} break;
+
+        default:
+        {
+            throw std::invalid_argument("Invalid octant");
+        }
 	}
 }
 
@@ -145,6 +155,10 @@ Octant getOctant(Point p)
 	{
 		return Octant::Eighth;
 	}
+    else
+    {
+        throw std::invalid_argument("Invalid octant");
+    }
 }
 
 template <typename F>

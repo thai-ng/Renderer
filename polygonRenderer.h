@@ -74,16 +74,14 @@ double getXSlope(Line line)
 	}
 }
 
-void renderPolygon(const Polygon& polygon, Drawable* drawable)
+void renderPolygon(const std::vector<Point>& points, Drawable* drawable, unsigned int color)
 {
-	auto sortedVertices = sortVertices(polygon.vertices(), comparePoints);
-
-	auto vertexChains = splitVertices(sortedVertices, comparePoints);
+	auto vertexChains = splitVertices(points, comparePoints);
 	auto leftChain = std::get<0>(vertexChains);
 	auto rightChain = std::get<1>(vertexChains);
 
-	auto topPoint = sortedVertices.front();
-	auto bottomPoint = sortedVertices.back();
+	auto topPoint = points.front();
+	auto bottomPoint = points.back();
 
 	auto leftIter = std::next(leftChain.begin());
 	Line leftLine{ leftChain.front(), *leftIter };
@@ -102,7 +100,7 @@ void renderPolygon(const Polygon& polygon, Drawable* drawable)
 		{
 			auto currentPoint = Point{ static_cast<int>(std::round(x)), y, topPoint.parent };
 			auto globalPoint = currentPoint.toGlobalCoordinate();
-			drawable->setPixel(globalPoint.x, globalPoint.y, 0xffffffff);
+			drawable->setPixel(globalPoint.x, globalPoint.y, color);
 		}
 
 		if (y == leftLine.p2.y)
@@ -121,4 +119,10 @@ void renderPolygon(const Polygon& polygon, Drawable* drawable)
 			xr = static_cast<double>(rightLine.p1.x);
 		}
 	}
+}
+
+void renderPolygon(const Polygon& polygon, Drawable* drawable, unsigned int color)
+{
+	auto sortedVertices = sortVertices(polygon.vertices(), comparePoints);
+    renderPolygon(sortedVertices, drawable, color);
 }
