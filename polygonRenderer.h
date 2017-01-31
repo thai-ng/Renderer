@@ -91,7 +91,27 @@ double getXSlope(Line line)
 	}
 }
 
-void renderPolygon(const std::vector<Point>& points, Drawable* drawable, unsigned int color)
+typedef std::tuple<unsigned int, unsigned int, unsigned int> ColorChannels;
+
+ColorChannels getColorChannels(unsigned int color)
+{
+	auto blue = color << 24 >> 24;
+	auto green = color << 16 >> 24;
+	auto red = color << 8 >> 24;
+	return std::make_tuple(red, green, blue);
+}
+
+unsigned int getColorFromChannels(unsigned int r, unsigned int g, unsigned int b)
+{
+	return 0xff000000 & r << 24 & g << 16 & b;
+}
+
+unsigned int getColorWithOpacity(unsigned int oldColor, unsigned int newColor, double opacity)
+{
+
+}
+
+void renderPolygon(const std::vector<Point>& points, Drawable* drawable, unsigned int color, double opacity = 1.0)
 {
 	auto sortedVertices = sortVertices(points, comparePoints);
 	auto vertexChains = splitVertices(sortedVertices, comparePoints);
@@ -144,8 +164,8 @@ void renderPolygon(const Polygon& polygon, Drawable* drawable, unsigned int colo
     renderPolygon(polygon.vertices(), drawable, color);
 }
 
-void renderTriangle(const Triangle& triangle, Drawable* drawable, unsigned int color)
+void renderTriangle(const Triangle& triangle, Drawable* drawable, unsigned int color, double opacity = 1.0)
 {
 	auto vertices = triangle.vertices();
-	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, static_cast<unsigned int>(color));
+	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, static_cast<unsigned int>(color), opacity);
 }

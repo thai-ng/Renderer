@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <array>
 #include <algorithm>
 #include <iterator>
 #include <cmath>
@@ -145,7 +146,7 @@ auto generateRandomLines()
 	return lines;
 }
 
-void drawCircularTriangles(Rect& panel, Drawable* drawable)
+void drawCircularTriangles(Rect& panel, Drawable* drawable, double opacity = 1.0)
 {
 	auto lines = generateStarburstLines(90, 125, panel);
 	std::random_device device;
@@ -169,7 +170,7 @@ void drawCircularTriangles(Rect& panel, Drawable* drawable)
 	}
 }
 
-void drawRandomTriangles(Rect& panel, Drawable* drawable)
+void drawRandomTriangles(Rect& panel, Drawable* drawable, double opacity = 1.0)
 {
 	std::random_device device;
 	std::mt19937 gen(device());
@@ -194,6 +195,49 @@ void drawRandomTriangles(Rect& panel, Drawable* drawable)
 	});
 }
 
+auto generatePointGrid(int margin, int triangleLength)
+{
+	auto currentY = margin;
+	std::vector<std::vector<Point>> pointGrid;
+	pointGrid.reserve(10);
+	std::generate_n(std::back_inserter(pointGrid), 10, [&currentY, margin, triangleLength]
+	{
+		std::vector<Point> pointRow;
+		pointRow.reserve(10);
+		auto currentX = margin;
+		std::generate_n(std::back_inserter(pointRow), 10, [&currentX, currentY, margin, triangleLength]
+		{
+			auto point = Point{ currentX, currentY };
+			currentX += triangleLength;
+			return point;
+		});
+		currentY += triangleLength;
+		return pointRow;
+	});
+	return pointGrid;
+}
+
+void drawPointGrid(Rect& panel, const std::vector<std::vector<Point>>& pointGrid, Drawable* drawable, double opacity = 1.0)
+{
+	std::random_device device;
+	std::mt19937 gen(device());
+	std::uniform_int_distribution<> colorDis(0x00000000, 0x00ffffff);
+
+	for (auto row = 0; row < 9; ++row)
+	{
+		for (auto col = 0; col < 9; ++col)
+		{
+			auto color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+			auto triangle = Triangle(std::array<Point, 3>{pointGrid[row][col], pointGrid[row][col + 1], pointGrid[row + 1][col + 1]}, &panel);
+			renderTriangle(triangle, drawable, color);
+
+			color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+			triangle = Triangle(std::array<Point, 3>{pointGrid[row][col], pointGrid[row + 1][col + 1], pointGrid[row + 1][col]}, &panel);
+			renderTriangle(triangle, drawable, color);
+		}
+	}
+}
+
 void Client::nextPage() {
     static int pageNumber = 0;
     pageNumber++;
@@ -209,7 +253,7 @@ void Client::nextPage() {
 	draw_rect(panel2.x, panel2.y, panel2.right(), panel2.bottom(), 0xff000000);
 
 	Rect panel3{ 50, 400, 300, 300 };
-	draw_rect(panel3.x, panel3.y, panel3.right(), panel3.bottom(), 0xff000000);
+	draw_rect(panel3.x, panel3.y, panel3.right(), panel3.bottom(), 0xffffffff);
 
 	Rect panel4{ 400, 400, 300, 300 };
 	draw_rect(panel4.x, panel4.y, panel4.right(), panel4.bottom(), 0xff000000);
@@ -244,14 +288,63 @@ void Client::nextPage() {
 			// Panel 1
 			drawCircularTriangles(panel1, drawable);
 
+			// Panel 2
+			// Generate points
+			auto margin = 13;
+			auto triangleLength = 30;
+			auto pointGrid = generatePointGrid(margin, triangleLength);
+			drawPointGrid(panel2, pointGrid, drawable);
+
+			// Panel 3
+			// Shift points
+			std::random_device device;
+			std::mt19937 gen(device());
+			std::uniform_int_distribution<> shiftDis(0, 24);
+
+			std::for_each(pointGrid.begin(), pointGrid.end(), [&shiftDis, &gen] (auto& currentRow)
+			{
+				std::for_each(currentRow.begin(), currentRow.end(), [&shiftDis, &gen](auto& point)
+				{
+					point.x += (shiftDis(gen) - 12);
+					point.y += (shiftDis(gen) - 12);
+				});
+			});
+			drawPointGrid(panel3, pointGrid, drawable);
+
 			// Panel 4
 			drawRandomTriangles(panel4, drawable);
 		} break;
 		// fall through...
 		default:
 		{
-			draw_rect(0, 0, 750, 750, 0xffffffff);
-			draw_rect(400, 400, 700, 700, 0xff00ff40);
+			// Panel 1
+			drawCircularTriangles(panel1, drawable);
+
+			// Panel 2
+			// Generate points
+			auto margin = 13;
+			auto triangleLength = 30;
+			auto pointGrid = generatePointGrid(margin, triangleLength);
+			drawPointGrid(panel2, pointGrid, drawable);
+
+			// Panel 3
+			// Shift points
+			std::random_device device;
+			std::mt19937 gen(device());
+			std::uniform_int_distribution<> shiftDis(0, 24);
+
+			std::for_each(pointGrid.begin(), pointGrid.end(), [&shiftDis, &gen](auto& currentRow)
+			{
+				std::for_each(currentRow.begin(), currentRow.end(), [&shiftDis, &gen](auto& point)
+				{
+					point.x += (shiftDis(gen) - 12);
+					point.y += (shiftDis(gen) - 12);
+				});
+			});
+			drawPointGrid(panel3, pointGrid, drawable);
+
+			// Panel 4
+			drawRandomTriangles(panel4, drawable);
 		} break;
 	}
 
