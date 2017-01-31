@@ -5,6 +5,8 @@
 #include <iterator>
 #include <cmath>
 #include <random>
+#include <fstream>
+#include <numeric>
 
 #include "client.h"
 #include "primitives.h"
@@ -165,8 +167,16 @@ void drawCircularTriangles(Rect& panel, Drawable* drawable, double opacity = 1.0
 		}
 
 		auto triangle = Triangle(*it, *nextIt);
-		auto color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
-		renderTriangle(triangle, drawable, color);
+		unsigned int color;
+		if (opacity != 1.0)
+		{
+			color = 0xffffffff;
+		}
+		else
+		{
+			color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+		}
+		renderTriangle(triangle, drawable, color, opacity);
 	}
 }
 
@@ -188,10 +198,18 @@ void drawRandomTriangles(Rect& panel, Drawable* drawable, double opacity = 1.0)
 		return Triangle(std::array<Point, 3>{p1, p2, p3}, &panel);
 	});
 
-	std::for_each(triangles.begin(), triangles.end(), [&colorDis, &gen, drawable](auto& triangle)
-	{
-		auto color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
-		renderTriangle(triangle, drawable, color);
+	std::for_each(triangles.begin(), triangles.end(), [&colorDis, &gen, drawable, opacity](auto& triangle)
+	{			
+		unsigned int color;
+		if (opacity != 1.0)
+		{
+			color = 0xffffffff;
+		}
+		else
+		{
+			color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+		}
+		renderTriangle(triangle, drawable, color, opacity);
 	});
 }
 
@@ -222,18 +240,93 @@ void drawPointGrid(Rect& panel, const std::vector<std::vector<Point>>& pointGrid
 	std::random_device device;
 	std::mt19937 gen(device());
 	std::uniform_int_distribution<> colorDis(0x00000000, 0x00ffffff);
+	auto count = 1;
+	std::ofstream outFile("log.txt", std::ios_base::out);
 
 	for (auto row = 0; row < 9; ++row)
 	{
 		for (auto col = 0; col < 9; ++col)
 		{
-			auto color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+			unsigned int color;
+			if (opacity != 1.0)
+			{
+				color = 0xffffffff;
+			}
+			else
+			{
+				color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+			}
 			auto triangle = Triangle(std::array<Point, 3>{pointGrid[row][col], pointGrid[row][col + 1], pointGrid[row + 1][col + 1]}, &panel);
-			renderTriangle(triangle, drawable, color);
+			renderTriangle(triangle, drawable, color, opacity);
+			drawable->updateScreen();
+			outFile << "Drawing triangle " << count++ << "- ";
+			for (auto point : triangle.vertices())
+			{
+				outFile << point.x << ":" << point.y << "   ";
+			}
+			outFile << color << "   ";
+			auto totalX = 0;
+			auto totalY = 0;
+			for (auto point : triangle.vertices())
+			{
+				auto globalPoint = point.toGlobalCoordinate();
+				totalX += globalPoint.x;
+				totalY += globalPoint.y;
+			}
+			auto midX = static_cast<int>(totalX / 3.0);
+			auto midY = static_cast<int>(totalY / 3.0);
+			auto pixel = drawable->getPixel(midX, midY);
+			outFile << "Center color " << pixel;
+			if (color == pixel)
+			{
+				outFile << " MATCH";
+			}
+			else
+			{
+				outFile << " NOT MATCH";
+			}
+			outFile << "\n";
+			
 
-			color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+			if (opacity != 1.0)
+			{
+				color = 0xffffffff;
+			}
+			else
+			{
+				color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+			}
 			triangle = Triangle(std::array<Point, 3>{pointGrid[row][col], pointGrid[row + 1][col + 1], pointGrid[row + 1][col]}, &panel);
-			renderTriangle(triangle, drawable, color);
+			renderTriangle(triangle, drawable, color, opacity);
+			drawable->updateScreen();
+
+			outFile << "Drawing triangle " << count++ << "- ";
+			for (auto point : triangle.vertices())
+			{
+				outFile << point.x << ":" << point.y << "   ";
+			}
+			outFile << color << "   ";
+			totalX = 0;
+			totalY = 0;
+			for (auto point : triangle.vertices())
+			{
+				auto globalPoint = point.toGlobalCoordinate();
+				totalX += globalPoint.x;
+				totalY += globalPoint.y;
+			}
+			midX = static_cast<int>(totalX / 3.0);
+			midY = static_cast<int>(totalY / 3.0);
+			pixel = drawable->getPixel(midX, midY);
+			outFile << "Center color " << pixel;
+			if (color == pixel)
+			{
+				outFile << " MATCH";
+			}
+			else
+			{
+				outFile << " NOT MATCH";
+			}
+			outFile << "\n";
 		}
 	}
 }
@@ -266,6 +359,8 @@ void Client::nextPage() {
 			drawStarburst(panel1, drawable, 90, 125, DDALineRenderer);
 			drawStarburst(panel2, drawable, 90, 125, BresenhamLineRenderer);
 			drawStarburst(panel3, drawable, 90, 125, DDALineRenderer, BresenhamLineRenderer);
+			renderLine(Line{ Point{ 99, 14, &panel4 }, Point{ 129, 16, &panel4 } }, drawable, DDALineRenderer);
+			renderLine(Line{ Point{ 99, 114, &panel4 }, Point{ 129, 42, &panel4 } }, drawable, DDALineRenderer);
 
 		} break;
 
@@ -299,33 +394,36 @@ void Client::nextPage() {
 			// Shift points
 			std::random_device device;
 			std::mt19937 gen(device());
-			std::uniform_int_distribution<> shiftDis(0, 24);
+			std::uniform_int_distribution<> shiftDis(0, 12);
 
 			std::for_each(pointGrid.begin(), pointGrid.end(), [&shiftDis, &gen] (auto& currentRow)
 			{
 				std::for_each(currentRow.begin(), currentRow.end(), [&shiftDis, &gen](auto& point)
 				{
-					point.x += (shiftDis(gen) - 12);
-					point.y += (shiftDis(gen) - 12);
+					point.x += (shiftDis(gen) - 6);
+					point.y += (shiftDis(gen) - 6);
 				});
 			});
 			drawPointGrid(panel3, pointGrid, drawable);
 
 			// Panel 4
-			drawRandomTriangles(panel4, drawable);
+			//drawRandomTriangles(panel4, drawable);
+			auto triangle = Triangle(std::array<Point, 3>{Point{ 79, 10, nullptr }, Point{ 101, 24, nullptr }, Point{ 109, 31, nullptr }}, &panel4);
+			renderTriangle(triangle, drawable, 0xffffffff);
+
 		} break;
 		// fall through...
 		default:
 		{
 			// Panel 1
-			drawCircularTriangles(panel1, drawable);
+			drawCircularTriangles(panel1, drawable, 0.14);
 
 			// Panel 2
 			// Generate points
 			auto margin = 13;
 			auto triangleLength = 30;
 			auto pointGrid = generatePointGrid(margin, triangleLength);
-			drawPointGrid(panel2, pointGrid, drawable);
+			drawPointGrid(panel2, pointGrid, drawable, 0.14);
 
 			// Panel 3
 			// Shift points
@@ -341,10 +439,10 @@ void Client::nextPage() {
 					point.y += (shiftDis(gen) - 12);
 				});
 			});
-			drawPointGrid(panel3, pointGrid, drawable);
+			drawPointGrid(panel3, pointGrid, drawable, 0.14);
 
 			// Panel 4
-			drawRandomTriangles(panel4, drawable);
+			drawRandomTriangles(panel4, drawable, 0.14);
 		} break;
 	}
 

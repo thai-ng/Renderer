@@ -103,12 +103,25 @@ ColorChannels getColorChannels(unsigned int color)
 
 unsigned int getColorFromChannels(unsigned int r, unsigned int g, unsigned int b)
 {
-	return 0xff000000 & r << 24 & g << 16 & b;
+	return 0xff000000 | (r << 16) | (g << 8) | b;
 }
 
 unsigned int getColorWithOpacity(unsigned int oldColor, unsigned int newColor, double opacity)
 {
+	auto oldColorChannels = getColorChannels(oldColor);
+	auto oldRed = std::get<0>(oldColorChannels);
+	auto oldGreen = std::get<1>(oldColorChannels);
+	auto oldBlue = std::get<2>(oldColorChannels);
 
+	auto newColorChannels = getColorChannels(newColor);
+	auto newRed = std::get<0>(newColorChannels);
+	auto newGreen = std::get<1>(newColorChannels);
+	auto newBlue = std::get<2>(newColorChannels);
+
+	auto red = static_cast<unsigned int>((opacity * newRed) + ((1 - opacity)*oldRed));
+	auto green = static_cast<unsigned int>((opacity * newGreen) + ((1 - opacity)*oldGreen));
+	auto blue = static_cast<unsigned int>((opacity * newBlue) + ((1 - opacity)*oldBlue));
+	return getColorFromChannels(red, green, blue);
 }
 
 void renderPolygon(const std::vector<Point>& points, Drawable* drawable, unsigned int color, double opacity = 1.0)
@@ -138,7 +151,9 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, unsigne
 		{
 			auto currentPoint = Point{ static_cast<int>(std::round(x)), y, topPoint.parent };
 			auto globalPoint = currentPoint.toGlobalCoordinate();
-			drawable->setPixel(globalPoint.x, globalPoint.y, color);
+			auto oldColor = drawable->getPixel(globalPoint.x, globalPoint.y);
+			auto colorToPaint = getColorWithOpacity(oldColor, color, opacity);
+			drawable->setPixel(globalPoint.x, globalPoint.y, colorToPaint);
 		}
 
 		if (y == leftLine.p2.y)
