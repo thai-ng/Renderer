@@ -31,37 +31,27 @@ T sortVertices(const T& vertices, F comp)
 template<typename T, typename F>
 std::tuple<T, T> splitVertices(const T& vertices, F sortComp)
 {
-	auto frontPoint = vertices.front();
-	auto backPoint = vertices.back();
 	std::vector<Point> leftChain = { vertices.front(), vertices.back() };
 	std::vector<Point> rightChain = { vertices.front(), vertices.back() };
-	// TODO: fix this hack, this has dependency on sortComp
-    auto allLeftOfTop = std::all_of(std::next(vertices.begin()), vertices.end(), [&frontPoint](auto& point) {return (point.y > frontPoint.y) && (point.x > frontPoint.x); });
+	
+	auto centerX = 0;
+	for (auto point : vertices)
+	{
+		centerX += point.x;
+	}
+	centerX /= static_cast<int>(vertices.size());
+
 	auto endIt = std::prev(vertices.end());
 	for (auto currentIt = std::next(vertices.begin()); currentIt != endIt; currentIt = std::next(currentIt))
 	{
 		auto currentPoint = *currentIt;
-		if (!allLeftOfTop)
+		if (currentPoint.x <= centerX)
 		{
-			if (currentPoint.x <= frontPoint.x)
-			{
-				leftChain.push_back(currentPoint);
-			}
-			else
-			{
-				rightChain.push_back(currentPoint);
-			}
+			leftChain.push_back(currentPoint);
 		}
 		else
 		{
-			if (currentPoint.x <= backPoint.x)
-			{
-				leftChain.push_back(currentPoint);
-			}
-			else
-			{
-				rightChain.push_back(currentPoint);
-			}
+			rightChain.push_back(currentPoint);
 		}
 	}
 

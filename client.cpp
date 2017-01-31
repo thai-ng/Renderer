@@ -240,9 +240,6 @@ void drawPointGrid(Rect& panel, const std::vector<std::vector<Point>>& pointGrid
 	std::random_device device;
 	std::mt19937 gen(device());
 	std::uniform_int_distribution<> colorDis(0x00000000, 0x00ffffff);
-	auto count = 1;
-	std::ofstream outFile("log.txt", std::ios_base::out);
-
 	for (auto row = 0; row < 9; ++row)
 	{
 		for (auto col = 0; col < 9; ++col)
@@ -258,36 +255,7 @@ void drawPointGrid(Rect& panel, const std::vector<std::vector<Point>>& pointGrid
 			}
 			auto triangle = Triangle(std::array<Point, 3>{pointGrid[row][col], pointGrid[row][col + 1], pointGrid[row + 1][col + 1]}, &panel);
 			renderTriangle(triangle, drawable, color, opacity);
-			drawable->updateScreen();
-			outFile << "Drawing triangle " << count++ << "- ";
-			for (auto point : triangle.vertices())
-			{
-				outFile << point.x << ":" << point.y << "   ";
-			}
-			outFile << color << "   ";
-			auto totalX = 0;
-			auto totalY = 0;
-			for (auto point : triangle.vertices())
-			{
-				auto globalPoint = point.toGlobalCoordinate();
-				totalX += globalPoint.x;
-				totalY += globalPoint.y;
-			}
-			auto midX = static_cast<int>(totalX / 3.0);
-			auto midY = static_cast<int>(totalY / 3.0);
-			auto pixel = drawable->getPixel(midX, midY);
-			outFile << "Center color " << pixel;
-			if (color == pixel)
-			{
-				outFile << " MATCH";
-			}
-			else
-			{
-				outFile << " NOT MATCH";
-			}
-			outFile << "\n";
 			
-
 			if (opacity != 1.0)
 			{
 				color = 0xffffffff;
@@ -298,35 +266,6 @@ void drawPointGrid(Rect& panel, const std::vector<std::vector<Point>>& pointGrid
 			}
 			triangle = Triangle(std::array<Point, 3>{pointGrid[row][col], pointGrid[row + 1][col + 1], pointGrid[row + 1][col]}, &panel);
 			renderTriangle(triangle, drawable, color, opacity);
-			drawable->updateScreen();
-
-			outFile << "Drawing triangle " << count++ << "- ";
-			for (auto point : triangle.vertices())
-			{
-				outFile << point.x << ":" << point.y << "   ";
-			}
-			outFile << color << "   ";
-			totalX = 0;
-			totalY = 0;
-			for (auto point : triangle.vertices())
-			{
-				auto globalPoint = point.toGlobalCoordinate();
-				totalX += globalPoint.x;
-				totalY += globalPoint.y;
-			}
-			midX = static_cast<int>(totalX / 3.0);
-			midY = static_cast<int>(totalY / 3.0);
-			pixel = drawable->getPixel(midX, midY);
-			outFile << "Center color " << pixel;
-			if (color == pixel)
-			{
-				outFile << " MATCH";
-			}
-			else
-			{
-				outFile << " NOT MATCH";
-			}
-			outFile << "\n";
 		}
 	}
 }
@@ -408,9 +347,6 @@ void Client::nextPage() {
 
 			// Panel 4
 			drawRandomTriangles(panel4, drawable);
-			/*auto triangle = Triangle(std::array<Point, 3>{Point{ 79, 10, nullptr }, Point{ 101, 24, nullptr }, Point{ 109, 31, nullptr }}, &panel4);
-			renderTriangle(triangle, drawable, 0xffffffff);
-*/
 		} break;
 		// fall through...
 		default:
