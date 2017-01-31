@@ -264,31 +264,31 @@ void WuLineRenderer(Point p1, Point p2, Drawable* drawable, unsigned int color)
 		gradient = 1.0;
 	}
 
-	double xend = p1.x;
-	double yend = p1.y;
+    double xend = p1.x;
+    double yend = p1.y;
 	auto xgap = rfpart(p1.x + 0.5);
-	double xpixel1 = xend;
-	double ypixel1 = yend;
+    double xpixel1 = xend;
+    double ypixel1 = yend;
 
 	if (steep)
 	{
-		auto currentColor = drawable->getPixel(ypixel1, xpixel1);
+		auto currentColor = drawable->getPixel(static_cast<int>(ypixel1), static_cast<int>(xpixel1));
 		auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yend) * xgap);
-		drawable->setPixel(ypixel1, xpixel1, colorToDraw);
+		drawable->setPixel(static_cast<int>(ypixel1), static_cast<int>(xpixel1), colorToDraw);
 
-		currentColor = drawable->getPixel(ypixel1 + 1, xpixel1);
+		currentColor = drawable->getPixel(static_cast<int>(ypixel1) + 1, static_cast<int>(xpixel1));
 		colorToDraw = getColorWithOpacity(currentColor, color, fpart(yend) * xgap);
-		drawable->setPixel(ypixel1 + 1, xpixel1, colorToDraw);
+		drawable->setPixel(static_cast<int>(ypixel1) + 1, static_cast<int>(xpixel1), colorToDraw);
 	}
 	else
 	{
-		auto currentColor = drawable->getPixel(xpixel1, ypixel1);
+		auto currentColor = drawable->getPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1));
 		auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yend) * xgap);
-		drawable->setPixel(xpixel1, ypixel1, colorToDraw);
+		drawable->setPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1), colorToDraw);
 
-		currentColor = drawable->getPixel(xpixel1, ypixel1 + 1);
+		currentColor = drawable->getPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1) + 1);
 		colorToDraw = getColorWithOpacity(currentColor, color, fpart(yend) * xgap);
-		drawable->setPixel(xpixel1, ypixel1 + 1, colorToDraw);
+		drawable->setPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1) + 1, colorToDraw);
 	}
 
 	auto yIntersection = yend + gradient;
@@ -296,33 +296,33 @@ void WuLineRenderer(Point p1, Point p2, Drawable* drawable, unsigned int color)
 	xend = p2.x;
 	yend = p2.y;
 	xgap = rfpart(p2.x + 0.5);
-	double xpixel2 = xend;
-	double ypixel2 = yend;
+    double xpixel2 = xend;
+    double ypixel2 = yend;
 
 	if (steep)
 	{
-		auto currentColor = drawable->getPixel(ypixel2, xpixel2);
+		auto currentColor = drawable->getPixel(static_cast<int>(ypixel2), static_cast<int>(xpixel2));
 		auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yend) * xgap);
-		drawable->setPixel(ypixel2, xpixel2, colorToDraw);
+		drawable->setPixel(static_cast<int>(ypixel2), static_cast<int>(xpixel2), colorToDraw);
 
-		currentColor = drawable->getPixel(ypixel2 + 1, xpixel2);
+		currentColor = drawable->getPixel(static_cast<int>(ypixel2) + 1, static_cast<int>(xpixel2));
 		colorToDraw = getColorWithOpacity(currentColor, color, fpart(yend) * xgap);
-		drawable->setPixel(ypixel2 + 1, xpixel2, colorToDraw);
+		drawable->setPixel(static_cast<int>(ypixel2) + 1, static_cast<int>(xpixel2), colorToDraw);
 	}
 	else
 	{
-		auto currentColor = drawable->getPixel(xpixel2, ypixel2);
+		auto currentColor = drawable->getPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2));
 		auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yend) * xgap);
-		drawable->setPixel(xpixel2, ypixel2, colorToDraw);
+		drawable->setPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2), colorToDraw);
 
-		currentColor = drawable->getPixel(xpixel2, ypixel2 + 1);
+		currentColor = drawable->getPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2) + 1);
 		colorToDraw = getColorWithOpacity(currentColor, color, fpart(yend) * xgap);
-		drawable->setPixel(xpixel2, ypixel2 + 1, colorToDraw);
+		drawable->setPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2) + 1, colorToDraw);
 	}
 
 	if (steep)
 	{
-		for (auto x = xpixel1 + 1; x < xpixel2; ++x, yIntersection += gradient)
+		for (auto x = static_cast<int>(xpixel1) + 1; x < static_cast<int>(xpixel2); ++x, yIntersection += gradient)
 		{
 			auto currentColor = drawable->getPixel(static_cast<int>(yIntersection), x);
 			auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yIntersection));
@@ -335,7 +335,7 @@ void WuLineRenderer(Point p1, Point p2, Drawable* drawable, unsigned int color)
 	}
 	else
 	{
-		for (auto x = xpixel1 + 1; x < xpixel2; ++x, yIntersection += gradient)
+		for (auto x = static_cast<int>(xpixel1) + 1; x < static_cast<int>(xpixel2); ++x, yIntersection += gradient)
 		{
 			auto currentColor = drawable->getPixel(x, static_cast<int>(yIntersection));
 			auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yIntersection));
