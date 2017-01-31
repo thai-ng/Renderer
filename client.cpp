@@ -346,7 +346,7 @@ void Client::nextPage() {
 	draw_rect(panel2.x, panel2.y, panel2.right(), panel2.bottom(), 0xff000000);
 
 	Rect panel3{ 50, 400, 300, 300 };
-	draw_rect(panel3.x, panel3.y, panel3.right(), panel3.bottom(), 0xffffffff);
+	draw_rect(panel3.x, panel3.y, panel3.right(), panel3.bottom(), 0xff000000);
 
 	Rect panel4{ 400, 400, 300, 300 };
 	draw_rect(panel4.x, panel4.y, panel4.right(), panel4.bottom(), 0xff000000);
@@ -359,8 +359,7 @@ void Client::nextPage() {
 			drawStarburst(panel1, drawable, 90, 125, DDALineRenderer);
 			drawStarburst(panel2, drawable, 90, 125, BresenhamLineRenderer);
 			drawStarburst(panel3, drawable, 90, 125, DDALineRenderer, BresenhamLineRenderer);
-			renderLine(Line{ Point{ 99, 14, &panel4 }, Point{ 129, 16, &panel4 } }, drawable, DDALineRenderer);
-			renderLine(Line{ Point{ 99, 114, &panel4 }, Point{ 129, 42, &panel4 } }, drawable, DDALineRenderer);
+			drawStarburst(panel4, drawable, 90, 125, WuLineRenderer);
 
 		} break;
 
@@ -369,6 +368,7 @@ void Client::nextPage() {
 			drawParallelogram(panel1, drawable, DDALineRenderer);
 			drawParallelogram(panel2, drawable, BresenhamLineRenderer);
 			drawParallelogram(panel3, drawable, DDALineRenderer, BresenhamLineRenderer);
+			drawParallelogram(panel4, drawable, WuLineRenderer);
 		} break;
 		case 3:
 		{
@@ -376,7 +376,7 @@ void Client::nextPage() {
 			drawRandomLines(panel1, drawable, lines, DDALineRenderer);
 			drawRandomLines(panel2, drawable, lines, BresenhamLineRenderer);
 			drawRandomLines(panel3, drawable, lines, DDALineRenderer, BresenhamLineRenderer);
-
+			drawRandomLines(panel4, drawable, lines, WuLineRenderer);
 		} break;
 		case 4:
 		{
@@ -407,10 +407,10 @@ void Client::nextPage() {
 			drawPointGrid(panel3, pointGrid, drawable);
 
 			// Panel 4
-			//drawRandomTriangles(panel4, drawable);
-			auto triangle = Triangle(std::array<Point, 3>{Point{ 79, 10, nullptr }, Point{ 101, 24, nullptr }, Point{ 109, 31, nullptr }}, &panel4);
+			drawRandomTriangles(panel4, drawable);
+			/*auto triangle = Triangle(std::array<Point, 3>{Point{ 79, 10, nullptr }, Point{ 101, 24, nullptr }, Point{ 109, 31, nullptr }}, &panel4);
 			renderTriangle(triangle, drawable, 0xffffffff);
-
+*/
 		} break;
 		// fall through...
 		default:

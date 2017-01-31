@@ -28,7 +28,8 @@ HEADERS  += \
     rect.h \
     polygon.h \
     polygonRenderer.h \
-    primitives.h
+    primitives.h \
+    colorUtils.h
 
 
 win32: LIBS += -lshell32

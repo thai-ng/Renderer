@@ -2,6 +2,7 @@
 #include <utility>
 #include "drawable.h"
 #include "primitives.h"
+#include "colorUtils.h"
 
 enum class Octant
 {
@@ -164,10 +165,7 @@ Octant getOctant(Point p)
 template <typename F>
 void renderLine(Point p1, Point p2, Drawable* surface, unsigned int color, F function)
 {
-	auto originalOctant = getOctant(p2 - p1);
-    auto converted_p1 = toFirstOctant(originalOctant, p1);
-    auto converted_p2 = toFirstOctant(originalOctant, p2);
-    function(converted_p1, converted_p2, originalOctant, surface, color);
+	function(p1, p2, surface, color);
 }
 
 template <typename F>
@@ -177,15 +175,16 @@ void renderLine(const Line& l, Drawable* surface, F function)
 	auto p1 = std::get<0>(points);
 	auto p2 = std::get<1>(points);
 
-	auto originalOctant = getOctant(p2 - p1);
-	auto converted_p1 = toFirstOctant(originalOctant, p1);
-	auto converted_p2 = toFirstOctant(originalOctant, p2);
-	function(converted_p1, converted_p2, originalOctant, surface, l.color);
+	function(p1, p2, surface, l.color);
 }
 
 
-void BresenhamLineRenderer(Point p1, Point p2, Octant octant, Drawable* drawSurface, unsigned int color)
+void BresenhamLineRenderer(Point p1, Point p2, Drawable* drawSurface, unsigned int color)
 {
+	auto octant = getOctant(p2 - p1);
+	p1 = toFirstOctant(octant, p1);
+	p2 = toFirstOctant(octant, p2);
+
 	auto dx = p2.x - p1.x;
 	auto dy = p2.y - p1.y;
 	auto two_dy = 2 * dy;
@@ -207,8 +206,12 @@ void BresenhamLineRenderer(Point p1, Point p2, Octant octant, Drawable* drawSurf
 	}
 }
 
-void DDALineRenderer(Point p1, Point p2, Octant octant, Drawable* drawSurface, unsigned int color)
+void DDALineRenderer(Point p1, Point p2, Drawable* drawSurface, unsigned int color)
 {
+	auto octant = getOctant(p2 - p1);
+	p1 = toFirstOctant(octant, p1);
+	p2 = toFirstOctant(octant, p2);
+
 	auto delta_x = p2.x - p1.x;
 	auto delta_y = p2.y - p1.y;
     auto m = static_cast<double>(delta_y) / static_cast<double>(delta_x);
@@ -218,5 +221,129 @@ void DDALineRenderer(Point p1, Point p2, Octant octant, Drawable* drawSurface, u
         auto screenPoint = fromFirstOctant(octant, Point{x, static_cast<int>(std::round(y))});
         drawSurface->setPixel(screenPoint.x, screenPoint.y, color);
 		y += m;
+	}
+}
+
+double fpart(double num)
+{
+	if (num < 0)
+	{
+		return 1 - (num - std::floor(num));
+	}
+	else
+	{
+		return num - std::floor(num);
+	}
+}
+
+double rfpart(double num)
+{
+	return 1 - fpart(num);
+}
+
+void WuLineRenderer(Point p1, Point p2, Drawable* drawable, unsigned int color)
+{
+	bool steep = std::abs(p2.y - p1.y) > std::abs(p2.x - p1.x);
+	if (steep)
+	{
+		std::swap(p1.x, p1.y);
+		std::swap(p2.x, p2.y);
+	}
+
+	if (p1.x > p2.x)
+	{
+		std::swap(p1.x, p2.x);
+		std::swap(p1.y, p2.y);
+	}
+
+	auto dx = p2.x - p1.x;
+	auto dy = p2.y - p1.y;
+	auto gradient = static_cast<double>(dy) / static_cast<double>(dx);
+	if (dx == 0.0)
+	{
+		gradient = 1.0;
+	}
+
+	double xend = p1.x;
+	double yend = p1.y;
+	auto xgap = rfpart(p1.x + 0.5);
+	double xpixel1 = xend;
+	double ypixel1 = yend;
+
+	if (steep)
+	{
+		auto currentColor = drawable->getPixel(ypixel1, xpixel1);
+		auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yend) * xgap);
+		drawable->setPixel(ypixel1, xpixel1, colorToDraw);
+
+		currentColor = drawable->getPixel(ypixel1 + 1, xpixel1);
+		colorToDraw = getColorWithOpacity(currentColor, color, fpart(yend) * xgap);
+		drawable->setPixel(ypixel1 + 1, xpixel1, colorToDraw);
+	}
+	else
+	{
+		auto currentColor = drawable->getPixel(xpixel1, ypixel1);
+		auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yend) * xgap);
+		drawable->setPixel(xpixel1, ypixel1, colorToDraw);
+
+		currentColor = drawable->getPixel(xpixel1, ypixel1 + 1);
+		colorToDraw = getColorWithOpacity(currentColor, color, fpart(yend) * xgap);
+		drawable->setPixel(xpixel1, ypixel1 + 1, colorToDraw);
+	}
+
+	auto yIntersection = yend + gradient;
+
+	xend = p2.x;
+	yend = p2.y;
+	xgap = rfpart(p2.x + 0.5);
+	double xpixel2 = xend;
+	double ypixel2 = yend;
+
+	if (steep)
+	{
+		auto currentColor = drawable->getPixel(ypixel2, xpixel2);
+		auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yend) * xgap);
+		drawable->setPixel(ypixel2, xpixel2, colorToDraw);
+
+		currentColor = drawable->getPixel(ypixel2 + 1, xpixel2);
+		colorToDraw = getColorWithOpacity(currentColor, color, fpart(yend) * xgap);
+		drawable->setPixel(ypixel2 + 1, xpixel2, colorToDraw);
+	}
+	else
+	{
+		auto currentColor = drawable->getPixel(xpixel2, ypixel2);
+		auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yend) * xgap);
+		drawable->setPixel(xpixel2, ypixel2, colorToDraw);
+
+		currentColor = drawable->getPixel(xpixel2, ypixel2 + 1);
+		colorToDraw = getColorWithOpacity(currentColor, color, fpart(yend) * xgap);
+		drawable->setPixel(xpixel2, ypixel2 + 1, colorToDraw);
+	}
+
+	if (steep)
+	{
+		for (auto x = xpixel1 + 1; x < xpixel2; ++x, yIntersection += gradient)
+		{
+			auto currentColor = drawable->getPixel(static_cast<int>(yIntersection), x);
+			auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yIntersection));
+			drawable->setPixel(static_cast<int>(yIntersection), x, colorToDraw);
+
+			currentColor = drawable->getPixel(static_cast<int>(yIntersection) + 1, x);
+			colorToDraw = getColorWithOpacity(currentColor, color, fpart(yIntersection));
+			drawable->setPixel(static_cast<int>(yIntersection) + 1, x, colorToDraw);
+		}
+	}
+	else
+	{
+		for (auto x = xpixel1 + 1; x < xpixel2; ++x, yIntersection += gradient)
+		{
+			auto currentColor = drawable->getPixel(x, static_cast<int>(yIntersection));
+			auto colorToDraw = getColorWithOpacity(currentColor, color, rfpart(yIntersection));
+			drawable->setPixel(x, static_cast<int>(yIntersection), colorToDraw);
+
+			currentColor = drawable->getPixel(x, static_cast<int>(yIntersection) + 1);
+			colorToDraw = getColorWithOpacity(currentColor, color, fpart(yIntersection));
+			drawable->setPixel(x, static_cast<int>(yIntersection) + 1, colorToDraw);
+		}
 	}
 }
