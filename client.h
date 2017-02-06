@@ -8,7 +8,7 @@ class Client : public PageTurner
 public:
     Client(Drawable *drawable);
     void nextPage();
-
+	Drawable* getDrawable() const;
 private:
     Drawable *drawable;
     void draw_rect(int x1, int y1, int x2, int y2, unsigned int color);
