@@ -1,5 +1,3 @@
-Thai Nguyen - 301213376 - thain@sfu.ca
-
 Developed with Qt 5.7.1 - MSVC 2015 64bit
 
 Compiled and tested with MSVC 2015 compiler.
