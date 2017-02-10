@@ -22,6 +22,10 @@ struct Point
 	int x;
 	int y;
 	Rect* parent;
+	unsigned int color;
+
+	Point() : x(0), y(0), parent(nullptr), color(0xffffffff) {}
+	Point(int x, int y, Rect* parent = nullptr, unsigned int color = 0xffffffff) : x(x), y(y), parent(parent), color(color) {}
 
 	auto toGlobalCoordinate() const
 	{
