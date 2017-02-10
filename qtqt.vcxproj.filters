@@ -78,19 +78,10 @@
     <ClInclude Include="pageturner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="point.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="polygon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="polygonRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="primitives.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="rect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <CustomBuild Include="renderarea361.h">

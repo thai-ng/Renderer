@@ -24,9 +24,6 @@ HEADERS  += \
     window361.h \
     renderarea361.h \
     lineRenderer.h \
-    point.h \
-    rect.h \
-    polygon.h \
     polygonRenderer.h \
     primitives.h \
     colorUtils.h \
