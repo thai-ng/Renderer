@@ -4,9 +4,9 @@
 #include <algorithm>
 #include <cmath>
 
+#include "color.h"
 #include "drawable.h"
 #include "primitives.h"
-#include "colorUtils.h"
 
 auto comparePoints = [](auto p1, auto p2)
 {
@@ -82,7 +82,7 @@ double getXSlope(Line line)
 	}
 }
 
-void renderPolygon(const std::vector<Point>& points, Drawable* drawable, unsigned int color, double opacity = 1.0)
+void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const Color& color, double opacity = 1.0)
 {
 	auto sortedVertices = sortVertices(points, comparePoints);
 	auto vertexChains = splitVertices(sortedVertices, comparePoints);
@@ -110,8 +110,8 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, unsigne
 			auto currentPoint = Point{ static_cast<int>(std::round(x)), y, topPoint.parent };
 			auto globalPoint = currentPoint.toGlobalCoordinate();
 			auto oldColor = drawable->getPixel(globalPoint.x, globalPoint.y);
-			auto colorToPaint = getColorWithOpacity(oldColor, color, opacity);
-			drawable->setPixel(globalPoint.x, globalPoint.y, colorToPaint);
+			auto colorToPaint = colorWithOpacity(color, oldColor, opacity);
+			drawable->setPixel(globalPoint.x, globalPoint.y, colorToPaint.asUnsigned());
 		}
 
 		if (y == leftLine.p2.y)
@@ -132,13 +132,13 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, unsigne
 	}
 }
 
-void renderPolygon(const Polygon& polygon, Drawable* drawable, unsigned int color)
+void renderPolygon(const Polygon& polygon, Drawable* drawable, const Color& color)
 {
     renderPolygon(polygon.vertices(), drawable, color);
 }
 
-void renderTriangle(const Triangle& triangle, Drawable* drawable, unsigned int color, double opacity = 1.0)
+void renderTriangle(const Triangle& triangle, Drawable* drawable, const Color& color, double opacity = 1.0)
 {
 	auto vertices = triangle.vertices();
-	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, static_cast<unsigned int>(color), opacity);
+	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, color, opacity);
 }
