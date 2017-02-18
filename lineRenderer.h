@@ -4,6 +4,7 @@
 #include "color.h"
 #include "drawable.h"
 #include "primitives.h"
+#include "lerp.h"
 
 enum class Octant
 {
@@ -164,7 +165,7 @@ Octant getOctant(Point p)
 }
 
 template <typename F>
-void renderLine(Point p1, Point p2, Drawable* surface, const Color& color, F function)
+void renderLine(const Point& p1, const Point& p2, Drawable* surface, const Color& color, F function)
 {
 	function(p1, p2, surface, color);
 }
@@ -179,22 +180,21 @@ void renderLine(const Line& l, Drawable* surface, F function)
 	function(p1, p2, surface, l.color);
 }
 
-
-void BresenhamLineRenderer(Point p1, Point p2, Drawable* drawSurface, const Color& color)
+void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color)
 {
 	auto octant = getOctant(p2 - p1);
-	p1 = toFirstOctant(octant, p1);
-	p2 = toFirstOctant(octant, p2);
+	auto point1 = toFirstOctant(octant, p1);
+	auto point2 = toFirstOctant(octant, p2);
 
-	auto dx = p2.x - p1.x;
-	auto dy = p2.y - p1.y;
+	auto dx = point2.x - point1.x;
+	auto dy = point2.y - point1.y;
 	auto two_dy = 2 * dy;
 
 	auto error = two_dy - dx;
-	auto y = p1.y;
-	auto screenPoint = fromFirstOctant(octant, p1);
+	auto y = point1.y;
+	auto screenPoint = fromFirstOctant(octant, point1);
 	drawSurface->setPixel(screenPoint.x, screenPoint.y, color.asUnsigned());
-    for (auto x = p1.x + 1; x <= p2.x; ++x)
+    for (auto x = point1.x + 1; x <= point2.x; ++x)
 	{
 		if (error > 0)
 		{
@@ -207,21 +207,20 @@ void BresenhamLineRenderer(Point p1, Point p2, Drawable* drawSurface, const Colo
 	}
 }
 
-void DDALineRenderer(Point p1, Point p2, Drawable* drawSurface, const Color& color)
+void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color)
 {
 	auto octant = getOctant(p2 - p1);
-	p1 = toFirstOctant(octant, p1);
-	p2 = toFirstOctant(octant, p2);
+	auto point1 = toFirstOctant(octant, p1);
+	auto point2 = toFirstOctant(octant, p2);
 
-	auto delta_x = p2.x - p1.x;
-	auto delta_y = p2.y - p1.y;
-    auto m = static_cast<double>(delta_y) / static_cast<double>(delta_x);
-	auto y = static_cast<double>(p1.y);
-    for (auto x = p1.x; x <= p2.x; ++x)
+	Lerp<decltype(point1.x)> lerp(point1.x, point2.x, point1.y, point2.y);
+	for (auto& point : lerp)
 	{
-        auto screenPoint = fromFirstOctant(octant, Point{x, static_cast<int>(std::round(y))});
-        drawSurface->setPixel(screenPoint.x, screenPoint.y, color.asUnsigned());
-		y += m;
+		auto x = point.first;
+		auto y = point.second;
+
+		auto screenPoint = fromFirstOctant(octant, Point{ x, static_cast<int>(std::round(y)) });
+		drawSurface->setPixel(screenPoint.x, screenPoint.y, color.asUnsigned());
 	}
 }
 
@@ -242,32 +241,34 @@ double rfpart(double num)
 	return 1 - fpart(num);
 }
 
-void WuLineRenderer(Point p1, Point p2, Drawable* drawable, const Color& color)
+void WuLineRenderer(const Point& p1, const Point& p2, Drawable* drawable, const Color& color)
 {
-	bool steep = std::abs(p2.y - p1.y) > std::abs(p2.x - p1.x);
+	auto point1 = p1;
+	auto point2 = p2;
+	bool steep = std::abs(point2.y - point1.y) > std::abs(point2.x - point1.x);
 	if (steep)
 	{
-		std::swap(p1.x, p1.y);
-		std::swap(p2.x, p2.y);
+		std::swap(point1.x, point1.y);
+		std::swap(point2.x, point2.y);
 	}
 
-	if (p1.x > p2.x)
+	if (point1.x > point2.x)
 	{
-		std::swap(p1.x, p2.x);
-		std::swap(p1.y, p2.y);
+		std::swap(point1.x, point2.x);
+		std::swap(point1.y, point2.y);
 	}
 
-	auto dx = p2.x - p1.x;
-	auto dy = p2.y - p1.y;
+	auto dx = point2.x - point1.x;
+	auto dy = point2.y - point1.y;
 	auto gradient = static_cast<double>(dy) / static_cast<double>(dx);
 	if (dx == 0.0)
 	{
 		gradient = 1.0;
 	}
 
-    double xend = p1.x;
-    double yend = p1.y;
-	auto xgap = rfpart(p1.x + 0.5);
+    double xend = point1.x;
+    double yend = point1.y;
+	auto xgap = rfpart(point1.x + 0.5);
     double xpixel1 = xend;
     double ypixel1 = yend;
 
@@ -295,9 +296,9 @@ void WuLineRenderer(Point p1, Point p2, Drawable* drawable, const Color& color)
 
 	auto yIntersection = yend + gradient;
 
-	xend = p2.x;
-	yend = p2.y;
-	xgap = rfpart(p2.x + 0.5);
+	xend = point2.x;
+	yend = point2.y;
+	xgap = rfpart(point2.x + 0.5);
     double xpixel2 = xend;
     double ypixel2 = yend;
 

@@ -8,15 +8,17 @@ Client::Client(Drawable *drawable)
 
 void Client::nextPage() 
 {
-	static int pageNumber = 0;
-	pageNumber++;
-	std::cout << "PageNumber " << pageNumber << std::endl;
+	//static int pageNumber = 0;
+	//pageNumber++;
+	//std::cout << "PageNumber " << pageNumber << std::endl;
 
-	Rect bg{ 0, 0, 750, 750 };
-	draw_rect(bg.x, bg.y, bg.right(), bg.bottom(), 0xffffffff);
+	//Rect bg{ 0, 0, 750, 750 };
+	//draw_rect(bg.x, bg.y, bg.right(), bg.bottom(), 0xffffffff);
 
-	Rect viewPort{ 50, 50, 650, 650 };
-	draw_rect(viewPort.x, viewPort.y, viewPort.right(), viewPort.bottom(), 0x00000000);
+	//Rect viewPort{ 50, 50, 650, 650 };
+	//draw_rect(viewPort.x, viewPort.y, viewPort.right(), viewPort.bottom(), 0x00000000);
+
+	doAssignment1(this);
 }
 
 Drawable* Client::getDrawable() const
