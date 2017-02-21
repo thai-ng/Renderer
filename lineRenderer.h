@@ -24,42 +24,42 @@ Point toFirstOctant(Octant octant, Point p)
     {
 		case Octant::First:
         {
-            return Point{p.x, p.y};
+            return Point{p.x, p.y, p.parent, p.color};
         } break;
 
         case Octant::Second:
         {
-            return Point {p.y, p.x};
+            return Point {p.y, p.x, p.parent, p.color };
 		} break;
 		
 		case Octant::Third:
 		{
-			return Point{p.y, -p.x};
+			return Point{p.y, -p.x, p.parent, p.color };
 		} break;
 		
 		case Octant::Fourth:
 		{
-			return Point{-p.x, p.y};
+			return Point{-p.x, p.y, p.parent, p.color };
 		} break;
 		
 		case Octant::Fifth:
 		{
-			return Point{-p.x, -p.y};
+			return Point{-p.x, -p.y, p.parent, p.color };
 		} break;
 
 		case Octant::Sixth:
 		{
-			return Point{-p.y, -p.x};
+			return Point{-p.y, -p.x, p.parent, p.color };
 		} break;
 		
 		case Octant::Seventh:
 		{
-			return Point{-p.y, p.x};
+			return Point{-p.y, p.x, p.parent, p.color };
 		} break;
 		
 		case Octant::Eighth:
 		{
-			return Point{p.x, -p.y};
+			return Point{p.x, -p.y, p.parent, p.color };
 		} break;
 
         default:
@@ -213,15 +213,52 @@ void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, co
 	auto point1 = toFirstOctant(octant, p1);
 	auto point2 = toFirstOctant(octant, p2);
 
-	Lerp<decltype(point1.x)> lerp(point1.x, point2.x, point1.y, point2.y);
-	for (auto& point : lerp)
+	if (p1.color == p2.color)
 	{
-		auto x = point.first;
-		auto y = point.second;
+		Lerp<decltype(point1.x)> posLerp(point1.x, point2.x, point1.y, point2.y);
+		for (auto& point : posLerp)
+		{
+			auto x = point.first;
+			auto y = point.second;
 
-		auto screenPoint = fromFirstOctant(octant, Point{ x, static_cast<int>(std::round(y)) });
-		drawSurface->setPixel(screenPoint.x, screenPoint.y, color.asUnsigned());
+			auto screenPoint = fromFirstOctant(octant, Point{ x, static_cast<int>(std::round(y)) });
+			drawSurface->setPixel(screenPoint.x, screenPoint.y, color.asUnsigned());
+		}
 	}
+	else
+	{
+		auto p1ColorChannels = point1.color.getColorChannels();
+		auto p1Red = std::get<0>(p1ColorChannels);
+		auto p1Green = std::get<1>(p1ColorChannels);
+		auto p1Blue = std::get<2>(p1ColorChannels);
+
+		auto p2ColorChannels = point2.color.getColorChannels();
+		auto p2Red = std::get<0>(p2ColorChannels);
+		auto p2Green = std::get<1>(p2ColorChannels);
+		auto p2Blue = std::get<2>(p2ColorChannels);
+
+		Lerp<decltype(point1.x)> redLerp(point1.x, point2.x, p1Red, p2Red);
+		Lerp<decltype(point1.x)> greenLerp(point1.x, point2.x, p1Green, p2Green);
+		Lerp<decltype(point1.x)> blueLerp(point1.x, point2.x, p1Blue, p2Blue);
+
+		Lerp<decltype(point1.x)> posLerp(point1.x, point2.x, point1.y, point2.y);
+
+		for (auto i = 0; i < posLerp.size(); ++i)
+		{
+			auto lerpPoint = posLerp[i];
+			auto x = lerpPoint.first;
+			auto y = lerpPoint.second;
+			
+			auto r = static_cast<unsigned char>(redLerp[i].second);
+			auto g = static_cast<unsigned char>(greenLerp[i].second);
+			auto b = static_cast<unsigned char>(blueLerp[i].second);
+
+			auto screenPoint = fromFirstOctant(octant, Point{ x, static_cast<int>(std::round(y)) });
+			drawSurface->setPixel(screenPoint.x, screenPoint.y, Color(r, g, b).asUnsigned());
+		}
+	}
+
+
 }
 
 double fpart(double num)

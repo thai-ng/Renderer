@@ -28,8 +28,10 @@ public:
 		});
 	}
 
-	typedef typename std::vector<std::pair<T, double>>::iterator iterator;
-	typedef typename std::vector<std::pair<T, double>>::const_iterator const_iterator;
+	typedef typename std::pair<T, double> value_t;
+
+	typedef typename std::vector<value_t>::iterator iterator;
+	typedef typename std::vector<value_t>::const_iterator const_iterator;
 
 	iterator begin() { return steps.begin(); }
 	const_iterator begin() const { return steps.begin(); }
@@ -39,7 +41,17 @@ public:
 	const_iterator end() const { return steps.end(); }
 	const_iterator cendn() const { return steps.cend(); }
 
+	auto operator[](int i) const
+	{
+		return steps[i];
+	}
+
+	auto size() const
+	{
+		return steps.size();
+	}
+
 
 private:
-	std::vector<std::pair<T, double>> steps;
+	std::vector<value_t> steps;
 };

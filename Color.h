@@ -24,6 +24,11 @@ public:
 	{
 		return std::make_tuple(r, g, b);
 	}
+
+	bool operator==(const Color& other) const
+	{
+		return other.asUnsigned() == asUnsigned();
+	}
 private:
 	unsigned char r;
 	unsigned char g;

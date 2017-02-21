@@ -4,6 +4,8 @@
 #include <vector>
 #include <array>
 
+#include "Color.h"
+
 struct Rect
 {
 	int x;
@@ -22,20 +24,20 @@ struct Point
 	int x;
 	int y;
 	Rect* parent;
-	unsigned int color;
+	Color color;
 
 	Point() : x(0), y(0), parent(nullptr), color(0xffffffff) {}
-	Point(int x, int y, Rect* parent = nullptr, unsigned int color = 0xffffffff) : x(x), y(y), parent(parent), color(color) {}
+	Point(int x, int y, Rect* parent = nullptr, const Color& color = 0xffffffff) : x(x), y(y), parent(parent), color(color) {}
 
 	auto toGlobalCoordinate() const
 	{
 		if (parent)
 		{
-			return Point{ parent->x + x, parent->y + y };
+			return Point{ parent->x + x, parent->y + y, nullptr, color};
 		}
 		else
 		{
-			return Point{ x, y };
+			return Point{ x, y, nullptr, color };
 		}
 	}
 

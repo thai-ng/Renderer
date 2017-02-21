@@ -1,24 +1,102 @@
 #include "client.h"
-#include "assignment1.h"
+
+#include <vector>
+#include <random>
+#include <iostream>
+
+#include "primitives.h"
+#include "polygonRenderer.h"
+#include "Color.h"
 
 Client::Client(Drawable *drawable)
 {
     this->drawable = drawable;
 }
 
+auto generatePointGrid(int margin, int triangleLength)
+{
+	auto currentY = margin;
+	std::vector<std::vector<Point>> pointGrid;
+	pointGrid.reserve(10);
+	std::random_device device;
+	std::mt19937 gen(device());
+	std::uniform_int_distribution<unsigned int> colorDis(0x00000000u, 0x00ffffffu);
+
+	std::generate_n(std::back_inserter(pointGrid), 10, [&currentY, &colorDis, &gen, margin, triangleLength]
+	{
+		std::vector<Point> pointRow;
+		pointRow.reserve(10);
+		auto currentX = margin;
+		std::generate_n(std::back_inserter(pointRow), 10, [&currentX, &colorDis, &gen, currentY, margin, triangleLength]
+		{
+			auto color = colorDis(gen);
+			auto point = Point{ currentX, currentY, nullptr, Color(color)};
+			currentX += triangleLength;
+			return point;
+		});
+		currentY += triangleLength;
+		return pointRow;
+	});
+	return pointGrid;
+}
+
+void drawPointGrid(Rect& panel, const std::vector<std::vector<Point>>& pointGrid, Drawable* drawable)
+{
+	for (auto row = 0; row < 9; ++row)
+	{
+		for (auto col = 0; col < 9; ++col)
+		{
+			
+			auto triangle = Polygon(std::vector<Point>{pointGrid[row][col], pointGrid[row][col + 1], pointGrid[row + 1][col + 1]}, &panel);
+			renderPolygonWireframe(triangle, drawable);
+
+			triangle = Polygon(std::vector<Point>{pointGrid[row][col], pointGrid[row + 1][col + 1], pointGrid[row + 1][col]}, &panel);
+			renderPolygonWireframe(triangle, drawable);
+		}
+	}
+}
+
+
 void Client::nextPage() 
 {
-	//static int pageNumber = 0;
-	//pageNumber++;
-	//std::cout << "PageNumber " << pageNumber << std::endl;
+	static int pageNumber = 0;
+	pageNumber++;
+	std::cout << "PageNumber " << pageNumber << std::endl;
 
-	//Rect bg{ 0, 0, 750, 750 };
-	//draw_rect(bg.x, bg.y, bg.right(), bg.bottom(), 0xffffffff);
+	Rect bg{ 0, 0, 750, 750 };
+	draw_rect(bg.x, bg.y, bg.right(), bg.bottom(), 0xffffffff);
 
-	//Rect viewPort{ 50, 50, 650, 650 };
-	//draw_rect(viewPort.x, viewPort.y, viewPort.right(), viewPort.bottom(), 0x00000000);
+	Rect viewPort{ 50, 50, 650, 650 };
+	draw_rect(viewPort.x, viewPort.y, viewPort.right(), viewPort.bottom(), 0x00000000);
 
-	doAssignment1(this);
+	switch (pageNumber % 7)
+	{
+		// Page 1
+		case 1:
+		{
+			auto margin = 13;
+			
+			auto triangleLength = (viewPort.width - (margin * 2)) / 9;;
+			auto pointGrid = generatePointGrid(margin, triangleLength);
+			
+			// Panel 3
+			// Shift points
+			std::random_device device;
+			std::mt19937 gen(device());
+			std::uniform_int_distribution<> shiftDis(0, 12);
+
+			std::for_each(pointGrid.begin(), pointGrid.end(), [&shiftDis, &gen](auto& currentRow)
+			{
+				std::for_each(currentRow.begin(), currentRow.end(), [&shiftDis, &gen](auto& point)
+				{
+					point.x += (shiftDis(gen) - 6);
+					point.y += (shiftDis(gen) - 6);
+				});
+			});
+			drawPointGrid(viewPort, pointGrid, this->getDrawable());
+		} break;
+	}
+
 }
 
 Drawable* Client::getDrawable() const

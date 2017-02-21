@@ -7,6 +7,7 @@
 #include "color.h"
 #include "drawable.h"
 #include "primitives.h"
+#include "lineRenderer.h"
 
 auto comparePoints = [](auto p1, auto p2)
 {
@@ -134,11 +135,34 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const C
 
 void renderPolygon(const Polygon& polygon, Drawable* drawable, const Color& color)
 {
-    renderPolygon(polygon.vertices(), drawable, color);
+	renderPolygon(polygon.vertices(), drawable, color);
 }
 
 void renderTriangle(const Triangle& triangle, Drawable* drawable, const Color& color, double opacity = 1.0)
 {
 	auto vertices = triangle.vertices();
 	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, color, opacity);
+}
+
+void renderPolygonWireframe(const Polygon& polygon, Drawable* drawable)
+{
+	auto points = polygon.vertices();
+	auto sortedVertices = sortVertices(points, comparePoints);
+	auto vertexChains = splitVertices(sortedVertices, comparePoints);
+	
+	auto leftChain = std::get<0>(vertexChains);
+	auto currentPointLeft = *(leftChain.begin());
+	std::for_each(std::next(leftChain.begin()), leftChain.end(), [&currentPointLeft, drawable](auto point) 
+	{ 
+		renderLine(Line(currentPointLeft, point), drawable, DDALineRenderer); 
+		currentPointLeft = point;
+	});
+	
+	auto rightChain = std::get<1>(vertexChains);
+	auto currentPointRight = *(rightChain.begin());
+	std::for_each(std::next(rightChain.begin()), rightChain.end(), [&currentPointRight, drawable](auto point)
+	{
+		renderLine(Line(currentPointRight, point), drawable, DDALineRenderer);
+		currentPointRight = point;
+	});
 }
