@@ -93,6 +93,12 @@
     <ClInclude Include="lerp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="assignment2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="assignment1.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
