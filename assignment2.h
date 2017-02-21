@@ -52,6 +52,27 @@ namespace assignment2
 		}
 	}
 
+	void drawPointGrid(Rect& panel, const std::vector<std::vector<Point>>& pointGrid, Drawable* drawable)
+	{
+		std::random_device device;
+		std::mt19937 gen(device());
+		std::uniform_int_distribution<> colorDis(0x00000000, 0x00ffffff);
+		for (auto row = 0; row < 9; ++row)
+		{
+			for (auto col = 0; col < 9; ++col)
+			{
+				auto color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+				auto triangle = Triangle(std::array<Point, 3>{pointGrid[row][col], pointGrid[row][col + 1], pointGrid[row + 1][col + 1]}, &panel);
+				renderTriangle(triangle, drawable, color);
+
+				
+				color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
+				triangle = Triangle(std::array<Point, 3>{pointGrid[row][col], pointGrid[row + 1][col + 1], pointGrid[row + 1][col]}, &panel);
+				renderTriangle(triangle, drawable, color);
+			}
+		}
+	}
+
 	void draw_rect(Client* client, int x1, int y1, int x2, int y2, unsigned int color)
 	{
 		for (int x = x1; x<x2; x++)
@@ -124,8 +145,15 @@ namespace assignment2
 						point.y += (shiftDis(gen) - 6);
 					});
 				});
-				drawPointGridWireFrame(viewPort, pointGrid, client->getDrawable());
+				drawPointGrid(viewPort, pointGrid, client->getDrawable());
 			} break;
+
+			default:
+			{
+
+			}break;
 		}
+		client->getDrawable()->updateScreen();   // you must call this to make the display change.
+
 	}
 }

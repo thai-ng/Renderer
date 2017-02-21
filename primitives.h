@@ -45,6 +45,11 @@ struct Point
 	{
 		return (x == other.x) && (y == other.y) && (parent == other.parent);
 	}
+
+	Point flipped() const
+	{
+		return Point{ y, x, parent, color };
+	}
 };
 
 auto Rect::center() 

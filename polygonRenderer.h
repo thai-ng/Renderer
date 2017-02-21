@@ -85,55 +85,83 @@ double getXSlope(Line line)
 
 void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const Color& color, double opacity = 1.0)
 {
+	auto tempColor = color;
 	auto sortedVertices = sortVertices(points, comparePoints);
-	auto vertexChains = splitVertices(sortedVertices, comparePoints);
-	auto leftChain = std::get<0>(vertexChains);
-	auto rightChain = std::get<1>(vertexChains);
-
 	auto topPoint = sortedVertices.front();
 	auto bottomPoint = sortedVertices.back();
 
+	auto vertexChains = splitVertices(sortedVertices, comparePoints);
+	
+	// Left line chain
+	auto leftChain = std::get<0>(vertexChains);
 	auto leftIter = std::next(leftChain.begin());
 	Line leftLine{ leftChain.front(), *leftIter };
+	Lerp<int> leftLerp(leftLine.p1.y, leftLine.p2.y, leftLine.p1.x, leftLine.p2.x);
+	
+	auto leftColorLerps = getColorLerp(leftLine.p1.flipped(), leftLine.p2.flipped());
+	auto leftRedLerp = std::get<0>(leftColorLerps);
+	auto leftGreenLerp = std::get<1>(leftColorLerps);
+	auto leftBlueLerp = std::get<2>(leftColorLerps);
 
+	auto leftCount = 0;
+
+	// Right line chain
+	auto rightChain = std::get<1>(vertexChains);
 	auto rightIter = std::next(rightChain.begin());
 	Line rightLine{ rightChain.front(), *rightIter };
+	Lerp<int> rightLerp(rightLine.p1.y, rightLine.p2.y, rightLine.p1.x, rightLine.p2.x);
 
-	auto ml = getXSlope(leftLine);
-	auto mr = getXSlope(rightLine);
-	auto xl = static_cast<double>(leftLine.p1.x);
-	auto xr = static_cast<double>(rightLine.p1.x);
+	auto rightColorLerps = getColorLerp(rightLine.p1.flipped(), rightLine.p2.flipped());
+	auto rightRedLerp = std::get<0>(rightColorLerps);
+	auto rightGreenLerp = std::get<1>(rightColorLerps);
+	auto rightBlueLerp = std::get<2>(rightColorLerps);
 
-	for (auto y = topPoint.y; y < bottomPoint.y; ++y, xl += ml, xr += mr)
+	auto rightCount = 0;
+
+	for (auto y = topPoint.y; y < bottomPoint.y; ++y)
 	{
-		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, topPoint.parent, color };
-		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y, topPoint.parent, color };
+		auto xl = leftLerp[leftCount].second;
+		auto r = static_cast<unsigned char>(leftRedLerp[leftCount].second);
+		auto g = static_cast<unsigned char>(leftGreenLerp[leftCount].second);
+		auto b = static_cast<unsigned char>(leftBlueLerp[leftCount].second);
+		++leftCount;
+		auto leftColor = Color(r, g, b);
+
+		auto xr = rightLerp[rightCount].second;
+		r = static_cast<unsigned char>(rightRedLerp[rightCount].second);
+		g = static_cast<unsigned char>(rightGreenLerp[rightCount].second);
+		b = static_cast<unsigned char>(rightBlueLerp[rightCount].second);
+		++rightCount;
+		auto rightColor = Color(r, g, b);
+
+		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, topPoint.parent, leftColor };
+		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y, topPoint.parent, rightColor };
 
 		renderLine(Line{ leftPoint, rightPoint }, drawable, DDALineRenderer, opacity);
-
-		/*for (auto x = xl; x <= xr; ++x)
-		{
-			auto currentPoint = Point{ static_cast<int>(std::round(x)), y, topPoint.parent };
-			auto globalPoint = currentPoint.toGlobalCoordinate();
-			auto oldColor = drawable->getPixel(globalPoint.x, globalPoint.y);
-			auto colorToPaint = colorWithOpacity(color, oldColor, opacity);
-			drawable->setPixel(globalPoint.x, globalPoint.y, colorToPaint.asUnsigned());
-		}*/
 
 		if (y == leftLine.p2.y)
 		{
 			leftIter = std::next(leftIter);
 			leftLine = Line{ leftLine.p2, *leftIter };
-			ml = getXSlope(leftLine);
-			xl = static_cast<double>(leftLine.p1.x);
+			leftLerp = Lerp<int>(leftLine.p1.y, leftLine.p2.y, leftLine.p1.x, leftLine.p2.x);
+			leftColorLerps = getColorLerp(leftLine.p1.flipped(), leftLine.p2.flipped());
+			leftRedLerp = std::get<0>(leftColorLerps);
+			leftGreenLerp = std::get<1>(leftColorLerps);
+			leftBlueLerp = std::get<2>(leftColorLerps);
+
+			leftCount = 0;
 		}
 
 		if (y == rightLine.p2.y)
 		{
 			rightIter = std::next(rightIter);
 			rightLine = Line{ rightLine.p2, *rightIter };
-			mr = getXSlope(rightLine);
-			xr = static_cast<double>(rightLine.p1.x);
+			rightLerp = Lerp<int>(rightLine.p1.y, rightLine.p2.y, rightLine.p1.x, rightLine.p2.x);
+			rightColorLerps = getColorLerp(rightLine.p1.flipped(), rightLine.p2.flipped());
+			rightRedLerp = std::get<0>(rightColorLerps);
+			rightGreenLerp = std::get<1>(rightColorLerps);
+			rightBlueLerp = std::get<2>(rightColorLerps);
+			rightCount = 0;
 		}
 	}
 }
