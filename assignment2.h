@@ -42,7 +42,6 @@ namespace assignment2
 		{
 			for (auto col = 0; col < 9; ++col)
 			{
-
 				auto triangle = Polygon(std::vector<Point>{pointGrid[row][col], pointGrid[row][col + 1], pointGrid[row + 1][col + 1]}, &panel);
 				renderPolygonWireframe(triangle, drawable);
 
@@ -147,9 +146,9 @@ namespace assignment2
 
 			case 3:
 			{
-				Point p1{ 50, 50, nullptr, Color(255, 0, 0) };
-				Point p2{ 700, 50, nullptr, Color(0, 255, 0) };
-				Point p3{ 50, 700, nullptr, Color(0, 0, 255) };
+				Point p1{ 50, 700, nullptr, Color(255, 0, 0) };
+				Point p2{ 375, 50, nullptr, Color(0, 255, 0) };
+				Point p3{ 700, 700, nullptr, Color(0, 0, 255) };
 				renderPolygon(std::vector<Point>{p1, p2, p3}, client->getDrawable());
 			} break;
 

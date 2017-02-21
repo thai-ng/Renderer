@@ -18,7 +18,7 @@ public:
 		auto currentVal2 = static_cast<double>(beginVal2);
 
 		steps.reserve(deltaVal1 + 1);
-
+		
 		std::generate_n(std::back_inserter(steps),
 			deltaVal1 + 1,
 			[&currentVal1, &currentVal2, slope]
