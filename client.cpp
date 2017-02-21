@@ -11,8 +11,7 @@ Client::Client(Drawable *drawable)
 
 void Client::nextPage() 
 {
-	assignment2::doNextPage(this);
-
+	assignment1::doNextPage(this);
 }
 
 Drawable* Client::getDrawable() const

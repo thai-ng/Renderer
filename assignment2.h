@@ -36,7 +36,7 @@ namespace assignment2
 		return pointGrid;
 	}
 
-	void drawPointGrid(Rect& panel, const std::vector<std::vector<Point>>& pointGrid, Drawable* drawable)
+	void drawPointGridWireFrame(Rect& panel, const std::vector<std::vector<Point>>& pointGrid, Drawable* drawable)
 	{
 		for (auto row = 0; row < 9; ++row)
 		{
@@ -99,7 +99,32 @@ namespace assignment2
 						point.y += (shiftDis(gen) - 6);
 					});
 				});
-				drawPointGrid(viewPort, pointGrid, client->getDrawable());
+				drawPointGridWireFrame(viewPort, pointGrid, client->getDrawable());
+			} break;
+
+			// Page 2
+			case 2:
+			{
+				auto margin = 13;
+
+				auto triangleLength = (viewPort.width - (margin * 2)) / 9;;
+				auto pointGrid = generatePointGrid(margin, triangleLength);
+
+				// Panel 3
+				// Shift points
+				std::random_device device;
+				std::mt19937 gen(device());
+				std::uniform_int_distribution<> shiftDis(0, 12);
+
+				std::for_each(pointGrid.begin(), pointGrid.end(), [&shiftDis, &gen](auto& currentRow)
+				{
+					std::for_each(currentRow.begin(), currentRow.end(), [&shiftDis, &gen](auto& point)
+					{
+						point.x += (shiftDis(gen) - 6);
+						point.y += (shiftDis(gen) - 6);
+					});
+				});
+				drawPointGridWireFrame(viewPort, pointGrid, client->getDrawable());
 			} break;
 		}
 	}

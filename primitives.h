@@ -67,15 +67,20 @@ static constexpr double Pi = 3.141592653589793238462643383279502884;
 
 struct Line
 {
-	Line(Point inp1, Point inp2, unsigned int c = 0xffffffff) : p1(inp1), p2(inp2), color(c) {}
+	Line(Point inp1, Point inp2, unsigned int c = 0xffffffff) : p1(inp1), p2(inp2), color(c) 
+	{
+		p1.color = Color(color);
+		p2.color = Color(color);
+	}
 
 	Line(const Point& origin, int length, int angle, Rect* parent = nullptr, unsigned int c = 0xffffffff) : p1(origin), color(c)
 	{
 		auto radianAngle = angle * Pi / 180.0;
 		auto opposite = length * std::sin(radianAngle);
 		auto adjacent = length * std::cos(radianAngle);
-        p2 = Point{ origin.x + static_cast<int>(adjacent), origin.y + static_cast<int>(opposite), parent };
+        p2 = Point{ origin.x + static_cast<int>(adjacent), origin.y + static_cast<int>(opposite), parent , color};
 		p1.parent = parent;
+		p1.color = Color(color);
 	}
 
 	Point p1;
