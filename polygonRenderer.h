@@ -106,14 +106,19 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const C
 
 	for (auto y = topPoint.y; y < bottomPoint.y; ++y, xl += ml, xr += mr)
 	{
-		for (auto x = xl; x <= xr; ++x)
+		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, topPoint.parent, color };
+		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y, topPoint.parent, color };
+
+		renderLine(Line{ leftPoint, rightPoint }, drawable, DDALineRenderer, opacity);
+
+		/*for (auto x = xl; x <= xr; ++x)
 		{
 			auto currentPoint = Point{ static_cast<int>(std::round(x)), y, topPoint.parent };
 			auto globalPoint = currentPoint.toGlobalCoordinate();
 			auto oldColor = drawable->getPixel(globalPoint.x, globalPoint.y);
 			auto colorToPaint = colorWithOpacity(color, oldColor, opacity);
 			drawable->setPixel(globalPoint.x, globalPoint.y, colorToPaint.asUnsigned());
-		}
+		}*/
 
 		if (y == leftLine.p2.y)
 		{

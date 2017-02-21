@@ -172,13 +172,13 @@ void renderLine(const Point& p1, const Point& p2, Drawable* surface, const Color
 }
 
 template <typename F>
-void renderLine(const Line& l, Drawable* surface, F function)
+void renderLine(const Line& l, Drawable* surface, F function, double opacity = 1.0)
 {
 	auto points = l.toGlobalCoordinate();
 	auto p1 = std::get<0>(points);
 	auto p2 = std::get<1>(points);
 
-	function(p1, p2, surface, l.color);
+	function(p1, p2, surface, l.color, opacity);
 }
 
 auto getColorLerp(const Point& point1, const Point& point2)
@@ -202,8 +202,11 @@ auto getColorLerp(const Point& point1, const Point& point2)
 	return std::make_tuple(redLerp, greenLerp, blueLerp);
 }
 
-void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color)
+void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color, double opacity = 1.0)
 {
+	// Hack to remove warning, refactor later
+	auto tempColor = color;
+
 	auto octant = getOctant(p2 - p1);
 	auto point1 = toFirstOctant(octant, p1);
 	auto point2 = toFirstOctant(octant, p2);
@@ -216,71 +219,117 @@ void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurfa
 	auto y = point1.y;
 	auto screenPoint = fromFirstOctant(octant, point1);
 	
-	auto colorLerps = getColorLerp(point1, point2);
-	auto redLerp = std::get<0>(colorLerps);
-	auto greenLerp = std::get<1>(colorLerps);
-	auto blueLerp = std::get<2>(colorLerps);
-	auto colorIndex = 0;
-
-	// Hack to remove warning, refactor later
-	auto newColor = color;
-
-	auto r = static_cast<unsigned char>(redLerp[colorIndex].second);
-	auto g = static_cast<unsigned char>(greenLerp[colorIndex].second);
-	auto b = static_cast<unsigned char>(blueLerp[colorIndex].second);
-
-	drawSurface->setPixel(screenPoint.x, screenPoint.y, Color(r, g, b).asUnsigned());
-    for (auto x = point1.x + 1; x <= point2.x; ++x)
+	if (point1.color == point2.color)
 	{
-		++colorIndex;
-
-		if (error > 0)
+		for (auto x = point1.x + 1; x <= point2.x; ++x)
 		{
-			error -= dx;
-            y += 1;
-		}
-		error += dy;
-		screenPoint = fromFirstOctant(octant, Point{ x, y });
+			if (error > 0)
+			{
+				error -= dx;
+				y += 1;
+			}
+			error += dy;
+			screenPoint = fromFirstOctant(octant, Point{ x, y });
 
-		r = static_cast<unsigned char>(redLerp[colorIndex].second);
-		g = static_cast<unsigned char>(greenLerp[colorIndex].second);
-		b = static_cast<unsigned char>(blueLerp[colorIndex].second);
+			auto oldColor = drawSurface->getPixel(screenPoint.x, screenPoint.y);
+			auto colorToPaint = colorWithOpacity(point1.color, oldColor, opacity);
+
+			drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+		}
+	}
+	else
+	{
+		auto colorLerps = getColorLerp(point1, point2);
+		auto redLerp = std::get<0>(colorLerps);
+		auto greenLerp = std::get<1>(colorLerps);
+		auto blueLerp = std::get<2>(colorLerps);
+		auto colorIndex = 0;
+
+		auto r = static_cast<unsigned char>(redLerp[colorIndex].second);
+		auto g = static_cast<unsigned char>(greenLerp[colorIndex].second);
+		auto b = static_cast<unsigned char>(blueLerp[colorIndex].second);
 
 		drawSurface->setPixel(screenPoint.x, screenPoint.y, Color(r, g, b).asUnsigned());
+		for (auto x = point1.x + 1; x <= point2.x; ++x)
+		{
+			++colorIndex;
+
+			if (error > 0)
+			{
+				error -= dx;
+				y += 1;
+			}
+			error += dy;
+			screenPoint = fromFirstOctant(octant, Point{ x, y });
+
+			r = static_cast<unsigned char>(redLerp[colorIndex].second);
+			g = static_cast<unsigned char>(greenLerp[colorIndex].second);
+			b = static_cast<unsigned char>(blueLerp[colorIndex].second);
+
+			auto newColor = Color(r, g, b);
+			auto oldColor = drawSurface->getPixel(x, y);
+			auto colorToPaint = colorWithOpacity(newColor, oldColor, opacity);
+
+			drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+		}
 	}
+	
 }
 
-void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color)
+void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color, double opacity = 1.0)
 {
 	auto octant = getOctant(p2 - p1);
 	auto point1 = toFirstOctant(octant, p1);
 	auto point2 = toFirstOctant(octant, p2);
 
 	// Hack to remove warning, refactor later
-	auto newColor = color;
-
-	auto colorLerps = getColorLerp(point1, point2);
-	auto redLerp = std::get<0>(colorLerps);
-	auto greenLerp = std::get<1>(colorLerps);
-	auto blueLerp = std::get<2>(colorLerps);
-
-	Lerp<decltype(point1.x)> posLerp(point1.x, point2.x, point1.y, point2.y);
-
-	for (auto i = 0; i < posLerp.size(); ++i)
+	auto tempColor = color;
+	
+	if (point1.color == point2.color)
 	{
-		auto lerpPoint = posLerp[i];
-		auto x = lerpPoint.first;
-		auto y = lerpPoint.second;
-			
-		auto r = static_cast<unsigned char>(redLerp[i].second);
-		auto g = static_cast<unsigned char>(greenLerp[i].second);
-		auto b = static_cast<unsigned char>(blueLerp[i].second);
+		Lerp<decltype(point1.x)> posLerp(point1.x, point2.x, point1.y, point2.y);
 
-		auto screenPoint = fromFirstOctant(octant, Point{ x, static_cast<int>(std::round(y)) });
-		drawSurface->setPixel(screenPoint.x, screenPoint.y, Color(r, g, b).asUnsigned());
+		for (auto& point : posLerp)
+		{
+			auto x = point.first;
+			auto y = point.second;
+
+			auto screenPoint = fromFirstOctant(octant, Point{ x, static_cast<int>(std::round(y)) });
+
+			auto oldColor = drawSurface->getPixel(screenPoint.x, screenPoint.y);
+			auto colorToPaint = colorWithOpacity(point1.color, oldColor, opacity);
+
+			drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+		}
 	}
+	else
+	{
+		auto colorLerps = getColorLerp(point1, point2);
+		auto redLerp = std::get<0>(colorLerps);
+		auto greenLerp = std::get<1>(colorLerps);
+		auto blueLerp = std::get<2>(colorLerps);
 
+		Lerp<decltype(point1.x)> posLerp(point1.x, point2.x, point1.y, point2.y);
 
+		for (auto i = 0; i < posLerp.size(); ++i)
+		{
+			auto lerpPoint = posLerp[i];
+			auto x = lerpPoint.first;
+			auto y = lerpPoint.second;
+
+			auto r = static_cast<unsigned char>(redLerp[i].second);
+			auto g = static_cast<unsigned char>(greenLerp[i].second);
+			auto b = static_cast<unsigned char>(blueLerp[i].second);
+
+			auto screenPoint = fromFirstOctant(octant, Point{ x, static_cast<int>(std::round(y)) });
+
+			auto newColor = Color(r, g, b);
+			auto oldColor = drawSurface->getPixel(screenPoint.x, screenPoint.y);
+			auto colorToPaint = colorWithOpacity(newColor, oldColor, opacity);
+
+			drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+		}
+	}
 }
 
 double fpart(double num)
@@ -300,8 +349,9 @@ double rfpart(double num)
 	return 1 - fpart(num);
 }
 
-void WuLineRenderer(const Point& p1, const Point& p2, Drawable* drawable, const Color& color)
+void WuLineRenderer(const Point& p1, const Point& p2, Drawable* drawable, const Color& color, double opacity = 1.0)
 {
+	opacity += 1;
 	auto point1 = p1;
 	auto point2 = p2;
 	bool steep = std::abs(point2.y - point1.y) > std::abs(point2.x - point1.x);

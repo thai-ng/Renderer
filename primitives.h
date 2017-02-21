@@ -67,7 +67,12 @@ static constexpr double Pi = 3.141592653589793238462643383279502884;
 
 struct Line
 {
-	Line(Point inp1, Point inp2, unsigned int c = 0xffffffff) : p1(inp1), p2(inp2), color(c) 
+	Line(Point inp1, Point inp2) : p1(inp1), p2(inp2)
+	{
+	}
+
+
+	Line(Point inp1, Point inp2, unsigned int c) : p1(inp1), p2(inp2), color(c) 
 	{
 		p1.color = Color(color);
 		p2.color = Color(color);
@@ -86,6 +91,7 @@ struct Line
 	Point p1;
 	Point p2;
 	unsigned int color;
+
 	auto toGlobalCoordinate() const
 	{
 		return std::make_tuple<Point, Point>(p1.toGlobalCoordinate(), p2.toGlobalCoordinate());
