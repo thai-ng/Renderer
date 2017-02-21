@@ -83,21 +83,21 @@ double getXSlope(Line line)
 	}
 }
 
-void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const Color& color, double opacity = 1.0)
+
+void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double opacity = 1.0)
 {
-	auto tempColor = color;
 	auto sortedVertices = sortVertices(points, comparePoints);
 	auto topPoint = sortedVertices.front();
 	auto bottomPoint = sortedVertices.back();
 
 	auto vertexChains = splitVertices(sortedVertices, comparePoints);
-	
+
 	// Left line chain
 	auto leftChain = std::get<0>(vertexChains);
 	auto leftIter = std::next(leftChain.begin());
 	Line leftLine{ leftChain.front(), *leftIter };
 	Lerp<int> leftLerp(leftLine.p1.y, leftLine.p2.y, leftLine.p1.x, leftLine.p2.x);
-	
+
 	auto leftColorLerps = getColorLerp(leftLine.p1.flipped(), leftLine.p2.flipped());
 	auto leftRedLerp = std::get<0>(leftColorLerps);
 	auto leftGreenLerp = std::get<1>(leftColorLerps);
@@ -118,7 +118,7 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const C
 
 	auto rightCount = 0;
 
-	for (auto y = topPoint.y; y < bottomPoint.y; ++y)
+	for (auto y = topPoint.y; y <= bottomPoint.y; ++y)
 	{
 		auto xl = leftLerp[leftCount].second;
 		auto r = static_cast<unsigned char>(leftRedLerp[leftCount].second);
@@ -139,7 +139,7 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const C
 
 		renderLine(Line{ leftPoint, rightPoint }, drawable, DDALineRenderer, opacity);
 
-		if (y == leftLine.p2.y)
+		if (y == leftLine.p2.y && leftLine.p2 != bottomPoint)
 		{
 			leftIter = std::next(leftIter);
 			leftLine = Line{ leftLine.p2, *leftIter };
@@ -152,7 +152,7 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const C
 			leftCount = 0;
 		}
 
-		if (y == rightLine.p2.y)
+		if (y == rightLine.p2.y && rightLine.p2 != bottomPoint)
 		{
 			rightIter = std::next(rightIter);
 			rightLine = Line{ rightLine.p2, *rightIter };
@@ -161,6 +161,63 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const C
 			rightRedLerp = std::get<0>(rightColorLerps);
 			rightGreenLerp = std::get<1>(rightColorLerps);
 			rightBlueLerp = std::get<2>(rightColorLerps);
+			rightCount = 0;
+		}
+	}
+}
+
+void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const Color& color, double opacity = 1.0)
+{
+	auto sortedVertices = sortVertices(points, comparePoints);
+	auto topPoint = sortedVertices.front();
+	auto bottomPoint = sortedVertices.back();
+
+	auto vertexChains = splitVertices(sortedVertices, comparePoints);
+	
+	// Left line chain
+	auto leftChain = std::get<0>(vertexChains);
+	auto leftIter = std::next(leftChain.begin());
+	Line leftLine{ leftChain.front(), *leftIter };
+	Lerp<int> leftLerp(leftLine.p1.y, leftLine.p2.y, leftLine.p1.x, leftLine.p2.x);
+	
+	auto leftCount = 0;
+
+	// Right line chain
+	auto rightChain = std::get<1>(vertexChains);
+	auto rightIter = std::next(rightChain.begin());
+	Line rightLine{ rightChain.front(), *rightIter };
+	Lerp<int> rightLerp(rightLine.p1.y, rightLine.p2.y, rightLine.p1.x, rightLine.p2.x);
+
+	auto rightCount = 0;
+
+	for (auto y = topPoint.y; y <= bottomPoint.y; ++y)
+	{
+		auto xl = leftLerp[leftCount].second;
+		++leftCount;
+
+		auto xr = rightLerp[rightCount].second;
+		++rightCount;
+
+		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, topPoint.parent, color };
+		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y, topPoint.parent, color };
+
+		renderLine(Line{ leftPoint, rightPoint }, drawable, DDALineRenderer, opacity);
+
+		if (y == leftLine.p2.y && leftLine.p2 != bottomPoint)
+		{
+			leftIter = std::next(leftIter);
+			leftLine = Line{ leftLine.p2, *leftIter };
+			leftLerp = Lerp<int>(leftLine.p1.y, leftLine.p2.y, leftLine.p1.x, leftLine.p2.x);
+
+			leftCount = 0;
+		}
+
+		if (y == rightLine.p2.y && rightLine.p2 != bottomPoint)
+		{
+			rightIter = std::next(rightIter);
+			rightLine = Line{ rightLine.p2, *rightIter };
+			rightLerp = Lerp<int>(rightLine.p1.y, rightLine.p2.y, rightLine.p1.x, rightLine.p2.x);
+
 			rightCount = 0;
 		}
 	}
@@ -176,6 +233,13 @@ void renderTriangle(const Triangle& triangle, Drawable* drawable, const Color& c
 	auto vertices = triangle.vertices();
 	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, color, opacity);
 }
+
+void renderTriangle(const Triangle& triangle, Drawable* drawable, double opacity = 1.0)
+{
+	auto vertices = triangle.vertices();
+	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, opacity);
+}
+
 
 void renderPolygonWireframe(const Polygon& polygon, Drawable* drawable)
 {

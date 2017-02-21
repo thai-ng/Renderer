@@ -46,6 +46,11 @@ struct Point
 		return (x == other.x) && (y == other.y) && (parent == other.parent);
 	}
 
+	bool operator!=(const Point& other) const
+	{
+		return !(*this == other);
+	}
+
 	Point flipped() const
 	{
 		return Point{ y, x, parent, color };
@@ -139,6 +144,7 @@ struct Line
 			throw std::invalid_argument("Lines must connect.");
 		}
 	}
+
 };
 
 class Polygon

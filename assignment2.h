@@ -61,14 +61,11 @@ namespace assignment2
 		{
 			for (auto col = 0; col < 9; ++col)
 			{
-				auto color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
 				auto triangle = Triangle(std::array<Point, 3>{pointGrid[row][col], pointGrid[row][col + 1], pointGrid[row + 1][col + 1]}, &panel);
-				renderTriangle(triangle, drawable, color);
+				renderTriangle(triangle, drawable);
 
-				
-				color = 0xff000000u + static_cast<unsigned int>(colorDis(gen));
 				triangle = Triangle(std::array<Point, 3>{pointGrid[row][col], pointGrid[row + 1][col + 1], pointGrid[row + 1][col]}, &panel);
-				renderTriangle(triangle, drawable, color);
+				renderTriangle(triangle, drawable);
 			}
 		}
 	}
@@ -146,6 +143,14 @@ namespace assignment2
 					});
 				});
 				drawPointGrid(viewPort, pointGrid, client->getDrawable());
+			} break;
+
+			case 3:
+			{
+				Point p1{ 50, 50, nullptr, Color(255, 0, 0) };
+				Point p2{ 700, 50, nullptr, Color(0, 255, 0) };
+				Point p3{ 50, 700, nullptr, Color(0, 0, 255) };
+				renderPolygon(std::vector<Point>{p1, p2, p3}, client->getDrawable());
 			} break;
 
 			default:
