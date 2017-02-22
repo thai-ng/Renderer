@@ -146,10 +146,35 @@ namespace assignment2
 
 			case 3:
 			{
-				Point p1{ 50, 700, nullptr, Color(255, 0, 0) };
-				Point p2{ 375, 50, nullptr, Color(0, 255, 0) };
-				Point p3{ 700, 700, nullptr, Color(0, 0, 255) };
-				renderPolygon(std::vector<Point>{p1, p2, p3}, client->getDrawable());
+				auto centerPoint = viewPort.center();
+				auto p1 = Line(centerPoint, 275, 90, &viewPort).p2;
+				auto p2 = Line(centerPoint, 275, 210, &viewPort).p2;
+				auto p3 = Line(centerPoint, 275, 330, &viewPort).p2;
+				auto pointArray = std::array<Point, 3>{p1, p2, p3};
+
+				std::vector<Triangle> triangles;
+				triangles.reserve(6);
+
+				auto colorDouble = 1.0;
+
+				std::random_device device;
+				std::mt19937 randomEngine(device());
+				std::uniform_int_distribution<> zDist(0, 199);
+
+				std::generate_n(std::back_inserter(triangles),
+								6, 
+								[&viewPort, &pointArray, &colorDouble, &randomEngine, &zDist]
+								{
+									std::for_each(pointArray.begin(), pointArray.end(), [colorDouble](auto& point) {point.color = Color(colorDouble); });
+									colorDouble -= .15;
+
+									auto zCoordinate = zDist(randomEngine);
+									std::for_each(pointArray.begin(), pointArray.end(), [zCoordinate](auto& point) {point.z = zCoordinate; });
+
+									return Triangle(pointArray, &viewPort);
+								});
+				std::for_each(triangles.begin(), triangles.end(), [client](auto& triangle) {renderTriangle(triangle, client->getDrawable()); });
+
 			} break;
 
 			default:

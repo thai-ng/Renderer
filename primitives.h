@@ -23,6 +23,7 @@ struct Point
 {
 	int x;
 	int y;
+	int z;
 	Rect* parent;
 	Color color;
 
@@ -94,7 +95,10 @@ struct Line
 		auto opposite = length * std::sin(radianAngle);
 		auto adjacent = length * std::cos(radianAngle);
         p2 = Point{ origin.x + static_cast<int>(adjacent), origin.y + static_cast<int>(opposite), parent , color};
-		p1.parent = parent;
+		if (p1.parent != parent)
+		{
+			p1.parent = parent;
+		}
 		p1.color = Color(color);
 	}
 
