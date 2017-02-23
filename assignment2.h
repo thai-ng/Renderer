@@ -27,7 +27,7 @@ namespace assignment2
 			std::generate_n(std::back_inserter(pointRow), 10, [&currentX, &colorDis, &gen, currentY, margin, triangleLength]
 			{
 				auto color = colorDis(gen);
-				auto point = Point{ currentX, currentY, nullptr, Color(color) };
+				auto point = Point{ currentX, currentY, 0, nullptr, Color(color) };
 				currentX += triangleLength;
 				return point;
 			});
@@ -184,10 +184,8 @@ namespace assignment2
 					triangles.end(), 
 					[client, &zBuffer](auto& triangle) 
 				{
-					renderTriangle(triangle, client->getDrawable(), 1.0, &zBuffer); 
+					renderTriangle(triangle, client->getDrawable(), .75, &zBuffer); 
 				});
-
-
 			} break;
 
 			default:

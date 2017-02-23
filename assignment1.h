@@ -66,18 +66,18 @@ namespace assignment1
 		{
 			if (algorithmSwitch)
 			{
-				auto line1 = Line{ Point{ 20, 80 + p, &panel }, Point{ 150, 150 + p, &panel }, 0xffffffff };
+				auto line1 = Line{ Point{ 20, 80 + p, 0, &panel }, Point{ 150, 150 + p, 0, &panel }, 0xffffffff };
 				renderLine(line1, drawable, renderAlgorithm1);
 
-				auto line2 = Line{ Point{ 160 + p, 270, &panel }, Point{ 240 + p, 40, &panel }, 0xffffffff };
+				auto line2 = Line{ Point{ 160 + p, 270, 0, &panel }, Point{ 240 + p, 40, 0, &panel }, 0xffffffff };
 				renderLine(line2, drawable, renderAlgorithm1);
 			}
 			else
 			{
-				auto line1 = Line{ Point{ 20, 80 + p, &panel }, Point{ 150, 150 + p, &panel }, 0xffffffff };
+				auto line1 = Line{ Point{ 20, 80 + p, 0, &panel }, Point{ 150, 150 + p, 0, &panel }, 0xffffffff };
 				renderLine(line1, drawable, renderAlgorithm2);
 
-				auto line2 = Line{ Point{ 160 + p, 270, &panel }, Point{ 240 + p, 40, &panel }, 0xffffffff };
+				auto line2 = Line{ Point{ 160 + p, 270, 0, &panel }, Point{ 240 + p, 40, 0, &panel }, 0xffffffff };
 				renderLine(line2, drawable, renderAlgorithm2);
 			}
 		}
@@ -88,10 +88,10 @@ namespace assignment1
 	{
 		for (auto p = 0; p <= 50; ++p)
 		{
-			auto line1 = Line{ Point{ 20, 80 + p, &panel }, Point{ 150, 150 + p, &panel }, 0xffffffff };
+			auto line1 = Line{ Point{ 20, 80 + p, 0, &panel }, Point{ 150, 150 + p, 0, &panel }, 0xffffffff };
 			renderLine(line1, drawable, renderAlgorithm);
 
-			auto line2 = Line{ Point{ 160 + p, 270, &panel }, Point{ 240 + p, 40, &panel }, 0xffffffff };
+			auto line2 = Line{ Point{ 160 + p, 270, 0, &panel }, Point{ 240 + p, 40, 0, &panel }, 0xffffffff };
 			renderLine(line2, drawable, renderAlgorithm);
 		}
 	}

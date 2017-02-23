@@ -25,42 +25,42 @@ Point toFirstOctant(Octant octant, Point p)
     {
 		case Octant::First:
         {
-            return Point{p.x, p.y, p.parent, p.color};
+            return Point{p.x, p.y, p.z, p.parent, p.color};
         } break;
 
         case Octant::Second:
         {
-            return Point {p.y, p.x, p.parent, p.color };
+            return Point {p.y, p.x, p.z, p.parent, p.color };
 		} break;
 		
 		case Octant::Third:
 		{
-			return Point{p.y, -p.x, p.parent, p.color };
+			return Point{p.y, -p.x, p.z, p.parent, p.color };
 		} break;
 		
 		case Octant::Fourth:
 		{
-			return Point{-p.x, p.y, p.parent, p.color };
+			return Point{-p.x, p.y, p.z, p.parent, p.color };
 		} break;
 		
 		case Octant::Fifth:
 		{
-			return Point{-p.x, -p.y, p.parent, p.color };
+			return Point{-p.x, -p.y, p.z, p.parent, p.color };
 		} break;
 
 		case Octant::Sixth:
 		{
-			return Point{-p.y, -p.x, p.parent, p.color };
+			return Point{-p.y, -p.x, p.z, p.parent, p.color };
 		} break;
 		
 		case Octant::Seventh:
 		{
-			return Point{-p.y, p.x, p.parent, p.color };
+			return Point{-p.y, p.x, p.z, p.parent, p.color };
 		} break;
 		
 		case Octant::Eighth:
 		{
-			return Point{p.x, -p.y, p.parent, p.color };
+			return Point{p.x, -p.y, p.z, p.parent, p.color };
 		} break;
 
         default:
@@ -236,7 +236,7 @@ void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurfa
 
 			if (zBuffer != nullptr)
 			{
-				if (screenPoint.z >= (*zBuffer)[screenPoint.x][screenPoint.y])
+				if (screenPoint.z <= (*zBuffer)[screenPoint.x][screenPoint.y])
 				{
 					(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
 					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
@@ -283,7 +283,7 @@ void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurfa
 
 			if (zBuffer != nullptr)
 			{
-				if (screenPoint.z >= (*zBuffer)[screenPoint.x][screenPoint.y])
+				if (screenPoint.z < (*zBuffer)[screenPoint.x][screenPoint.y])
 				{
 					(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
 					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
@@ -323,7 +323,7 @@ void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, co
 
 			if (zBuffer != nullptr)
 			{
-				if (screenPoint.z >= (*zBuffer)[screenPoint.x][screenPoint.y])
+				if (screenPoint.z < (*zBuffer)[screenPoint.x][screenPoint.y])
 				{
 					(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
 					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
@@ -362,7 +362,7 @@ void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, co
 
 			if (zBuffer != nullptr)
 			{
-				if (screenPoint.z >= (*zBuffer)[screenPoint.x][screenPoint.y])
+				if (screenPoint.z < (*zBuffer)[screenPoint.x][screenPoint.y])
 				{
 					(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
 					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());

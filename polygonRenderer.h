@@ -134,8 +134,8 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double 
 		++rightCount;
 		auto rightColor = Color(r, g, b);
 
-		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, topPoint.parent, leftColor };
-		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y, topPoint.parent, rightColor };
+		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, topPoint.z, topPoint.parent, leftColor };
+		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y, topPoint.z, topPoint.parent, rightColor };
 
 		renderLine(Line{ leftPoint, rightPoint }, drawable, DDALineRenderer, opacity, zBuffer);
 
@@ -198,8 +198,8 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const C
 		auto xr = rightLerp[rightCount].second;
 		++rightCount;
 
-		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, topPoint.parent, color };
-		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y, topPoint.parent, color };
+		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, topPoint.z, topPoint.parent, color };
+		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y, topPoint.z, topPoint.parent, color };
 
 		renderLine(Line{ leftPoint, rightPoint }, drawable, DDALineRenderer, opacity, zBuffer);
 

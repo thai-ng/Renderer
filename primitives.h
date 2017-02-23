@@ -31,17 +31,17 @@ struct Point
 	Color color;
 
 	Point() : x(0), y(0), parent(nullptr), color(0xffffffff) {}
-	Point(int x, int y, Rect* parent = nullptr, const Color& color = 0xffffffff) : x(x), y(y), parent(parent), color(color) {}
+	Point(int x, int y, int z=0, Rect* parent = nullptr, const Color& color = 0xffffffff) : x(x), y(y), z(z), parent(parent), color(color) {}
 
 	auto toGlobalCoordinate() const
 	{
 		if (parent)
 		{
-			return Point{ parent->x + x, parent->y + y, nullptr, color};
+			return Point{ parent->x + x, parent->y + y, z, nullptr, color};
 		}
 		else
 		{
-			return Point{ x, y, nullptr, color };
+			return Point{ x, y, z, nullptr, color };
 		}
 	}
 
@@ -57,13 +57,13 @@ struct Point
 
 	Point flipped() const
 	{
-		return Point{ y, x, parent, color };
+		return Point{ y, x, z, parent, color };
 	}
 };
 
 auto Rect::center() 
 { 
-	return Point{ (width / 2), (height / 2), this}; 
+	return Point{ (width / 2), (height / 2), 0, this}; 
 }
 
 Point operator+(const Point& p1, const Point& p2)
@@ -100,7 +100,7 @@ struct Line
 		auto radianAngle = getRadianFromDegree(angle);
 		auto opposite = length * std::sin(radianAngle);
 		auto adjacent = length * std::cos(radianAngle);
-        p2 = Point{ origin.x + static_cast<int>(adjacent), origin.y + static_cast<int>(opposite), parent , color};
+        p2 = Point{ origin.x + static_cast<int>(adjacent), origin.y + static_cast<int>(opposite), origin.z, parent , color};
 		if (p1.parent != parent)
 		{
 			p1.parent = parent;
