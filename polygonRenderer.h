@@ -84,7 +84,7 @@ double getXSlope(Line line)
 }
 
 
-void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double opacity = 1.0)
+void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr)
 {
 	auto sortedVertices = sortVertices(points, comparePoints);
 	auto topPoint = sortedVertices.front();
@@ -137,7 +137,7 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double 
 		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, topPoint.parent, leftColor };
 		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y, topPoint.parent, rightColor };
 
-		renderLine(Line{ leftPoint, rightPoint }, drawable, DDALineRenderer, opacity);
+		renderLine(Line{ leftPoint, rightPoint }, drawable, DDALineRenderer, opacity, zBuffer);
 
 		if (y == leftLine.p2.y && leftLine.p2 != bottomPoint)
 		{
@@ -166,7 +166,7 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double 
 	}
 }
 
-void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const Color& color, double opacity = 1.0)
+void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const Color& color, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr)
 {
 	auto sortedVertices = sortVertices(points, comparePoints);
 	auto topPoint = sortedVertices.front();
@@ -201,7 +201,7 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const C
 		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, topPoint.parent, color };
 		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y, topPoint.parent, color };
 
-		renderLine(Line{ leftPoint, rightPoint }, drawable, DDALineRenderer, opacity);
+		renderLine(Line{ leftPoint, rightPoint }, drawable, DDALineRenderer, opacity, zBuffer);
 
 		if (y == leftLine.p2.y && leftLine.p2 != bottomPoint)
 		{
@@ -223,21 +223,21 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, const C
 	}
 }
 
-void renderPolygon(const Polygon& polygon, Drawable* drawable, const Color& color)
+void renderPolygon(const Polygon& polygon, Drawable* drawable, const Color& color, Matrix2D<int>* zBuffer = nullptr)
 {
-	renderPolygon(polygon.vertices(), drawable, color);
+	renderPolygon(polygon.vertices(), drawable, color, 1.0, zBuffer);
 }
 
-void renderTriangle(const Triangle& triangle, Drawable* drawable, const Color& color, double opacity = 1.0)
+void renderTriangle(const Triangle& triangle, Drawable* drawable, const Color& color, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr)
 {
 	auto vertices = triangle.vertices();
-	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, color, opacity);
+	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, color, opacity, zBuffer);
 }
 
-void renderTriangle(const Triangle& triangle, Drawable* drawable, double opacity = 1.0)
+void renderTriangle(const Triangle& triangle, Drawable* drawable, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr)
 {
 	auto vertices = triangle.vertices();
-	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, opacity);
+	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, opacity, zBuffer);
 }
 
 

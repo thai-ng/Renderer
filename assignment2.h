@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "client.h"
+#include "transformationUtil.h"
 #include "polygonRenderer.h"
 
 namespace assignment2
@@ -160,10 +161,11 @@ namespace assignment2
 				std::random_device device;
 				std::mt19937 randomEngine(device());
 				std::uniform_int_distribution<> zDist(0, 199);
+				std::uniform_int_distribution<> rotateDist(0, 120);
 
 				std::generate_n(std::back_inserter(triangles),
 								6, 
-								[&viewPort, &pointArray, &colorDouble, &randomEngine, &zDist]
+								[&viewPort, &pointArray, &colorDouble, &randomEngine, &zDist, &rotateDist, &centerPoint]
 								{
 									std::for_each(pointArray.begin(), pointArray.end(), [colorDouble](auto& point) {point.color = Color(colorDouble); });
 									colorDouble -= .15;
@@ -171,9 +173,20 @@ namespace assignment2
 									auto zCoordinate = zDist(randomEngine);
 									std::for_each(pointArray.begin(), pointArray.end(), [zCoordinate](auto& point) {point.z = zCoordinate; });
 
-									return Triangle(pointArray, &viewPort);
+									auto triangle =  Triangle(pointArray, &viewPort);
+									return rotate(triangle, rotateDist(randomEngine), centerPoint);
 								});
-				std::for_each(triangles.begin(), triangles.end(), [client](auto& triangle) {renderTriangle(triangle, client->getDrawable()); });
+
+				Matrix2D<int> zBuffer(650, std::vector<int>(650, 200));
+
+				std::sort(triangles.begin(), triangles.end(), [](auto triangle1, auto triangle2) {return triangle1.vertices()[0].z < triangle2.vertices()[0].z; });
+				std::for_each(triangles.begin(), 
+					triangles.end(), 
+					[client, &zBuffer](auto& triangle) 
+				{
+					renderTriangle(triangle, client->getDrawable(), 1.0, &zBuffer); 
+				});
+
 
 			} break;
 

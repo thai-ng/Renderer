@@ -170,6 +170,7 @@
     <ClInclude Include="pageturner.h" />
     <ClInclude Include="polygonRenderer.h" />
     <ClInclude Include="primitives.h" />
+    <ClInclude Include="transformationUtil.h" />
     <CustomBuild Include="renderarea361.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-IC:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x64" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtANGLE" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing renderarea361.h...</Message>

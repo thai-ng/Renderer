@@ -166,19 +166,19 @@ Octant getOctant(Point p)
 }
 
 template <typename F>
-void renderLine(const Point& p1, const Point& p2, Drawable* surface, const Color& color, F function)
+void renderLine(const Point& p1, const Point& p2, Drawable* surface, const Color& color, F function, Matrix2D<int>* zBuffer = nullptr)
 {
-	function(p1, p2, surface, color);
+	function(p1, p2, surface, color, 1.0, zBuffer);
 }
 
 template <typename F>
-void renderLine(const Line& l, Drawable* surface, F function, double opacity = 1.0)
+void renderLine(const Line& l, Drawable* surface, F function, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr)
 {
 	auto points = l.toGlobalCoordinate();
 	auto p1 = std::get<0>(points);
 	auto p2 = std::get<1>(points);
 
-	function(p1, p2, surface, l.color, opacity);
+	function(p1, p2, surface, l.color, opacity, zBuffer);
 }
 
 auto getColorLerp(const Point& point1, const Point& point2)
@@ -202,7 +202,7 @@ auto getColorLerp(const Point& point1, const Point& point2)
 	return std::make_tuple(redLerp, greenLerp, blueLerp);
 }
 
-void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color, double opacity = 1.0)
+void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr)
 {
 	// Hack to remove warning, refactor later
 	auto tempColor = color;
@@ -234,7 +234,18 @@ void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurfa
 			auto oldColor = drawSurface->getPixel(screenPoint.x, screenPoint.y);
 			auto colorToPaint = colorWithOpacity(point1.color, oldColor, opacity);
 
-			drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+			if (zBuffer != nullptr)
+			{
+				if (screenPoint.z >= (*zBuffer)[screenPoint.x][screenPoint.y])
+				{
+					(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
+					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+				}
+			}
+			else
+			{
+				drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+			}
 		}
 	}
 	else
@@ -270,13 +281,24 @@ void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurfa
 			auto oldColor = drawSurface->getPixel(x, y);
 			auto colorToPaint = colorWithOpacity(newColor, oldColor, opacity);
 
-			drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+			if (zBuffer != nullptr)
+			{
+				if (screenPoint.z >= (*zBuffer)[screenPoint.x][screenPoint.y])
+				{
+					(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
+					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+				}
+			}
+			else
+			{
+				drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+			}
 		}
 	}
 	
 }
 
-void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color, double opacity = 1.0)
+void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr)
 {
 	auto octant = getOctant(p2 - p1);
 	auto point1 = toFirstOctant(octant, p1);
@@ -299,7 +321,18 @@ void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, co
 			auto oldColor = drawSurface->getPixel(screenPoint.x, screenPoint.y);
 			auto colorToPaint = colorWithOpacity(point1.color, oldColor, opacity);
 
-			drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+			if (zBuffer != nullptr)
+			{
+				if (screenPoint.z >= (*zBuffer)[screenPoint.x][screenPoint.y])
+				{
+					(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
+					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+				}
+			}
+			else
+			{
+				drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+			}
 		}
 	}
 	else
@@ -327,7 +360,18 @@ void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, co
 			auto oldColor = drawSurface->getPixel(screenPoint.x, screenPoint.y);
 			auto colorToPaint = colorWithOpacity(newColor, oldColor, opacity);
 
-			drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+			if (zBuffer != nullptr)
+			{
+				if (screenPoint.z >= (*zBuffer)[screenPoint.x][screenPoint.y])
+				{
+					(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
+					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+				}
+			}
+			else
+			{
+				drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+			}
 		}
 	}
 }
@@ -349,8 +393,10 @@ double rfpart(double num)
 	return 1 - fpart(num);
 }
 
-void WuLineRenderer(const Point& p1, const Point& p2, Drawable* drawable, const Color& color, double opacity = 1.0)
+void WuLineRenderer(const Point& p1, const Point& p2, Drawable* drawable, const Color& color, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr)
 {
+	auto zBufferLocal = zBuffer;
+	++zBufferLocal;
 	opacity += 1;
 	auto point1 = p1;
 	auto point2 = p2;

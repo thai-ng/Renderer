@@ -6,6 +6,9 @@
 
 #include "Color.h"
 
+template <typename T>
+using Matrix2D = std::vector<std::vector<T>>;
+
 struct Rect
 {
 	int x;
@@ -74,8 +77,11 @@ Point operator-(const Point& p1, const Point& p2)
 }
 
 
-static constexpr double Pi = 3.141592653589793238462643383279502884;
-
+double getRadianFromDegree(int angle)
+{
+	static constexpr double Pi = 3.141592653589793238462643383279502884;
+	return (angle * Pi / 180.0);
+}
 struct Line
 {
 	Line(Point inp1, Point inp2) : p1(inp1), p2(inp2)
@@ -91,7 +97,7 @@ struct Line
 
 	Line(const Point& origin, int length, int angle, Rect* parent = nullptr, unsigned int c = 0xffffffff) : p1(origin), color(c)
 	{
-		auto radianAngle = angle * Pi / 180.0;
+		auto radianAngle = getRadianFromDegree(angle);
 		auto opposite = length * std::sin(radianAngle);
 		auto adjacent = length * std::cos(radianAngle);
         p2 = Point{ origin.x + static_cast<int>(adjacent), origin.y + static_cast<int>(opposite), parent , color};
@@ -163,6 +169,12 @@ public:
 	{
 		return _vertices;
 	}
+
+	Rect* parent() const
+	{
+		return _parent;
+	}
+
 private:
 	std::vector<Point> _vertices;
 	Rect* _parent;
@@ -193,6 +205,12 @@ public:
 	{
 		return _vertices;
 	}
+
+	Rect* parent() const
+	{
+		return _parent;
+	}
+
 private:
 	Rect* _parent;
 	std::array<Point, 3> _vertices;
