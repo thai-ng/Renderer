@@ -35,6 +35,9 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Simp Files">
+      <UniqueIdentifier>{0ab6d134-b84a-4c88-960e-1e6a27ca792b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client.cpp">
@@ -110,5 +113,16 @@
     <CustomBuild Include="release\moc_predefs.h.cbt">
       <Filter>Generated Files</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="simp\cube.simp">
+      <Filter>Simp Files</Filter>
+    </None>
+    <None Include="simp\cube2.simp">
+      <Filter>Simp Files</Filter>
+    </None>
+    <None Include="simp\z0_face.simp">
+      <Filter>Simp Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
