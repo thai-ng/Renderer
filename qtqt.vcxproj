@@ -116,6 +116,7 @@
       <WarningLevel>Level4</WarningLevel>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(QTDIR)\lib\qtmaind.lib;shell32.lib;"C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x64\shell32.lib";$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -164,8 +165,11 @@
     <ClInclude Include="assignment2.h" />
     <ClInclude Include="client.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="command.h" />
     <ClInclude Include="drawable.h" />
+    <ClInclude Include="FileReader.h" />
     <ClInclude Include="lerp.h" />
+    <ClInclude Include="LineParser.h" />
     <ClInclude Include="lineRenderer.h" />
     <ClInclude Include="pageturner.h" />
     <ClInclude Include="polygonRenderer.h" />

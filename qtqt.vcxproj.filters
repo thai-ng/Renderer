@@ -38,6 +38,18 @@
     <Filter Include="Simp Files">
       <UniqueIdentifier>{0ab6d134-b84a-4c88-960e-1e6a27ca792b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Renderer">
+      <UniqueIdentifier>{afd030bd-11ee-4264-9bdb-3c8e981f32b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Application">
+      <UniqueIdentifier>{54268c0b-3d9b-4792-aabb-effde7d2c9ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering Helpers">
+      <UniqueIdentifier>{9f0b49b8-098e-470a-ac6d-3e2716e8b5f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\File Reader">
+      <UniqueIdentifier>{4ac1e1ea-1e85-4602-948d-79f96631b64f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client.cpp">
@@ -66,44 +78,47 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="drawable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lineRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pageturner.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="polygonRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="primitives.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <CustomBuild Include="renderarea361.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="window361.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <ClInclude Include="Color.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lerp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="assignment2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="assignment1.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="lineRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="polygonRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="drawable.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="pageturner.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="client.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
     <ClInclude Include="transformationUtil.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.h">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="lerp.h">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="primitives.h">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileReader.h">
+      <Filter>Header Files\File Reader</Filter>
+    </ClInclude>
+    <ClInclude Include="command.h">
+      <Filter>Header Files\File Reader</Filter>
+    </ClInclude>
+    <ClInclude Include="LineParser.h">
+      <Filter>Header Files\File Reader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +127,12 @@
     </CustomBuild>
     <CustomBuild Include="release\moc_predefs.h.cbt">
       <Filter>Generated Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="window361.h">
+      <Filter>Header Files\Application</Filter>
+    </CustomBuild>
+    <CustomBuild Include="renderarea361.h">
+      <Filter>Header Files\Application</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
