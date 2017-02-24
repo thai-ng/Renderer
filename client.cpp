@@ -9,7 +9,6 @@ Client::Client(Drawable *drawable)
     this->drawable = drawable;
 }
 
-
 void Client::nextPage() 
 {
 	assignment2::doNextPage(this);
