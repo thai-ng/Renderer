@@ -2,6 +2,7 @@
 
 #include "assignment1.h"
 #include "assignment2.h"
+#include "SimpFile.h"
 
 Client::Client(Drawable *drawable)
 {

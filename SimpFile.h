@@ -83,9 +83,9 @@ private:
 				auto fileName = std::get<std::string>(command.paramerters());
 				SimpFile childFile(fileName);
 				auto childCommands = childFile.commands();
-				std::for_each(childCommands.begin(), childCommands.end(), [](auto command)
+				std::for_each(childCommands.begin(), childCommands.end(), [this](auto command)
 				{
-					_commands.push_back(std::move(command));
+					this->_commands.push_back(std::move(command));
 				});
 			}
 			else

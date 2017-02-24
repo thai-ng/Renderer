@@ -6,13 +6,6 @@
 #include <variant>
 #include <cstdlib>
 
-using Vector3 =  std::array<double, 3>;
-using PolygonParams = std::array<Vector3, 3>;
-using LineParams =  std::array<Vector3, 2>;
-using RotateParams = std::pair<Axis, int>;
-using FileParam = std::string;
-using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam>;
-
 enum class Operation
 {
 	OpenBrace,
@@ -33,6 +26,13 @@ enum class Axis
 	Y,
 	Z
 };
+
+using Vector3 = std::array<double, 3>;
+using PolygonParams = std::array<Vector3, 3>;
+using LineParams = std::array<Vector3, 2>;
+using RotateParams = std::pair<Axis, int>;
+using FileParam = std::string;
+using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam>;
 
 using namespace std::string_literals;
 
@@ -89,7 +89,9 @@ public:
 			
 			case Operation::File:
 			{
-				params = std::string(std::next(tokens[1].cbegin()), std::prev(std::prev(tokens[1].cend())));
+				auto fileName = std::string(std::next(tokens[1].cbegin()), std::prev(tokens[1].cend()));
+				fileName += ".simp";
+				params = fileName;
 			} break;
 
 			default:
