@@ -6,6 +6,13 @@
 #include <variant>
 #include <cstdlib>
 
+using Vector3 =  std::array<double, 3>;
+using PolygonParams = std::array<Vector3, 3>;
+using LineParams =  std::array<Vector3, 2>;
+using RotateParams = std::pair<Axis, int>;
+using FileParam = std::string;
+using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam>;
+
 enum class Operation
 {
 	OpenBrace,
@@ -53,8 +60,8 @@ class Command
 public:
 	Command(const std::vector<std::string>& tokens)
 	{
-		op = OperationTokens.at(tokens[0]);
-		switch (op)
+		_op = OperationTokens.at(tokens[0]);
+		switch (_op)
 		{
 			case Operation::Polygon:
 			{
@@ -92,14 +99,19 @@ public:
 		}
 	}
 
-private:
-	typedef std::array<double, 3> Vector3;
-	typedef std::array<Vector3, 3> PolygonParams;
-	typedef std::array<Vector3, 2> LineParams;
-	typedef std::pair<Axis, int> RotateParams;
-	typedef std::string FileParam;
+	Operation operation() const
+	{
+		return _op;
+	}
 
-	Operation op;
-	std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam> params;
+	const CommandParams& paramerters() const
+	{
+		return params;
+	}
+
+private:
+	
+	Operation _op;
+	CommandParams params;
 	
 };

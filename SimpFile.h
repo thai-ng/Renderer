@@ -26,9 +26,14 @@ public:
 		}
 	}
 
+	std::vector<Command> commands() const
+	{
+		return _commands;
+	}
+
 private:
 	std::ifstream currentStream;
-	std::vector<Command> commands;
+	std::vector<Command> _commands;
 
 	std::vector<std::string> getTokens(const std::string& line)
 	{
@@ -72,9 +77,21 @@ private:
 		auto tokens = getTokens(line);
 		if (tokens.size() > 0 && tokens[0] != "#")
 		{
-			// Not empty line or comment
 			Command command(tokens);
-			commands.push_back(command);
+			if (command.operation() == Operation::File)
+			{
+				auto fileName = std::get<std::string>(command.paramerters());
+				SimpFile childFile(fileName);
+				auto childCommands = childFile.commands();
+				std::for_each(childCommands.begin(), childCommands.end(), [](auto command)
+				{
+					_commands.push_back(std::move(command));
+				});
+			}
+			else
+			{
+				_commands.push_back(command);
+			}
 
 		}
 	}
