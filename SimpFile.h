@@ -7,10 +7,10 @@
 
 #include "command.h"
 
-class FileReader
+class SimpFile
 {
 public:
-	FileReader(const std::string& fileName) : currentStream(fileName)
+	SimpFile(const std::string& fileName) : currentStream(fileName)
 	{
 		if (currentStream)
 		{

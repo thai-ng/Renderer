@@ -47,7 +47,7 @@
     <Filter Include="Header Files\Rendering Helpers">
       <UniqueIdentifier>{9f0b49b8-098e-470a-ac6d-3e2716e8b5f1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\File Reader">
+    <Filter Include="Header Files\Simp File Parsing">
       <UniqueIdentifier>{4ac1e1ea-1e85-4602-948d-79f96631b64f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -111,14 +111,14 @@
     <ClInclude Include="primitives.h">
       <Filter>Header Files\Rendering Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="FileReader.h">
-      <Filter>Header Files\File Reader</Filter>
-    </ClInclude>
     <ClInclude Include="command.h">
-      <Filter>Header Files\File Reader</Filter>
+      <Filter>Header Files\Simp File Parsing</Filter>
     </ClInclude>
     <ClInclude Include="LineParser.h">
-      <Filter>Header Files\File Reader</Filter>
+      <Filter>Header Files\Simp File Parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpFile.h">
+      <Filter>Header Files\Simp File Parsing</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -167,7 +167,7 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="command.h" />
     <ClInclude Include="drawable.h" />
-    <ClInclude Include="FileReader.h" />
+    <ClInclude Include="SimpFile.h" />
     <ClInclude Include="lerp.h" />
     <ClInclude Include="LineParser.h" />
     <ClInclude Include="lineRenderer.h" />
