@@ -17,6 +17,7 @@ void Client::nextPage()
 	auto row0 = matrix.getRow<1>();
 	auto elem = matrix.getElement<1, 0>();
 	auto elemFromRow = row0[0];
+	auto col0 = matrix.getCol<1>();
 	std::cout << elem;
 	std::cout << elemFromRow;
 	assignment2::doNextPage(this);
