@@ -13,13 +13,14 @@ Client::Client(Drawable *drawable)
 
 void Client::nextPage() 
 {
-	Matrix<3, 2, int> matrix{ 1, 2, 3, 4, 5, 6 };
-	auto row0 = matrix.getRow<1>();
-	auto elem = matrix.getElement<1, 0>();
-	auto elemFromRow = row0[0];
-	auto col0 = matrix.getCol<1>();
-	std::cout << elem;
-	std::cout << elemFromRow;
+	Matrix<3, 3, int> matrix{ 1, 0, 0, 
+							  0, 2, 0,
+							  0, 0, 3 };
+	Matrix<3, 3, int> permutation{ 0, 1, 0,
+								   0, 0, 1,
+								   1, 0, 0 };
+	
+	auto mult = permutation * matrix;
 	assignment2::doNextPage(this);
 }
 
