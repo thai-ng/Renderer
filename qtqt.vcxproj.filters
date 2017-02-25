@@ -129,6 +129,9 @@
     <ClInclude Include="SimpEngine.hpp">
       <Filter>Header Files\Simp Engine</Filter>
     </ClInclude>
+    <ClInclude Include="RenderingEngine.hpp">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
