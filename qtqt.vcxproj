@@ -168,6 +168,7 @@
     <ClInclude Include="command.h" />
     <ClInclude Include="drawable.h" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="SimpEngine.hpp" />
     <ClInclude Include="SimpFile.h" />
     <ClInclude Include="lerp.h" />
     <ClInclude Include="LineParser.h" />

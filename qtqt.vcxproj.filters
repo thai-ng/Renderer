@@ -50,6 +50,9 @@
     <Filter Include="Header Files\Simp File Parsing">
       <UniqueIdentifier>{4ac1e1ea-1e85-4602-948d-79f96631b64f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Simp Engine">
+      <UniqueIdentifier>{0ee42237-3960-4ffe-9af8-e4ed6c65274f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client.cpp">
@@ -122,6 +125,9 @@
     </ClInclude>
     <ClInclude Include="Matrix.h">
       <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpEngine.hpp">
+      <Filter>Header Files\Simp Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,10 @@
 #include "client.h"
 
+#include <iostream>
 #include "assignment1.h"
 #include "assignment2.h"
 #include "SimpFile.h"
+#include "Matrix.h"
 
 Client::Client(Drawable *drawable)
 {
@@ -11,6 +13,12 @@ Client::Client(Drawable *drawable)
 
 void Client::nextPage() 
 {
+	Matrix<3, 2, int> matrix{ 1, 2, 3, 4, 5, 6 };
+	auto row0 = matrix.getRow<1>();
+	auto elem = matrix.getElement<1, 0>();
+	auto elemFromRow = row0[0];
+	std::cout << elem;
+	std::cout << elemFromRow;
 	assignment2::doNextPage(this);
 }
 
