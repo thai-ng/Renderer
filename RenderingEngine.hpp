@@ -12,11 +12,22 @@ using Line_t = std::array<Vector4_t, 2>;
 class RenderEngine
 {
 public:
+	RenderEngine(const Rect& viewPort, Drawable* drawSurface) : _viewPort(viewPort), _drawSurface(drawSurface)
+	{
+		zBuffer = Matrix2D<int>(_viewPort.width, std::vector<int>(_viewPort.height, zThreshold));
+		// Create transformation matrix
+		// - Create Scale matrix
+		// - Create Translation matrix
+
+		// Clip outside viewport
+	}
+
 	enum class RenderMode
 	{
 		Filled,
 		Wireframe
 	};
+
 	void RenderTriangle(const Triangle_t& triangle, RenderMode renderMode)
 	{
 		// Translate to screen space
@@ -43,6 +54,7 @@ public:
 		Point point1 = Point{ static_cast<int>(std::round(line[0][0])), static_cast<int>(std::round(line[0][1])), static_cast<int>(std::round(line[0][2])), nullptr, getColorFromZ(static_cast<int>(std::round(line[0][2]))) };
 		Point point2 = Point{ static_cast<int>(std::round(line[1][0])), static_cast<int>(std::round(line[1][1])), static_cast<int>(std::round(line[1][2])), nullptr, getColorFromZ(static_cast<int>(std::round(line[0][2]))) };
 
+		// This takes global coordinate, fix first
 		DDALineRenderer(point1, point2, nullptr, Color(0, 0, 0), 1.0, &zBuffer);
 	}
 
@@ -61,5 +73,6 @@ private:
 	Lerp<int> blueLerp = Lerp<int>(0, 200, 255, 0);
 	Matrix2D<int> zBuffer;
 	int zThreshold = 200;
-
+	Rect _viewPort;
+	Drawable* _drawSurface;
 };
