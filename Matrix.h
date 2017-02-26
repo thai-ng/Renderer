@@ -137,8 +137,8 @@ auto operator*(Matrix<4, 4, T>& l, Matrix<4, 4, T>& r)
 	auto elem33 = row3[0] * otherCol3[0] + row3[1] * otherCol3[1] + row3[2] * otherCol3[2] + row3[3] * otherCol3[3];
 
 
-	return Matrix<4, 4, T> { elem00, elem01, elem02, elem03
-							 elem10, elem11, elem12, elem13
+	return Matrix<4, 4, T> { elem00, elem01, elem02, elem03,
+							 elem10, elem11, elem12, elem13,
 							 elem20, elem21, elem22, elem23,
 							 elem30, elem31, elem32, elem33 };
 }

@@ -11,6 +11,11 @@ class SimpEngine
 {
 	using CTM_t = Matrix<4, 4, double>;
 
+	SimpEngine(RenderEngine renderEngine) : _renderEngine(renderEngine)
+	{
+
+	}
+
 	void runCommands(const std::vector<Command>& commands)
 	{
 		for (auto& command : commands)
@@ -19,21 +24,21 @@ class SimpEngine
 			{
 				case Operation::Filled:
 				{
-					currentRenderMode = RenderingEngine::RenderMode::Filled;
+					currentRenderMode = RenderEngine::RenderMode::Filled;
 				} break;
 
 				case Operation::Wire:
 				{
-					currentRenderMode = RenderingEngine::RenderMode::Wireframe;
+					currentRenderMode = RenderEngine::RenderMode::Wireframe;
 				} break;
 
 				case Operation::OpenBrace:
 				{
 					TransformStack.push(std::move(CTM));
-					CTM = CTM_t{ 1, 0, 0, 0,
-								 0, 1, 0, 0,
-						         0, 0, 1, 0,
-								 0, 0, 0, 1 };
+					CTM = CTM_t{ 1.0, 0.0, 0.0, 0.0,
+								 0.0, 1.0, 0.0, 0.0,
+						         0.0, 0.0, 1.0, 0.0,
+								 0.0, 0.0, 0.0, 1.0 };
 				} break;
 
 				case Operation::CloseBrace:
@@ -48,20 +53,20 @@ class SimpEngine
 				case Operation::Scale:
 				{
 					auto params = std::get<Vector3>(command.parameters());
-					auto scaleMatrix = CTM_t{ params[0], 0,			0,		    0, 	
-										      0,         params[1], 0,			0,
-										      0,		 0,			params[2],  0,
-											  0,		 0,			0		 ,  1};
+					auto scaleMatrix = CTM_t{ params[0], 0.0,		0.0,	   0.0, 	
+										      0.0,       params[1], 0.0,	   0.0,
+										      0.0,		 0.0,		params[2], 0.0,
+											  0.0,		 0.0,		0.0		 , 1.0};
 					CTM = scaleMatrix * CTM;
 				} break;
 
 				case Operation::Translate:
 				{
 					auto params = std::get<Vector3>(command.parameters());
-					auto translationMatrix = CTM_t{ 1, 0, 0, params[0],
-										            0, 1, 0, params[1],
-										            0, 0, 1, params[2],
-											        0, 0, 0, 1};
+					auto translationMatrix = CTM_t{ 1.0, 0.0, 0.0, params[0],
+										            0.0, 1.0, 0.0, params[1],
+										            0.0, 0.0, 1.0, params[2],
+											        0.0, 0.0, 0.0, 1.0};
 					CTM = translationMatrix * CTM;
 				} break;
 
@@ -82,6 +87,7 @@ class SimpEngine
 					auto transformedPoint2 = CTM * point2;
 
 					// Send to rendering engine to render
+					_renderEngine.RenderLine(Line_t{ transformedPoint1, transformedPoint2 }, currentRenderMode);
 				} break;
 
 				case Operation::Polygon:
@@ -95,45 +101,47 @@ class SimpEngine
 					auto transformedPoint3 = CTM * point2;
 
 					// Send to rendering engine to render
+					_renderEngine.RenderTriangle(Triangle_t{ transformedPoint1, transformedPoint2, transformedPoint3 }, currentRenderMode);
 				}
 			}
 		}
 	}
 private:
 
-	auto getRotationMatrix(const Axis& axis, int degree) const
+	CTM_t getRotationMatrix(const Axis& axis, int degree) const
 	{
 		auto radian = getRadianFromDegree(degree);
 		switch (axis)
 		{
 			case Axis::X:
 			{
-				return CTM_t{ 1, 0,				   0,				  0,
-							  0, std::cos(radian), -std::sin(radian), 0,
-							  0, std::sin(radian), std::cos(radian),  0,
-							  0, 0,				   0,				  1 };
+				return CTM_t{ 1.0, 0.0,				 0.0,				0.0,
+							  0.0, std::cos(radian), -std::sin(radian), 0.0,
+							  0.0, std::sin(radian), std::cos(radian),  0.0,
+							  0.0, 0.0,				 0.0,				1.0 };
 			} break;
 
 			case Axis::Y:
 			{
-				return CTM_t{ std::cos(radian),	 0, std::sin(radian), 0,
-							  0,				 1, 0,				  0,
-							  -std::sin(radian), 0, std::cos(radian), 0,
-							  0,				 0,	0,				  1 };
+				return CTM_t{ std::cos(radian),	 0.0, std::sin(radian), 0.0,
+							  0.0,				 1.0, 0.0,				0.0,
+							  -std::sin(radian), 0.0, std::cos(radian), 0.0,
+							  0.0,				 0.0, 0.0,				1.0 };
 			} break;
 			
 			case Axis::Z:
 			default:
 			{
-				return CTM_t{ std::cos(radian), -std::sin(radian), 0, 0,
-							  std::sin(radian), std::cos(radian),  0, 0,
-							  0,				0,				   0, 0,
-							  0,				0,				   0, 1 };
+				return CTM_t{ std::cos(radian), -std::sin(radian), 0.0, 0.0,
+							  std::sin(radian), std::cos(radian),  0.0, 0.0,
+							  0.0,				0.0,			   0.0, 0.0,
+							  0.0,				0.0,			   0.0, 1.0 };
 			} break;
 		}
 	}
 
-	RenderingEngine::RenderMode currentRenderMode = RenderingEngine::RenderMode::Filled;
+	RenderEngine _renderEngine;
+	RenderEngine::RenderMode currentRenderMode = RenderEngine::RenderMode::Filled;
 	CTM_t CTM;
 	std::stack<CTM_t> TransformStack;
 };
