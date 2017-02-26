@@ -1,9 +1,11 @@
 #include "client.h"
 
 #include <iostream>
+
 #include "assignment1.h"
 #include "assignment2.h"
 #include "SimpFile.h"
+#include "SimpEngine.hpp"
 #include "Matrix.h"
 
 Client::Client(Drawable *drawable)
@@ -13,14 +15,8 @@ Client::Client(Drawable *drawable)
 
 void Client::nextPage() 
 {
-	Matrix<3, 3, int> matrix{ 1, 0, 0, 
-							  0, 2, 0,
-							  0, 0, 3 };
-	Matrix<3, 3, int> permutation{ 0, 1, 0,
-								   0, 0, 1,
-								   1, 0, 0 };
+	SimpFile file("cube.simp");
 	
-	auto mult = permutation * matrix;
 	assignment2::doNextPage(this);
 }
 

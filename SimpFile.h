@@ -80,7 +80,7 @@ private:
 			Command command(tokens);
 			if (command.operation() == Operation::File)
 			{
-				auto fileName = std::get<std::string>(command.paramerters());
+				auto fileName = std::get<std::string>(command.parameters());
 				SimpFile childFile(fileName);
 				auto childCommands = childFile.commands();
 				std::for_each(childCommands.begin(), childCommands.end(), [this](auto command)

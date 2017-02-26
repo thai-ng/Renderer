@@ -106,7 +106,7 @@ public:
 		return _op;
 	}
 
-	const CommandParams& paramerters() const
+	const CommandParams& parameters() const
 	{
 		return params;
 	}
