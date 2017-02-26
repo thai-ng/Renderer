@@ -240,26 +240,30 @@ void renderTriangle(const Triangle& triangle, Drawable* drawable, double opacity
 	renderPolygon(std::vector<Point>(vertices.begin(), vertices.end()), drawable, opacity, zBuffer);
 }
 
-
-void renderPolygonWireframe(const Polygon& polygon, Drawable* drawable)
+void renderPolygonWireframe(const std::vector<Point>& points, Drawable* drawable, Matrix2D<int>* zBuffer = nullptr)
 {
-	auto points = polygon.vertices();
 	auto sortedVertices = sortVertices(points, comparePoints);
 	auto vertexChains = splitVertices(sortedVertices, comparePoints);
-	
+
 	auto leftChain = std::get<0>(vertexChains);
 	auto currentPointLeft = *(leftChain.begin());
-	std::for_each(std::next(leftChain.begin()), leftChain.end(), [&currentPointLeft, drawable](auto point) 
-	{ 
-		renderLine(Line(currentPointLeft, point), drawable, DDALineRenderer); 
+	std::for_each(std::next(leftChain.begin()), leftChain.end(), [&currentPointLeft, drawable](auto point)
+	{
+		renderLine(Line(currentPointLeft, point), drawable, DDALineRenderer, 1.0, zBuffer);
 		currentPointLeft = point;
 	});
-	
+
 	auto rightChain = std::get<1>(vertexChains);
 	auto currentPointRight = *(rightChain.begin());
 	std::for_each(std::next(rightChain.begin()), rightChain.end(), [&currentPointRight, drawable](auto point)
 	{
-		renderLine(Line(currentPointRight, point), drawable, DDALineRenderer);
+		renderLine(Line(currentPointRight, point), drawable, DDALineRenderer. 1.0, zBuffer);
 		currentPointRight = point;
 	});
+}
+
+void renderPolygonWireframe(const Polygon& polygon, Drawable* drawable)
+{
+	auto points = polygon.vertices();
+	renderPolygonWireframe(points, drawable);
 }

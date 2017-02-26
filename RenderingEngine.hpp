@@ -20,11 +20,20 @@ public:
 	void RenderTriangle(const Triangle_t& triangle, RenderMode renderMode)
 	{
 		// Translate to screen space
+
+
 		Point point1 = Point{ static_cast<int>(std::round(triangle[0][0])), static_cast<int>(std::round(triangle[0][1])), static_cast<int>(std::round(triangle[0][2])), nullptr, getColorFromZ(static_cast<int>(std::round(triangle[0][2]))) };
 		Point point2 = Point{ static_cast<int>(std::round(triangle[1][0])), static_cast<int>(std::round(triangle[1][1])), static_cast<int>(std::round(triangle[1][2])), nullptr, getColorFromZ(static_cast<int>(std::round(triangle[0][2]))) };
 		Point point3 = Point{ static_cast<int>(std::round(triangle[2][0])), static_cast<int>(std::round(triangle[2][1])), static_cast<int>(std::round(triangle[2][2])), nullptr, getColorFromZ(static_cast<int>(std::round(triangle[0][2]))) };
 
-		renderPolygon(std::vector<Point>{ point1, point2, point3 }, nullptr, Color{ 0, 0, 0 }, &zBuffer);
+		if (renderMode == RenderMode::Filled)
+		{
+			renderPolygon(std::vector<Point>{ point1, point2, point3 }, nullptr, Color{ 0, 0, 0 }, &zBuffer);
+		}
+		else
+		{
+			renderPolygonWireframe(std::vector<Point>{ point1, point2, point3 }, nullptr, &zBuffer);
+		}
 	}
 	void RenderLine(const Line_t& line, RenderMode renderMode)
 	{
