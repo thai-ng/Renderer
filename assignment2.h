@@ -96,7 +96,7 @@ namespace assignment2
 		Rect viewPort{ 50, 50, 650, 650 };
 		draw_rect(client, viewPort.x, viewPort.y, viewPort.right(), viewPort.bottom(), 0x00000000);
 
-		switch (pageNumber % 7)
+		switch (pageNumber % 9)
 		{
 			// Page 1
 			case 1:
@@ -194,7 +194,7 @@ namespace assignment2
 			case 4:
 			{
 				SimpFile file("page4.simp");
-				RenderEngine renderEngine(viewPort, client->getDrawable());
+				RenderEngine renderEngine(viewPort, client->getDrawable(), Color(0, 255, 0));
 				SimpEngine simpEngine(renderEngine);
 				simpEngine.runCommands(file.commands());
 			} break;
@@ -202,23 +202,23 @@ namespace assignment2
 			case 5:
 			{
 				SimpFile file("page5.simp");
-				RenderEngine renderEngine(viewPort, client->getDrawable());
+				RenderEngine renderEngine(viewPort, client->getDrawable(), Color(255, 255, 255));
 				SimpEngine simpEngine(renderEngine);
 				simpEngine.runCommands(file.commands());
 			} break;
 
 			case 6:
 			{
-				SimpFile file("page5.simp");
-				RenderEngine renderEngine(viewPort, client->getDrawable());
+				SimpFile file("test1.simp");
+				RenderEngine renderEngine(viewPort, client->getDrawable(), Color(255, 255, 255));
 				SimpEngine simpEngine(renderEngine);
 				simpEngine.runCommands(file.commands());
 			} break;
 
 			case 7:
 			{
-				SimpFile file("test1.simp");
-				RenderEngine renderEngine(viewPort, client->getDrawable());
+				SimpFile file("test2.simp");
+				RenderEngine renderEngine(viewPort, client->getDrawable(), Color(255, 255, 255));
 				SimpEngine simpEngine(renderEngine);
 				simpEngine.runCommands(file.commands());
 			} break;
@@ -226,7 +226,7 @@ namespace assignment2
 			case 8:
 			{
 				SimpFile file("test3.simp");
-				RenderEngine renderEngine(viewPort, client->getDrawable());
+				RenderEngine renderEngine(viewPort, client->getDrawable(), Color(255, 255, 255));
 				SimpEngine simpEngine(renderEngine);
 				simpEngine.runCommands(file.commands());
 			} break;
@@ -234,10 +234,10 @@ namespace assignment2
 			default:
 			{
 				SimpFile file("test.simp");
-				RenderEngine renderEngine(viewPort, client->getDrawable());
+				RenderEngine renderEngine(viewPort, client->getDrawable(), Color(255, 255, 255));
 				SimpEngine simpEngine(renderEngine);
 				simpEngine.runCommands(file.commands());
-			}break;
+			} break;
 		}
 		client->getDrawable()->updateScreen();   // you must call this to make the display change.
 

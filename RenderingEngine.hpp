@@ -12,23 +12,27 @@ using Line_t = std::array<Vector4_t, 2>;
 class RenderEngine
 {
 public:
-	RenderEngine(const Rect& viewPort, Drawable* drawSurface) : _viewPort(viewPort), _drawSurface(drawSurface)
+	RenderEngine(const Rect& viewPort, Drawable* drawSurface, const Color& maxColor) : 
+		_viewPort(viewPort), 
+		_drawSurface(drawSurface),
+		redLerp(0, 200, std::get<0>(maxColor.getColorChannels()), 0),
+		greenLerp(0, 200, std::get<1>(maxColor.getColorChannels()), 0),
+		blueLerp(0, 200, std::get<2>(maxColor.getColorChannels()), 0)
 	{
 		zBuffer = Matrix2D<int>(_viewPort.width, std::vector<int>(_viewPort.height, zThreshold));
-		// Create transformation matrix
-		// - Create Scale matrix
-		// - Create Translation matrix
 
 		auto scaleMatrix = Matrix<4, 4, double>{ viewPort.width / 200.0, 0.0,					  0.0, 0.0,
-												 0.0,				   viewPort.height / 200.0, 0.0, 0.0,
-												 0.0,				   0.0,					  1.0, 0.0,
-												 0.0,				   0.0,					  0.0, 1.0 };
+												 0.0,				     viewPort.height / 200.0, 0.0, 0.0,
+												 0.0,				     0.0,					  1.0, 0.0,
+												 0.0,				     0.0,					  0.0, 1.0 };
 
 		auto translationMatrix = Matrix<4, 4, double>{ 1.0, 0.0, 0.0, viewPort.width / 2.0,
 													   0.0, 1.0, 0.0, viewPort.height / 2.0,
 													   0.0, 0.0, 1.0, 0.0,
 													   0.0, 0.0, 0.0, 1.0 };
 
+		// Rotate up
+		// Currently y points down
 		/*auto radian = getRadianFromDegree(-90);
 		auto rotationMatrix = Matrix<4, 4, double>{ std::cos(radian), -std::sin(radian), 0.0, 0.0,
 													std::sin(radian), std::cos(radian),  0.0, 0.0,
@@ -36,6 +40,7 @@ public:
 													0.0,			  0.0,			     0.0, 1.0 };
 
 		viewPortTransformationMatrix = rotationMatrix	 * viewPortTransformationMatrix;*/
+		
 		viewPortTransformationMatrix = scaleMatrix		 * viewPortTransformationMatrix;
 		viewPortTransformationMatrix = translationMatrix * viewPortTransformationMatrix;
 	}
@@ -102,9 +107,9 @@ private:
 	}
 
 
-	Lerp<int> redLerp = Lerp<int>(0, 200, 0, 0);
-	Lerp<int> greenLerp = Lerp<int>(0, 200, 255, 0);
-	Lerp<int> blueLerp = Lerp<int>(0, 200, 0, 0);
+	Lerp<int> redLerp;
+	Lerp<int> greenLerp;
+	Lerp<int> blueLerp;
 	Matrix2D<int> zBuffer;
 	int zThreshold = 200;
 	Rect _viewPort;
