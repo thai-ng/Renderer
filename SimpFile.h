@@ -75,7 +75,7 @@ private:
 	void parseAndAddLine(const std::string& line)
 	{
 		auto tokens = getTokens(line);
-		if (tokens.size() > 0 && tokens[0] != "#")
+		if (tokens.size() > 0 && tokens[0] != "#" && tokens[0][0] != '#')
 		{
 			Command command(tokens);
 			if (command.operation() == Operation::File)

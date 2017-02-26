@@ -1,0 +1,44 @@
+{
+    translate -80, -50, 25        
+    rotate X -15
+    rotate Y 10
+    scale 50, 50, 50
+    #wire
+    file "cube"
+}
+
+{
+    translate -60, -20, 50        
+    rotate X -15
+    rotate Y 10
+    scale 40, 40, 40
+    #wire
+    file "cube"
+}
+
+{
+    translate -40, 10, 75        
+    rotate X -15
+    rotate Y 10
+    scale 30, 30, 30
+    #wire
+    file "cube"
+}
+
+{
+    translate -20, 30, 100        
+    rotate X -15
+    rotate Y 10
+    scale 20, 20, 20
+    #wire
+    file "cube"
+}
+
+{
+    translate 0, 50, 125        
+    rotate X -15
+    rotate Y 10
+    scale 10, 10, 10
+    #wire
+    file "cube"
+}

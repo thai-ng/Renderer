@@ -16,8 +16,8 @@ struct Rect
 	int width;
 	int height;
 
-	int bottom() { return y + height; }
-	int right() { return x + width; }
+	int bottom() const { return y + height; }
+	int right() const { return x + width; }
 	auto center();
 };
 
@@ -37,7 +37,7 @@ struct Point
 	{
 		if (parent)
 		{
-			return Point{ parent->x + x, parent->y + y, z, nullptr, color};
+			return Point{ parent->x + x, parent->y + y, z, parent, color};
 		}
 		else
 		{
@@ -160,7 +160,7 @@ struct Line
 class Polygon
 {
 public:
-	Polygon(std::vector<Point>&& v, Rect* parent = nullptr) : _vertices(v), _parent(parent)
+	explicit Polygon(std::vector<Point>&& v, Rect* parent = nullptr) : _vertices(v), _parent(parent)
 	{
 		std::for_each(_vertices.begin(), _vertices.end(), [parent](Point& p) {p.parent = parent; });
 	}

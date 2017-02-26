@@ -97,6 +97,7 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double 
 	auto leftIter = std::next(leftChain.begin());
 	Line leftLine{ leftChain.front(), *leftIter };
 	Lerp<int> leftLerp(leftLine.p1.y, leftLine.p2.y, leftLine.p1.x, leftLine.p2.x);
+	Lerp<int> leftZLerp(leftLine.p1.y, leftLine.p2.y, leftLine.p1.z, leftLine.p2.z);
 
 	auto leftColorLerps = getColorLerp(leftLine.p1.flipped(), leftLine.p2.flipped());
 	auto leftRedLerp = std::get<0>(leftColorLerps);
@@ -110,6 +111,7 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double 
 	auto rightIter = std::next(rightChain.begin());
 	Line rightLine{ rightChain.front(), *rightIter };
 	Lerp<int> rightLerp(rightLine.p1.y, rightLine.p2.y, rightLine.p1.x, rightLine.p2.x);
+	Lerp<int> rightZLerp(rightLine.p1.y, rightLine.p2.y, rightLine.p1.z, rightLine.p2.z);
 
 	auto rightColorLerps = getColorLerp(rightLine.p1.flipped(), rightLine.p2.flipped());
 	auto rightRedLerp = std::get<0>(rightColorLerps);
@@ -121,6 +123,7 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double 
 	for (auto y = topPoint.y; y <= bottomPoint.y; ++y)
 	{
 		auto xl = leftLerp[leftCount].second;
+		auto zl = leftZLerp[leftCount].second;
 		auto r = static_cast<unsigned char>(leftRedLerp[leftCount].second);
 		auto g = static_cast<unsigned char>(leftGreenLerp[leftCount].second);
 		auto b = static_cast<unsigned char>(leftBlueLerp[leftCount].second);
@@ -128,14 +131,16 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double 
 		auto leftColor = Color(r, g, b);
 
 		auto xr = rightLerp[rightCount].second;
+		auto zr = rightZLerp[rightCount].second;
+
 		r = static_cast<unsigned char>(rightRedLerp[rightCount].second);
 		g = static_cast<unsigned char>(rightGreenLerp[rightCount].second);
 		b = static_cast<unsigned char>(rightBlueLerp[rightCount].second);
 		++rightCount;
 		auto rightColor = Color(r, g, b);
 
-		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, topPoint.z, topPoint.parent, leftColor };
-		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y, topPoint.z, topPoint.parent, rightColor };
+		auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, static_cast<int>(std::round(zl)), topPoint.parent, leftColor };
+		auto rightPoint = Point{ static_cast<int>(std::round(xr)), y,  static_cast<int>(std::round(zr)), topPoint.parent, rightColor };
 
 		renderLine(Line{ leftPoint, rightPoint }, drawable, DDALineRenderer, opacity, zBuffer);
 
@@ -144,6 +149,8 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double 
 			leftIter = std::next(leftIter);
 			leftLine = Line{ leftLine.p2, *leftIter };
 			leftLerp = Lerp<int>(leftLine.p1.y, leftLine.p2.y, leftLine.p1.x, leftLine.p2.x);
+			leftZLerp = Lerp<int>(leftLine.p1.y, leftLine.p2.y, leftLine.p1.z, leftLine.p2.z);
+			
 			leftColorLerps = getColorLerp(leftLine.p1.flipped(), leftLine.p2.flipped());
 			leftRedLerp = std::get<0>(leftColorLerps);
 			leftGreenLerp = std::get<1>(leftColorLerps);
@@ -157,6 +164,9 @@ void renderPolygon(const std::vector<Point>& points, Drawable* drawable, double 
 			rightIter = std::next(rightIter);
 			rightLine = Line{ rightLine.p2, *rightIter };
 			rightLerp = Lerp<int>(rightLine.p1.y, rightLine.p2.y, rightLine.p1.x, rightLine.p2.x);
+			rightZLerp = Lerp<int>(rightLine.p1.y, rightLine.p2.y, rightLine.p1.z, rightLine.p2.z);
+
+
 			rightColorLerps = getColorLerp(rightLine.p1.flipped(), rightLine.p2.flipped());
 			rightRedLerp = std::get<0>(rightColorLerps);
 			rightGreenLerp = std::get<1>(rightColorLerps);
@@ -247,7 +257,7 @@ void renderPolygonWireframe(const std::vector<Point>& points, Drawable* drawable
 
 	auto leftChain = std::get<0>(vertexChains);
 	auto currentPointLeft = *(leftChain.begin());
-	std::for_each(std::next(leftChain.begin()), leftChain.end(), [&currentPointLeft, drawable](auto point)
+	std::for_each(std::next(leftChain.begin()), leftChain.end(), [&currentPointLeft, drawable, zBuffer](auto point)
 	{
 		renderLine(Line(currentPointLeft, point), drawable, DDALineRenderer, 1.0, zBuffer);
 		currentPointLeft = point;
@@ -255,9 +265,9 @@ void renderPolygonWireframe(const std::vector<Point>& points, Drawable* drawable
 
 	auto rightChain = std::get<1>(vertexChains);
 	auto currentPointRight = *(rightChain.begin());
-	std::for_each(std::next(rightChain.begin()), rightChain.end(), [&currentPointRight, drawable](auto point)
+	std::for_each(std::next(rightChain.begin()), rightChain.end(), [&currentPointRight, drawable, zBuffer](auto point)
 	{
-		renderLine(Line(currentPointRight, point), drawable, DDALineRenderer. 1.0, zBuffer);
+		renderLine(Line(currentPointRight, point), drawable, DDALineRenderer, 1.0, zBuffer);
 		currentPointRight = point;
 	});
 }

@@ -9,8 +9,8 @@
 
 class SimpEngine
 {
+public:
 	using CTM_t = Matrix<4, 4, double>;
-
 	SimpEngine(RenderEngine renderEngine) : _renderEngine(renderEngine)
 	{
 
@@ -34,11 +34,8 @@ class SimpEngine
 
 				case Operation::OpenBrace:
 				{
-					TransformStack.push(std::move(CTM));
-					CTM = CTM_t{ 1.0, 0.0, 0.0, 0.0,
-								 0.0, 1.0, 0.0, 0.0,
-						         0.0, 0.0, 1.0, 0.0,
-								 0.0, 0.0, 0.0, 1.0 };
+					TransformStack.push(CTM);
+					
 				} break;
 
 				case Operation::CloseBrace:
@@ -57,7 +54,7 @@ class SimpEngine
 										      0.0,       params[1], 0.0,	   0.0,
 										      0.0,		 0.0,		params[2], 0.0,
 											  0.0,		 0.0,		0.0		 , 1.0};
-					CTM = scaleMatrix * CTM;
+					CTM = CTM * scaleMatrix;
 				} break;
 
 				case Operation::Translate:
@@ -67,7 +64,7 @@ class SimpEngine
 										            0.0, 1.0, 0.0, params[1],
 										            0.0, 0.0, 1.0, params[2],
 											        0.0, 0.0, 0.0, 1.0};
-					CTM = translationMatrix * CTM;
+					CTM = CTM * translationMatrix;
 				} break;
 
 				case Operation::Rotate:
@@ -75,8 +72,8 @@ class SimpEngine
 					auto params = std::get<RotateParams>(command.parameters());
 					auto rotationMatrix = getRotationMatrix(params.first, params.second);
 
-					CTM = rotationMatrix * CTM;
-				}
+					CTM = CTM * rotationMatrix;
+				} break;
 
 				case Operation::Line:
 				{
@@ -87,7 +84,7 @@ class SimpEngine
 					auto transformedPoint2 = CTM * point2;
 
 					// Send to rendering engine to render
-					_renderEngine.RenderLine(Line_t{ transformedPoint1, transformedPoint2 }, currentRenderMode);
+					_renderEngine.RenderLine(Line_t{ transformedPoint1, transformedPoint2 });
 				} break;
 
 				case Operation::Polygon:
@@ -98,11 +95,11 @@ class SimpEngine
 					auto point3 = std::array<double, 4>{ params[2][0], params[2][1], params[2][2], 1 };
 					auto transformedPoint1 = CTM * point1;
 					auto transformedPoint2 = CTM * point2;
-					auto transformedPoint3 = CTM * point2;
+					auto transformedPoint3 = CTM * point3;
 
 					// Send to rendering engine to render
 					_renderEngine.RenderTriangle(Triangle_t{ transformedPoint1, transformedPoint2, transformedPoint3 }, currentRenderMode);
-				}
+				} break;
 			}
 		}
 	}
@@ -134,7 +131,7 @@ private:
 			{
 				return CTM_t{ std::cos(radian), -std::sin(radian), 0.0, 0.0,
 							  std::sin(radian), std::cos(radian),  0.0, 0.0,
-							  0.0,				0.0,			   0.0, 0.0,
+							  0.0,				0.0,			   1.0, 0.0,
 							  0.0,				0.0,			   0.0, 1.0 };
 			} break;
 		}
@@ -142,6 +139,9 @@ private:
 
 	RenderEngine _renderEngine;
 	RenderEngine::RenderMode currentRenderMode = RenderEngine::RenderMode::Filled;
-	CTM_t CTM;
+	CTM_t CTM = CTM_t{ 1.0, 0.0, 0.0, 0.0,
+					   0.0, 1.0, 0.0, 0.0,
+					   0.0, 0.0, 1.0, 0.0,
+					   0.0, 0.0, 0.0, 1.0 };
 	std::stack<CTM_t> TransformStack;
 };

@@ -7,6 +7,9 @@
 #include "client.h"
 #include "transformationUtil.h"
 #include "polygonRenderer.h"
+#include "SimpEngine.hpp"
+#include "RenderingEngine.hpp"
+#include "SimpFile.h"
 
 namespace assignment2
 {
@@ -188,9 +191,52 @@ namespace assignment2
 				});
 			} break;
 
+			case 4:
+			{
+				SimpFile file("page4.simp");
+				RenderEngine renderEngine(viewPort, client->getDrawable());
+				SimpEngine simpEngine(renderEngine);
+				simpEngine.runCommands(file.commands());
+			} break;
+
+			case 5:
+			{
+				SimpFile file("page5.simp");
+				RenderEngine renderEngine(viewPort, client->getDrawable());
+				SimpEngine simpEngine(renderEngine);
+				simpEngine.runCommands(file.commands());
+			} break;
+
+			case 6:
+			{
+				SimpFile file("page5.simp");
+				RenderEngine renderEngine(viewPort, client->getDrawable());
+				SimpEngine simpEngine(renderEngine);
+				simpEngine.runCommands(file.commands());
+			} break;
+
+			case 7:
+			{
+				SimpFile file("test1.simp");
+				RenderEngine renderEngine(viewPort, client->getDrawable());
+				SimpEngine simpEngine(renderEngine);
+				simpEngine.runCommands(file.commands());
+			} break;
+
+			case 8:
+			{
+				SimpFile file("test3.simp");
+				RenderEngine renderEngine(viewPort, client->getDrawable());
+				SimpEngine simpEngine(renderEngine);
+				simpEngine.runCommands(file.commands());
+			} break;
+
 			default:
 			{
-
+				SimpFile file("test.simp");
+				RenderEngine renderEngine(viewPort, client->getDrawable());
+				SimpEngine simpEngine(renderEngine);
+				simpEngine.runCommands(file.commands());
 			}break;
 		}
 		client->getDrawable()->updateScreen();   // you must call this to make the display change.

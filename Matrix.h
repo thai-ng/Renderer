@@ -144,7 +144,7 @@ auto operator*(Matrix<4, 4, T>& l, Matrix<4, 4, T>& r)
 }
 
 template <typename T>
-auto operator*(Matrix<4, 4, T>& matrix, std::array<T, 4>& vector)
+auto operator*(const Matrix<4, 4, T>& matrix, const std::array<T, 4>& vector)
 {
 	return std::array<T, 4> { matrix.getElement<0, 0>() * vector[0] + matrix.getElement<0, 1>() * vector[1] + matrix.getElement<0, 2>() * vector[2] + matrix.getElement<0, 3>() * vector[3],
 							  matrix.getElement<1, 0>() * vector[0] + matrix.getElement<1, 1>() * vector[1] + matrix.getElement<1, 2>() * vector[2] + matrix.getElement<1, 3>() * vector[3],
