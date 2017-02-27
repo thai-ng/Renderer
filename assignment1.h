@@ -304,7 +304,6 @@ namespace assignment1
 				drawStarburst(panel1, client->getDrawable(), 90, 125, DDALineRenderer);
 				drawStarburst(panel2, client->getDrawable(), 90, 125, BresenhamLineRenderer);
 				drawStarburst(panel3, client->getDrawable(), 90, 125, DDALineRenderer, BresenhamLineRenderer);
-				drawStarburst(panel4, client->getDrawable(), 90, 125, WuLineRenderer);
 
 			} break;
 
@@ -313,7 +312,6 @@ namespace assignment1
 				drawParallelogram(panel1, client->getDrawable(), DDALineRenderer);
 				drawParallelogram(panel2, client->getDrawable(), BresenhamLineRenderer);
 				drawParallelogram(panel3, client->getDrawable(), DDALineRenderer, BresenhamLineRenderer);
-				drawParallelogram(panel4, client->getDrawable(), WuLineRenderer);
 			} break;
 			case 3:
 			{
@@ -321,7 +319,6 @@ namespace assignment1
 				drawRandomLines(panel1, client->getDrawable(), lines, DDALineRenderer);
 				drawRandomLines(panel2, client->getDrawable(), lines, BresenhamLineRenderer);
 				drawRandomLines(panel3, client->getDrawable(), lines, DDALineRenderer, BresenhamLineRenderer);
-				drawRandomLines(panel4, client->getDrawable(), lines, WuLineRenderer);
 			} break;
 			case 4:
 			{
