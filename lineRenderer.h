@@ -171,9 +171,9 @@ bool pointInRect(const Point& point, const Rect& rect)
 }
 
 template <typename F>
-void renderLine(const Point& p1, const Point& p2, Drawable* surface, const Color& color, F function, Matrix2D<int>* zBuffer = nullptr)
+void renderLine(const Point& p1, const Point& p2, Drawable* surface, F function, Matrix2D<int>* zBuffer = nullptr)
 {
-	function(p1, p2, surface, color, 1.0, zBuffer, p1.parent);
+	function(p1, p2, surface, 1.0, zBuffer, p1.parent);
 }
 
 template <typename F>
@@ -183,7 +183,7 @@ void renderLine(const Line& l, Drawable* surface, F function, double opacity = 1
 	auto p1 = std::get<0>(points);
 	auto p2 = std::get<1>(points);
 
-	function(p1, p2, surface, l.color, opacity, zBuffer, p1.parent);
+	function(p1, p2, surface, opacity, zBuffer, p1.parent);
 }
 
 auto getColorLerp(const Point& point1, const Point& point2)
@@ -207,11 +207,78 @@ auto getColorLerp(const Point& point1, const Point& point2)
 	return std::make_tuple(redLerp, greenLerp, blueLerp);
 }
 
-void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr, Rect* viewPort = nullptr)
+// Draw to surface
+void drawToSurface(const Point& screenPoint, Drawable* drawSurface, const Color& colorToPaint)
 {
-	// Hack to remove warning, refactor later
-	auto tempColor = color;
+	drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
+}
 
+// Zbuffer draw with no viewport
+void drawWithZBuffer(const Point& screenPoint, Drawable* drawSurface, const Color& colorToPaint, Matrix2D<int>* zBuffer)
+{
+	if (screenPoint.z <= (*zBuffer)[screenPoint.x][screenPoint.y])
+	{
+		(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
+		drawToSurface(screenPoint, drawSurface, colorToPaint);
+	}
+}
+
+// Zbuffer draw with Viewport
+void drawWithZBuffer(const Point& screenPoint, Drawable* drawSurface, const Color& colorToPaint, Matrix2D<int>* zBuffer, Rect* viewPort)
+{
+	if (screenPoint.z < (*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y])
+	{
+		(*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y] = screenPoint.z;
+		drawToSurface(screenPoint, drawSurface, colorToPaint);
+	}
+}
+
+// Draw with no viewport
+void drawPixel(const Point& screenPoint, Drawable* drawSurface, const Color& colorToPaint, Matrix2D<int>* zBuffer)
+{
+	if (zBuffer != nullptr)
+	{
+		drawWithZBuffer(screenPoint, drawSurface, colorToPaint, zBuffer);
+	}
+	else
+	{
+		drawToSurface(screenPoint, drawSurface, colorToPaint);
+	}
+}
+
+// Draw with Viewport
+void drawPixel(const Point& screenPoint, Drawable* drawSurface, const Color& colorToPaint, Matrix2D<int>* zBuffer, Rect* viewPort)
+{
+	if (zBuffer != nullptr)
+	{
+		drawWithZBuffer(screenPoint, drawSurface, colorToPaint, zBuffer, viewPort);
+	}
+	else
+	{
+		drawToSurface(screenPoint, drawSurface, colorToPaint);
+	}
+}
+
+Color getCurrentColor(int x, int y, Drawable* surface)
+{
+	return Color{ surface->getPixel(x, y) };
+}
+
+Color getColorFromLerp(int colorIndex, const std::tuple<Lerp<int>, Lerp<int>, Lerp<int>>& colorLerps)
+{
+	auto redLerp = std::get<0>(colorLerps);
+	auto greenLerp = std::get<1>(colorLerps);
+	auto blueLerp = std::get<2>(colorLerps);
+
+	auto r = static_cast<unsigned char>(redLerp[colorIndex].second);
+	auto g = static_cast<unsigned char>(greenLerp[colorIndex].second);
+	auto b = static_cast<unsigned char>(blueLerp[colorIndex].second);
+
+	return Color{ r, g, b };
+}
+
+void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr, Rect* viewPort = nullptr)
+{
 	auto octant = getOctant(p2 - p1);
 	auto point1 = toFirstOctant(octant, p1);
 	auto point2 = toFirstOctant(octant, p2);
@@ -236,57 +303,28 @@ void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurfa
 			error += dy;
 			screenPoint = fromFirstOctant(octant, Point{ x, y });
 
-			auto oldColor = drawSurface->getPixel(screenPoint.x, screenPoint.y);
+			auto oldColor = getCurrentColor(screenPoint.x, screenPoint.y, drawSurface);
 			auto colorToPaint = colorWithOpacity(point1.color, oldColor, opacity);
 
 			if (viewPort)
 			{
 				if (pointInRect(screenPoint, *viewPort))
 				{
-					if (zBuffer != nullptr)
-					{
-						if (screenPoint.z <= (*zBuffer)[screenPoint.x][screenPoint.y])
-						{
-							(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
-							drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-						}
-					}
-					else
-					{
-						drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-					}
+					drawPixel(screenPoint, drawSurface, colorToPaint, zBuffer);
 				}
 			}
 			else
 			{
-				if (zBuffer != nullptr)
-				{
-					if (screenPoint.z <= (*zBuffer)[screenPoint.x][screenPoint.y])
-					{
-						(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
-						drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-					}
-				}
-				else
-				{
-					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-				}
+				drawPixel(screenPoint, drawSurface, colorToPaint, zBuffer);
 			}
 		}
 	}
 	else
 	{
 		auto colorLerps = getColorLerp(point1, point2);
-		auto redLerp = std::get<0>(colorLerps);
-		auto greenLerp = std::get<1>(colorLerps);
-		auto blueLerp = std::get<2>(colorLerps);
 		auto colorIndex = 0;
 
-		auto r = static_cast<unsigned char>(redLerp[colorIndex].second);
-		auto g = static_cast<unsigned char>(greenLerp[colorIndex].second);
-		auto b = static_cast<unsigned char>(blueLerp[colorIndex].second);
-
-		drawSurface->setPixel(screenPoint.x, screenPoint.y, Color(r, g, b).asUnsigned());
+		drawSurface->setPixel(screenPoint.x, screenPoint.y, getColorFromLerp(colorIndex, colorLerps).asUnsigned());
 		for (auto x = point1.x + 1; x <= point2.x; ++x)
 		{
 			++colorIndex;
@@ -299,61 +337,32 @@ void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurfa
 			error += dy;
 			screenPoint = fromFirstOctant(octant, Point{ x, y });
 
-			r = static_cast<unsigned char>(redLerp[colorIndex].second);
-			g = static_cast<unsigned char>(greenLerp[colorIndex].second);
-			b = static_cast<unsigned char>(blueLerp[colorIndex].second);
-
-			auto newColor = Color(r, g, b);
-			auto oldColor = drawSurface->getPixel(x, y);
+			auto newColor = getColorFromLerp(colorIndex, colorLerps);
+			auto oldColor = drawSurface->getPixel(screenPoint.x, screenPoint.y);
 			auto colorToPaint = colorWithOpacity(newColor, oldColor, opacity);
 
 			if (viewPort)
 			{
 				if (pointInRect(screenPoint, *viewPort))
 				{
-					if (zBuffer != nullptr)
-					{
-						if (screenPoint.z < (*zBuffer)[screenPoint.x][screenPoint.y])
-						{
-							(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
-							drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-						}
-					}
-					else
-					{
-						drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-					}
+					drawPixel(screenPoint, drawSurface, colorToPaint, zBuffer, viewPort);
 				}
 			}
 			else
 			{
-				if (zBuffer != nullptr)
-				{
-					if (screenPoint.z < (*zBuffer)[screenPoint.x][screenPoint.y])
-					{
-						(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
-						drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-					}
-				}
-				else
-				{
-					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-				}
+				drawPixel(screenPoint, drawSurface, colorToPaint, zBuffer);
 			}
 		}
 	}
 	
 }
 
-void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, const Color& color, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr, Rect* viewPort = nullptr)
+void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr, Rect* viewPort = nullptr)
 {
 	auto octant = getOctant(p2 - p1);
 	auto point1 = toFirstOctant(octant, p1);
 	auto point2 = toFirstOctant(octant, p2);
 
-	// Hack to remove warning, refactor later
-	auto tempColor = color;
-	
 	if (point1.color == point2.color)
 	{
 		Lerp<decltype(point1.x)> posLerp(point1.x, point2.x, point1.y, point2.y);
@@ -367,51 +376,25 @@ void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, co
 			auto z = zLerp[i].second;
 			auto screenPoint = fromFirstOctant(octant, Point{ x, static_cast<int>(std::round(y)), static_cast<int>(std::round(z)) });
 
-			auto oldColor = drawSurface->getPixel(screenPoint.x, screenPoint.y);
+			auto oldColor = getCurrentColor(screenPoint.x, screenPoint.y, drawSurface);
 			auto colorToPaint = colorWithOpacity(point1.color, oldColor, opacity);
 
 			if (viewPort)
 			{
 				if (pointInRect(screenPoint, *viewPort))
 				{
-					if (zBuffer != nullptr)
-					{
-						if (screenPoint.z < (*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y -  viewPort->y])
-						{
-							(*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y] = screenPoint.z;
-							drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-						}
-					}
-					else
-					{
-						drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-					}
+					drawPixel(screenPoint, drawSurface, colorToPaint, zBuffer, viewPort);
 				}
 			}
 			else
 			{
-				if (zBuffer != nullptr)
-				{
-					if (screenPoint.z < (*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y])
-					{
-						(*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y] = screenPoint.z;
-						drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-					}
-				}
-				else
-				{
-					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-				}
+				drawPixel(screenPoint, drawSurface, colorToPaint, zBuffer);
 			}
 		}
 	}
 	else
 	{
 		auto colorLerps = getColorLerp(point1, point2);
-		auto redLerp = std::get<0>(colorLerps);
-		auto greenLerp = std::get<1>(colorLerps);
-		auto blueLerp = std::get<2>(colorLerps);
-
 		Lerp<decltype(point1.x)> posLerp(point1.x, point2.x, point1.y, point2.y);
 		Lerp<decltype(point1.x)> zLerp(point1.x, point2.x, point1.z, point2.z);
 
@@ -422,298 +405,23 @@ void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, co
 			auto y = point.second;
 			auto z = zLerp[i].second;
 
-			auto r = static_cast<unsigned char>(redLerp[i].second);
-			auto g = static_cast<unsigned char>(greenLerp[i].second);
-			auto b = static_cast<unsigned char>(blueLerp[i].second);
-
 			auto screenPoint = fromFirstOctant(octant, Point{ x, static_cast<int>(std::round(y)), static_cast<int>(std::round(z)) });
 
-			auto newColor = Color(r, g, b);
-			auto oldColor = drawSurface->getPixel(screenPoint.x, screenPoint.y);
+			auto newColor = getColorFromLerp(i, colorLerps);
+			auto oldColor = getCurrentColor(screenPoint.x, screenPoint.y, drawSurface);
 			auto colorToPaint = colorWithOpacity(newColor, oldColor, opacity);
 
 			if (viewPort)
 			{
 				if (pointInRect(screenPoint, *viewPort))
 				{
-					if (zBuffer != nullptr)
-					{
-						if (screenPoint.z < (*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y])
-						{
-							(*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y] = screenPoint.z;
-							drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-						}
-					}
-					else
-					{
-						drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-					}
+					drawPixel(screenPoint, drawSurface, colorToPaint, zBuffer, viewPort);
 				}
 			}
 			else
 			{
-				if (zBuffer != nullptr)
-				{
-					if (screenPoint.z < (*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y])
-					{
-						(*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y] = screenPoint.z;
-						drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-					}
-				}
-				else
-				{
-					drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
-				}
+				drawPixel(screenPoint, drawSurface, colorToPaint, zBuffer);
 			}
 		}
 	}
-}
-
-double fpart(double num)
-{
-	if (num < 0)
-	{
-		return 1 - (num - std::floor(num));
-	}
-	else
-	{
-		return num - std::floor(num);
-	}
-}
-
-double rfpart(double num)
-{
-	return 1 - fpart(num);
-}
-
-void WuLineRenderer(const Point& p1, const Point& p2, Drawable* drawable, const Color& color, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr, Rect* viewPort = nullptr)
-{
-	if (viewPort)
-	{
-		if (pointInRect(p1, *viewPort) && pointInRect(p2, *viewPort))
-		{
-			auto zBufferLocal = zBuffer;
-			++zBufferLocal;
-			opacity += 1;
-			auto point1 = p1;
-			auto point2 = p2;
-			bool steep = std::abs(point2.y - point1.y) > std::abs(point2.x - point1.x);
-			if (steep)
-			{
-				std::swap(point1.x, point1.y);
-				std::swap(point2.x, point2.y);
-			}
-
-			if (point1.x > point2.x)
-			{
-				std::swap(point1.x, point2.x);
-				std::swap(point1.y, point2.y);
-			}
-
-			auto dx = point2.x - point1.x;
-			auto dy = point2.y - point1.y;
-			auto gradient = static_cast<double>(dy) / static_cast<double>(dx);
-			if (dx == 0.0)
-			{
-				gradient = 1.0;
-			}
-
-			double xend = point1.x;
-			double yend = point1.y;
-			auto xgap = rfpart(point1.x + 0.5);
-			double xpixel1 = xend;
-			double ypixel1 = yend;
-
-			if (steep)
-			{
-				auto currentColor = drawable->getPixel(static_cast<int>(ypixel1), static_cast<int>(xpixel1));
-
-				auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yend) * xgap);
-				drawable->setPixel(static_cast<int>(ypixel1), static_cast<int>(xpixel1), colorToDraw.asUnsigned());
-
-				currentColor = drawable->getPixel(static_cast<int>(ypixel1) + 1, static_cast<int>(xpixel1));
-				colorToDraw = colorWithOpacity(color, currentColor, fpart(yend) * xgap);
-				drawable->setPixel(static_cast<int>(ypixel1) + 1, static_cast<int>(xpixel1), colorToDraw.asUnsigned());
-			}
-			else
-			{
-				auto currentColor = drawable->getPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1));
-				auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yend) * xgap);
-				drawable->setPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1), colorToDraw.asUnsigned());
-
-				currentColor = drawable->getPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1) + 1);
-				colorToDraw = colorWithOpacity(color, currentColor, fpart(yend) * xgap);
-				drawable->setPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1) + 1, colorToDraw.asUnsigned());
-			}
-
-			auto yIntersection = yend + gradient;
-
-			xend = point2.x;
-			yend = point2.y;
-			xgap = rfpart(point2.x + 0.5);
-			double xpixel2 = xend;
-			double ypixel2 = yend;
-
-			if (steep)
-			{
-				auto currentColor = drawable->getPixel(static_cast<int>(ypixel2), static_cast<int>(xpixel2));
-				auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yend) * xgap);
-				drawable->setPixel(static_cast<int>(ypixel2), static_cast<int>(xpixel2), colorToDraw.asUnsigned());
-
-				currentColor = drawable->getPixel(static_cast<int>(ypixel2) + 1, static_cast<int>(xpixel2));
-				colorToDraw = colorWithOpacity(color, currentColor, fpart(yend) * xgap);
-				drawable->setPixel(static_cast<int>(ypixel2) + 1, static_cast<int>(xpixel2), colorToDraw.asUnsigned());
-			}
-			else
-			{
-				auto currentColor = drawable->getPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2));
-				auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yend) * xgap);
-				drawable->setPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2), colorToDraw.asUnsigned());
-
-				currentColor = drawable->getPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2) + 1);
-				colorToDraw = colorWithOpacity(color, currentColor, fpart(yend) * xgap);
-				drawable->setPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2) + 1, colorToDraw.asUnsigned());
-			}
-
-			if (steep)
-			{
-				for (auto x = static_cast<int>(xpixel1) + 1; x < static_cast<int>(xpixel2); ++x, yIntersection += gradient)
-				{
-					auto currentColor = drawable->getPixel(static_cast<int>(yIntersection), x);
-					auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yIntersection));
-					drawable->setPixel(static_cast<int>(yIntersection), x, colorToDraw.asUnsigned());
-
-					currentColor = drawable->getPixel(static_cast<int>(yIntersection) + 1, x);
-					colorToDraw = colorWithOpacity(color, currentColor, fpart(yIntersection));
-					drawable->setPixel(static_cast<int>(yIntersection) + 1, x, colorToDraw.asUnsigned());
-				}
-			}
-			else
-			{
-				for (auto x = static_cast<int>(xpixel1) + 1; x < static_cast<int>(xpixel2); ++x, yIntersection += gradient)
-				{
-					auto currentColor = drawable->getPixel(x, static_cast<int>(yIntersection));
-					auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yIntersection));
-					drawable->setPixel(x, static_cast<int>(yIntersection), colorToDraw.asUnsigned());
-
-					currentColor = drawable->getPixel(x, static_cast<int>(yIntersection) + 1);
-					colorToDraw = colorWithOpacity(color, currentColor, fpart(yIntersection));
-					drawable->setPixel(x, static_cast<int>(yIntersection) + 1, colorToDraw.asUnsigned());
-				}
-			}
-		}
-	}
-	else
-	{
-		auto zBufferLocal = zBuffer;
-		++zBufferLocal;
-		opacity += 1;
-		auto point1 = p1;
-		auto point2 = p2;
-		bool steep = std::abs(point2.y - point1.y) > std::abs(point2.x - point1.x);
-		if (steep)
-		{
-			std::swap(point1.x, point1.y);
-			std::swap(point2.x, point2.y);
-		}
-
-		if (point1.x > point2.x)
-		{
-			std::swap(point1.x, point2.x);
-			std::swap(point1.y, point2.y);
-		}
-
-		auto dx = point2.x - point1.x;
-		auto dy = point2.y - point1.y;
-		auto gradient = static_cast<double>(dy) / static_cast<double>(dx);
-		if (dx == 0.0)
-		{
-			gradient = 1.0;
-		}
-
-		double xend = point1.x;
-		double yend = point1.y;
-		auto xgap = rfpart(point1.x + 0.5);
-		double xpixel1 = xend;
-		double ypixel1 = yend;
-
-		if (steep)
-		{
-			auto currentColor = drawable->getPixel(static_cast<int>(ypixel1), static_cast<int>(xpixel1));
-
-			auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yend) * xgap);
-			drawable->setPixel(static_cast<int>(ypixel1), static_cast<int>(xpixel1), colorToDraw.asUnsigned());
-
-			currentColor = drawable->getPixel(static_cast<int>(ypixel1) + 1, static_cast<int>(xpixel1));
-			colorToDraw = colorWithOpacity(color, currentColor, fpart(yend) * xgap);
-			drawable->setPixel(static_cast<int>(ypixel1) + 1, static_cast<int>(xpixel1), colorToDraw.asUnsigned());
-		}
-		else
-		{
-			auto currentColor = drawable->getPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1));
-			auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yend) * xgap);
-			drawable->setPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1), colorToDraw.asUnsigned());
-
-			currentColor = drawable->getPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1) + 1);
-			colorToDraw = colorWithOpacity(color, currentColor, fpart(yend) * xgap);
-			drawable->setPixel(static_cast<int>(xpixel1), static_cast<int>(ypixel1) + 1, colorToDraw.asUnsigned());
-		}
-
-		auto yIntersection = yend + gradient;
-
-		xend = point2.x;
-		yend = point2.y;
-		xgap = rfpart(point2.x + 0.5);
-		double xpixel2 = xend;
-		double ypixel2 = yend;
-
-		if (steep)
-		{
-			auto currentColor = drawable->getPixel(static_cast<int>(ypixel2), static_cast<int>(xpixel2));
-			auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yend) * xgap);
-			drawable->setPixel(static_cast<int>(ypixel2), static_cast<int>(xpixel2), colorToDraw.asUnsigned());
-
-			currentColor = drawable->getPixel(static_cast<int>(ypixel2) + 1, static_cast<int>(xpixel2));
-			colorToDraw = colorWithOpacity(color, currentColor, fpart(yend) * xgap);
-			drawable->setPixel(static_cast<int>(ypixel2) + 1, static_cast<int>(xpixel2), colorToDraw.asUnsigned());
-		}
-		else
-		{
-			auto currentColor = drawable->getPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2));
-			auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yend) * xgap);
-			drawable->setPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2), colorToDraw.asUnsigned());
-
-			currentColor = drawable->getPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2) + 1);
-			colorToDraw = colorWithOpacity(color, currentColor, fpart(yend) * xgap);
-			drawable->setPixel(static_cast<int>(xpixel2), static_cast<int>(ypixel2) + 1, colorToDraw.asUnsigned());
-		}
-
-		if (steep)
-		{
-			for (auto x = static_cast<int>(xpixel1) + 1; x < static_cast<int>(xpixel2); ++x, yIntersection += gradient)
-			{
-				auto currentColor = drawable->getPixel(static_cast<int>(yIntersection), x);
-				auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yIntersection));
-				drawable->setPixel(static_cast<int>(yIntersection), x, colorToDraw.asUnsigned());
-
-				currentColor = drawable->getPixel(static_cast<int>(yIntersection) + 1, x);
-				colorToDraw = colorWithOpacity(color, currentColor, fpart(yIntersection));
-				drawable->setPixel(static_cast<int>(yIntersection) + 1, x, colorToDraw.asUnsigned());
-			}
-		}
-		else
-		{
-			for (auto x = static_cast<int>(xpixel1) + 1; x < static_cast<int>(xpixel2); ++x, yIntersection += gradient)
-			{
-				auto currentColor = drawable->getPixel(x, static_cast<int>(yIntersection));
-				auto colorToDraw = colorWithOpacity(color, currentColor, rfpart(yIntersection));
-				drawable->setPixel(x, static_cast<int>(yIntersection), colorToDraw.asUnsigned());
-
-				currentColor = drawable->getPixel(x, static_cast<int>(yIntersection) + 1);
-				colorToDraw = colorWithOpacity(color, currentColor, fpart(yIntersection));
-				drawable->setPixel(x, static_cast<int>(yIntersection) + 1, colorToDraw.asUnsigned());
-			}
-		}
-	}
-	
 }
