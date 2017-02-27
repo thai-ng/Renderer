@@ -218,9 +218,15 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="simp\cube.simp" />
-    <None Include="simp\cube2.simp" />
-    <None Include="simp\z0_face.simp" />
+    <None Include="cube.simp" />
+    <None Include="cube2.simp" />
+    <None Include="page4.simp" />
+    <None Include="page5.simp" />
+    <None Include="test.simp" />
+    <None Include="test1.simp" />
+    <None Include="test2.simp" />
+    <None Include="test3.simp" />
+    <None Include="z0_face.simp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

@@ -17,7 +17,8 @@ public:
 		_drawSurface(drawSurface),
 		redLerp(0, 200, std::get<0>(maxColor.getColorChannels()), 0),
 		greenLerp(0, 200, std::get<1>(maxColor.getColorChannels()), 0),
-		blueLerp(0, 200, std::get<2>(maxColor.getColorChannels()), 0)
+		blueLerp(0, 200, std::get<2>(maxColor.getColorChannels()), 0),
+		_maxColor(maxColor)
 	{
 		zBuffer = Matrix2D<int>(_viewPort.width, std::vector<int>(_viewPort.height, zThreshold));
 
@@ -87,7 +88,9 @@ public:
 		Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, getColorFromZ(static_cast<int>(std::round(v2[2]))) };
 
 		// This takes global coordinate, fix first
-		DDALineRenderer(point1, point2, _drawSurface, 1.0, &zBuffer);
+		point1 = point1.toGlobalCoordinate();
+		point1 = point2.toGlobalCoordinate();
+		renderLine(point1, point2, _drawSurface, DDALineRenderer, 1.0, &zBuffer, &_viewPort);
 	}
 
 private:
@@ -99,6 +102,10 @@ private:
 			auto g = static_cast<unsigned char>(greenLerp[z].second);
 			auto b = static_cast<unsigned char>(blueLerp[z].second);
 			return Color{ r, g, b };
+		}
+		else if (z < 0)
+		{
+			return _maxColor;
 		}
 		else
 		{
@@ -113,6 +120,7 @@ private:
 	Matrix2D<int> zBuffer;
 	int zThreshold = 200;
 	Rect _viewPort;
+	Color _maxColor;
 	Drawable* _drawSurface;
 	Matrix<4, 4, double> viewPortTransformationMatrix = Matrix<4, 4, double>{ 1.0, 0.0, 0.0, 0.0,
 																			  0.0, 1.0, 0.0, 0.0,

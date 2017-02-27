@@ -148,13 +148,31 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="simp\cube.simp">
+    <None Include="cube.simp">
       <Filter>Simp Files</Filter>
     </None>
-    <None Include="simp\cube2.simp">
+    <None Include="cube2.simp">
       <Filter>Simp Files</Filter>
     </None>
-    <None Include="simp\z0_face.simp">
+    <None Include="page4.simp">
+      <Filter>Simp Files</Filter>
+    </None>
+    <None Include="page5.simp">
+      <Filter>Simp Files</Filter>
+    </None>
+    <None Include="test.simp">
+      <Filter>Simp Files</Filter>
+    </None>
+    <None Include="test1.simp">
+      <Filter>Simp Files</Filter>
+    </None>
+    <None Include="test2.simp">
+      <Filter>Simp Files</Filter>
+    </None>
+    <None Include="test3.simp">
+      <Filter>Simp Files</Filter>
+    </None>
+    <None Include="z0_face.simp">
       <Filter>Simp Files</Filter>
     </None>
   </ItemGroup>

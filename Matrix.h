@@ -34,35 +34,6 @@ public:
 		return _data[x*width + y];
 	}
 
-	// This is wrong, should be implemented with fold (or with recursion, but I don't have time for that)
-
-	//void operator*=(Matrix<width, height, T>& other)
-	//{
-	//	auto row0 = getRow<0>();
-	//	auto row1 = getRow<1>();
-	//	auto row2 = getRow<2>();
-
-	//	auto otherCol0 = other.getCol<0>();
-	//	auto otherCol1 = other.getCol<1>();
-	//	auto otherCol2 = other.getCol<2>();
-
-	//	auto elem00 = row0[0] * otherCol0[0] + row0[1] * otherCol0[1] + row0[2] * otherCol0[2];
-	//	auto elem01 = row0[0] * otherCol1[0] + row0[1] * otherCol1[1] + row0[2] * otherCol1[2];
-	//	auto elem02 = row0[0] * otherCol2[0] + row0[1] * otherCol2[1] + row0[2] * otherCol2[2];
-	//	
-	//	auto elem10 = row1[0] * otherCol0[0] + row1[1] * otherCol0[1] + row1[2] * otherCol0[2];
-	//	auto elem11 = row1[0] * otherCol1[0] + row1[1] * otherCol1[1] + row1[2] * otherCol1[2];
-	//	auto elem12 = row1[0] * otherCol2[0] + row1[1] * otherCol2[1] + row1[2] * otherCol2[2];
-
-	//	auto elem20 = row2[0] * otherCol0[0] + row2[1] * otherCol0[1] + row2[2] * otherCol0[2];
-	//	auto elem21 = row2[0] * otherCol1[0] + row2[1] * otherCol1[1] + row2[2] * otherCol1[2];
-	//	auto elem22 = row2[0] * otherCol2[0] + row2[1] * otherCol2[1] + row2[2] * otherCol2[2];
-
-	//	_data = { elem00, elem01, elem02,
-	//			  elem10, elem11, elem12,
-	//			  elem20, elem21, elem22 };
-	//}
-
 private:
 	
 	std::array<T, width*height> _data;
@@ -88,20 +59,6 @@ private:
 		return make_array_with_interval<Interval>(first, std::make_index_sequence<N>());
 	}
 };
-
-
-// No Fold expression in MSVC yet
-//template <typename T, std::size_t... Indices, typename Array = std::array<T, sizeof...(Indices)>>
-//auto multSumIndice(Array& l, Array& r, std::index_sequence<Indices...>)
-//{
-//	return (l[Indices] * r[Indices]) + ...;
-//}
-//
-//template <typename T, int length, typename Array = std::array<T, length>>
-//T multSum(Array& l, Array& r)
-//{
-//	return multSumIndice<T>(l, r, std::make_index_sequence<length>());
-//}
 
 template <typename T>
 auto operator*(Matrix<4, 4, T>& l, Matrix<4, 4, T>& r)

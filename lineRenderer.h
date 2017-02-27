@@ -177,6 +177,12 @@ void renderLine(const Point& p1, const Point& p2, Drawable* surface, F function,
 }
 
 template <typename F>
+void renderLine(const Point& p1, const Point& p2, Drawable* surface, F function, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr, Rect* viewPort = nullptr)
+{
+	function(p1, p2, surface, opacity, zBuffer, viewPort);
+}
+
+template <typename F>
 void renderLine(const Line& l, Drawable* surface, F function, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr)
 {
 	auto points = l.toGlobalCoordinate();
@@ -216,7 +222,7 @@ void drawToSurface(const Point& screenPoint, Drawable* drawSurface, const Color&
 // Zbuffer draw with no viewport
 void drawWithZBuffer(const Point& screenPoint, Drawable* drawSurface, const Color& colorToPaint, Matrix2D<int>* zBuffer)
 {
-	if (screenPoint.z <= (*zBuffer)[screenPoint.x][screenPoint.y])
+	if (screenPoint.z <= (*zBuffer)[screenPoint.x][screenPoint.y] && screenPoint.z >= 0)
 	{
 		(*zBuffer)[screenPoint.x][screenPoint.y] = screenPoint.z;
 		drawToSurface(screenPoint, drawSurface, colorToPaint);
@@ -226,7 +232,7 @@ void drawWithZBuffer(const Point& screenPoint, Drawable* drawSurface, const Colo
 // Zbuffer draw with Viewport
 void drawWithZBuffer(const Point& screenPoint, Drawable* drawSurface, const Color& colorToPaint, Matrix2D<int>* zBuffer, Rect* viewPort)
 {
-	if (screenPoint.z < (*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y])
+	if (screenPoint.z < (*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y] && screenPoint.z >= 0)
 	{
 		(*zBuffer)[screenPoint.x - viewPort->x][screenPoint.y - viewPort->y] = screenPoint.z;
 		drawToSurface(screenPoint, drawSurface, colorToPaint);
