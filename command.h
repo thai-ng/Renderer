@@ -58,6 +58,8 @@ static const std::unordered_map<std::string, Axis> AxisTokens {
 class Command
 {
 public:
+	Command(Operation op, CommandParams&& parameters) : _op(op), params(parameters) {}
+
 	Command(const std::vector<std::string>& tokens)
 	{
 		_op = OperationTokens.at(tokens[0]);
