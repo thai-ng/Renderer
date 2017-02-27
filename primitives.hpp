@@ -4,7 +4,7 @@
 #include <vector>
 #include <array>
 
-#include "Color.h"
+#include "Color.hpp"
 
 template <typename T>
 using Matrix2D = std::vector<std::vector<T>>;

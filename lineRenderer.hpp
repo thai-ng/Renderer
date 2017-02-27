@@ -1,9 +1,9 @@
 #pragma once
 
-#include "primitives.h"
-#include "color.h"
+#include "color.hpp"
 #include "drawable.h"
-#include "lerp.h"
+#include "lerp.hpp"
+#include "primitives.hpp"
 
 void BresenhamLineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, double opacity = 1.0, Matrix2D<int>* zBuffer = nullptr, const Rect* viewPort = nullptr);
 

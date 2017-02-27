@@ -1,13 +1,13 @@
-#include "assignment1.h"
+#include "assignment1.hpp"
 
 #include <vector>
 #include <algorithm>
 #include <random>
 #include <iostream>
 
-#include "primitives.h"
-#include "lineRenderer.h"
-#include "polygonRenderer.h"
+#include "lineRenderer.hpp"
+#include "polygonRenderer.hpp"
+#include "primitives.hpp"
 
 namespace assignment1
 {

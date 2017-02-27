@@ -1,4 +1,4 @@
-#include "primitives.h"
+#include "primitives.hpp"
 
 Triangle::Triangle(const std::array<Point, 3>& vertices, const Rect* parent) : _vertices(vertices), _parent(parent)
 {

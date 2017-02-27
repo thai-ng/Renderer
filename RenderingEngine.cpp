@@ -1,7 +1,7 @@
 #include "RenderingEngine.hpp"
-#include "Matrix.h"
-#include "lineRenderer.h"
-#include "polygonRenderer.h"
+#include "Matrix.hpp"
+#include "lineRenderer.hpp"
+#include "polygonRenderer.hpp"
 
 RenderEngine::RenderEngine(const Rect& viewPort, Drawable* drawSurface, const Color& maxColor) :
 	_viewPort(viewPort),

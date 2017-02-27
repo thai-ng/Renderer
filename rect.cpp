@@ -1,4 +1,4 @@
-#include "primitives.h"
+#include "primitives.hpp"
 
 int Rect::bottom() const { return y + height; }
 int Rect::right() const { return x + width; }

@@ -1,16 +1,16 @@
-#include "assignment2.h"
+#include "assignment2.hpp"
 
 #include <random>
 #include <iostream>
 #include <vector>
 
 #include "client.h"
-#include "transformationUtil.h"
-#include "lineRenderer.h"
-#include "polygonRenderer.h"
-#include "SimpEngine.hpp"
+#include "lineRenderer.hpp"
+#include "polygonRenderer.hpp"
 #include "RenderingEngine.hpp"
-#include "SimpFile.h"
+#include "SimpEngine.hpp"
+#include "SimpFile.hpp"
+#include "transformationUtil.hpp"
 
 namespace assignment2
 {

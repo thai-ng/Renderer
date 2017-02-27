@@ -3,9 +3,9 @@
 #include <tuple>
 #include <algorithm>
 
-#include "color.h"
+#include "color.hpp"
 #include "drawable.h"
-#include "primitives.h"
+#include "primitives.hpp"
 
 template <typename T, typename F>
 T sortVertices(const T& vertices, F comp)

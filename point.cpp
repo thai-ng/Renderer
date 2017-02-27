@@ -1,4 +1,4 @@
-#include "primitives.h"
+#include "primitives.hpp"
 
 Point::Point(int x, int y, int z, const Rect* parent, const Color& color) : x(x), y(y), z(z), parent(parent), color(color) {}
 

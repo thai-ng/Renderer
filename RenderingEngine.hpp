@@ -1,11 +1,11 @@
 #pragma once
 #include <cmath>
 
+#include "Color.hpp"
 #include "drawable.h"
-#include "primitives.h"
-#include "lerp.h"
-#include "Color.h"
-#include "Matrix.h"
+#include "lerp.hpp"
+#include "Matrix.hpp"
+#include "primitives.hpp"
 
 using Vector4_t = std::array<double, 4>;
 using Triangle_t = std::array<Vector4_t, 3>;

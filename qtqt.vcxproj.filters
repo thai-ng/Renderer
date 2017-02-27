@@ -65,6 +65,12 @@
     <Filter Include="Source Files\Assignments">
       <UniqueIdentifier>{13e71d8f-df49-4d2d-ab58-727fb29ab6c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Simp File Parsing">
+      <UniqueIdentifier>{b3413004-4a95-4933-b24e-a2ef084246b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Simp Engine">
+      <UniqueIdentifier>{1f31efff-0a9b-4f2e-ab87-1b6b31c0a81f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client.cpp">
@@ -127,14 +133,17 @@
     <ClCompile Include="assignment1.cpp">
       <Filter>Source Files\Assignments</Filter>
     </ClCompile>
+    <ClCompile Include="SimpFile.cpp">
+      <Filter>Source Files\Simp File Parsing</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpEngine.cpp">
+      <Filter>Source Files\Simp Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="command.cpp">
+      <Filter>Source Files\Simp File Parsing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lineRenderer.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="polygonRenderer.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="drawable.h">
       <Filter>Header Files\Application</Filter>
     </ClInclude>
@@ -144,41 +153,44 @@
     <ClInclude Include="client.h">
       <Filter>Header Files\Application</Filter>
     </ClInclude>
-    <ClInclude Include="transformationUtil.h">
-      <Filter>Header Files\Rendering Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Color.h">
-      <Filter>Header Files\Rendering Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="lerp.h">
-      <Filter>Header Files\Rendering Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="primitives.h">
-      <Filter>Header Files\Rendering Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="command.h">
-      <Filter>Header Files\Simp File Parsing</Filter>
-    </ClInclude>
-    <ClInclude Include="LineParser.h">
-      <Filter>Header Files\Simp File Parsing</Filter>
-    </ClInclude>
-    <ClInclude Include="SimpFile.h">
-      <Filter>Header Files\Simp File Parsing</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrix.h">
-      <Filter>Header Files\Rendering Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="SimpEngine.hpp">
       <Filter>Header Files\Simp Engine</Filter>
     </ClInclude>
     <ClInclude Include="RenderingEngine.hpp">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="assignment2.h">
+    <ClInclude Include="assignment1.hpp">
       <Filter>Header Files\Assigments</Filter>
     </ClInclude>
-    <ClInclude Include="assignment1.h">
+    <ClInclude Include="assignment2.hpp">
       <Filter>Header Files\Assigments</Filter>
+    </ClInclude>
+    <ClInclude Include="lineRenderer.hpp">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="polygonRenderer.hpp">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Color.hpp">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="lerp.hpp">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix.hpp">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="primitives.hpp">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="transformationUtil.hpp">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="command.hpp">
+      <Filter>Header Files\Simp File Parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpFile.hpp">
+      <Filter>Header Files\Simp File Parsing</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

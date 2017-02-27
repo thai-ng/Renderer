@@ -1,4 +1,4 @@
-#include "primitives.h"
+#include "primitives.hpp"
 
 Line::Line(Point inp1, Point inp2, unsigned int c) : p1(inp1), p2(inp2), color(c)
 {

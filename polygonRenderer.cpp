@@ -1,11 +1,11 @@
-#include "polygonRenderer.h"
+#include "polygonRenderer.hpp"
 
 #include <vector>
 #include <tuple>
 #include <algorithm>
 #include <cmath>
 
-#include "lineRenderer.h"
+#include "lineRenderer.hpp"
 
 auto comparePoints = [](auto p1, auto p2)
 {

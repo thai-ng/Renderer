@@ -1,4 +1,5 @@
-#include "lineRenderer.h"
+#include "lineRenderer.hpp"
+
 #include <cmath>
 #include <utility>
 

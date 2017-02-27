@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "assignment2.h"
+#include "assignment2.hpp"
 
 Client::Client(Drawable *drawable)
 {

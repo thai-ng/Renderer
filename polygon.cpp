@@ -1,4 +1,4 @@
-#include "primitives.h"
+#include "primitives.hpp"
 
 Polygon::Polygon(std::vector<Point>&& v, Rect* parent) : _vertices(v), _parent(parent)
 {

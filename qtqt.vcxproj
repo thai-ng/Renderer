@@ -147,6 +147,7 @@
     <ClCompile Include="assignment2.cpp" />
     <ClCompile Include="client.cpp" />
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="command.cpp" />
     <ClCompile Include="Debug\moc_renderarea361.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -169,27 +170,28 @@
     </ClCompile>
     <ClCompile Include="renderarea361.cpp" />
     <ClCompile Include="RenderingEngine.cpp" />
+    <ClCompile Include="SimpEngine.cpp" />
+    <ClCompile Include="SimpFile.cpp" />
     <ClCompile Include="triangle.cpp" />
     <ClCompile Include="window361.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="assignment1.h" />
-    <ClInclude Include="assignment2.h" />
+    <ClInclude Include="assignment1.hpp" />
+    <ClInclude Include="assignment2.hpp" />
     <ClInclude Include="client.h" />
-    <ClInclude Include="Color.h" />
-    <ClInclude Include="command.h" />
+    <ClInclude Include="Color.hpp" />
+    <ClInclude Include="command.hpp" />
     <ClInclude Include="drawable.h" />
-    <ClInclude Include="Matrix.h" />
+    <ClInclude Include="Matrix.hpp" />
     <ClInclude Include="RenderingEngine.hpp" />
     <ClInclude Include="SimpEngine.hpp" />
-    <ClInclude Include="SimpFile.h" />
-    <ClInclude Include="lerp.h" />
-    <ClInclude Include="LineParser.h" />
-    <ClInclude Include="lineRenderer.h" />
+    <ClInclude Include="SimpFile.hpp" />
+    <ClInclude Include="lerp.hpp" />
+    <ClInclude Include="lineRenderer.hpp" />
     <ClInclude Include="pageturner.h" />
-    <ClInclude Include="polygonRenderer.h" />
-    <ClInclude Include="primitives.h" />
-    <ClInclude Include="transformationUtil.h" />
+    <ClInclude Include="polygonRenderer.hpp" />
+    <ClInclude Include="primitives.hpp" />
+    <ClInclude Include="transformationUtil.hpp" />
     <CustomBuild Include="renderarea361.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DWIN64 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG "-I." "-IC:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x64" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtANGLE" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing renderarea361.h...</Message>

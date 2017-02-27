@@ -2,7 +2,7 @@
 #include <cmath>
 #include <algorithm>
 
-#include "primitives.h"
+#include "primitives.hpp"
 
 template <typename T>
 T rotate(const T& shape, int angle, const Point& center)
