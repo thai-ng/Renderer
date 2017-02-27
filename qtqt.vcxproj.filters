@@ -53,6 +53,18 @@
     <Filter Include="Header Files\Simp Engine">
       <UniqueIdentifier>{0ee42237-3960-4ffe-9af8-e4ed6c65274f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Renderer">
+      <UniqueIdentifier>{fe903c8a-916e-4264-8e67-fb92f9178544}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering Helpers">
+      <UniqueIdentifier>{245bf1ba-587b-47f8-83ba-8c87deb82492}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assigments">
+      <UniqueIdentifier>{a34a85b4-ea34-4c67-8761-4b3d4fcc4eeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assignments">
+      <UniqueIdentifier>{13e71d8f-df49-4d2d-ab58-727fb29ab6c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="client.cpp">
@@ -79,14 +91,44 @@
     <ClCompile Include="Release\moc_window361.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="lineRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="polygonRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="triangle.cpp">
+      <Filter>Source Files\Rendering Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="polygon.cpp">
+      <Filter>Source Files\Rendering Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="line.cpp">
+      <Filter>Source Files\Rendering Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="rect.cpp">
+      <Filter>Source Files\Rendering Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="point.cpp">
+      <Filter>Source Files\Rendering Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Color.cpp">
+      <Filter>Source Files\Rendering Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderingEngine.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="assignment2.cpp">
+      <Filter>Source Files\Assignments</Filter>
+    </ClCompile>
+    <ClCompile Include="primitives.cpp">
+      <Filter>Source Files\Rendering Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="assignment1.cpp">
+      <Filter>Source Files\Assignments</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="assignment2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="assignment1.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="lineRenderer.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
@@ -131,6 +173,12 @@
     </ClInclude>
     <ClInclude Include="RenderingEngine.hpp">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="assignment2.h">
+      <Filter>Header Files\Assigments</Filter>
+    </ClInclude>
+    <ClInclude Include="assignment1.h">
+      <Filter>Header Files\Assigments</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

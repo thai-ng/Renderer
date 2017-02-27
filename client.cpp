@@ -2,11 +2,7 @@
 
 #include <iostream>
 
-#include "assignment1.h"
 #include "assignment2.h"
-#include "SimpFile.h"
-#include "SimpEngine.hpp"
-#include "Matrix.h"
 
 Client::Client(Drawable *drawable)
 {

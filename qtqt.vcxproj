@@ -143,14 +143,24 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="assignment1.cpp" />
+    <ClCompile Include="assignment2.cpp" />
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="Color.cpp" />
     <ClCompile Include="Debug\moc_renderarea361.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Debug\moc_window361.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="line.cpp" />
+    <ClCompile Include="lineRenderer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="point.cpp" />
+    <ClCompile Include="polygon.cpp" />
+    <ClCompile Include="polygonRenderer.cpp" />
+    <ClCompile Include="primitives.cpp" />
+    <ClCompile Include="rect.cpp" />
     <ClCompile Include="Release\moc_renderarea361.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -158,6 +168,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="renderarea361.cpp" />
+    <ClCompile Include="RenderingEngine.cpp" />
+    <ClCompile Include="triangle.cpp" />
     <ClCompile Include="window361.cpp" />
   </ItemGroup>
   <ItemGroup>

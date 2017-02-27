@@ -9,6 +9,29 @@
 template <typename T>
 using Matrix2D = std::vector<std::vector<T>>;
 
+struct Rect;
+
+struct Point
+{
+	int x;
+	int y;
+	int z;
+	const Rect* parent;
+	Color color;
+
+	Point() : x(0), y(0), parent(nullptr), color(0xffffffff) {}
+	Point(int x, int y, int z = 0, const Rect* parent = nullptr, const Color& color = 0xffffffff);
+
+	Point toGlobalCoordinate() const;
+
+	bool operator==(const Point& other) const;
+
+	bool operator!=(const Point& other) const;
+
+	Point flipped() const;
+};
+
+
 struct Rect
 {
 	int x;
@@ -16,202 +39,63 @@ struct Rect
 	int width;
 	int height;
 
-	int bottom() const { return y + height; }
-	int right() const { return x + width; }
-	auto center();
+	int bottom() const;
+	int right() const;
+	Point center() const;
 };
 
 
-struct Point
-{
-	int x;
-	int y;
-	int z;
-	Rect* parent;
-	Color color;
+Point operator+(const Point& p1, const Point& p2);
+Point operator-(const Point& p1, const Point& p2);
+double getRadianFromDegree(int angle);
 
-	Point() : x(0), y(0), parent(nullptr), color(0xffffffff) {}
-	Point(int x, int y, int z=0, Rect* parent = nullptr, const Color& color = 0xffffffff) : x(x), y(y), z(z), parent(parent), color(color) {}
-
-	auto toGlobalCoordinate() const
-	{
-		if (parent)
-		{
-			return Point{ parent->x + x, parent->y + y, z, parent, color};
-		}
-		else
-		{
-			return Point{ x, y, z, nullptr, color };
-		}
-	}
-
-	bool operator==(const Point& other) const
-	{
-		return (x == other.x) && (y == other.y) && (parent == other.parent);
-	}
-
-	bool operator!=(const Point& other) const
-	{
-		return !(*this == other);
-	}
-
-	Point flipped() const
-	{
-		return Point{ y, x, z, parent, color };
-	}
-};
-
-auto Rect::center() 
-{ 
-	return Point{ (width / 2), (height / 2), 0, this}; 
-}
-
-Point operator+(const Point& p1, const Point& p2)
-{
-	return Point{ p1.x + p2.x, p1.y + p2.y };
-}
-
-Point operator-(const Point& p1, const Point& p2)
-{
-	return Point{ p1.x - p2.x, p1.y - p2.y };
-}
-
-
-double getRadianFromDegree(int angle)
-{
-	static constexpr double Pi = 3.141592653589793238462643383279502884;
-	return (angle * Pi / 180.0);
-}
 struct Line
 {
-	Line(Point inp1, Point inp2) : p1(inp1), p2(inp2)
-	{
-	}
+	Line(Point inp1, Point inp2) : p1(inp1), p2(inp2) {}
 
+	Line(Point inp1, Point inp2, unsigned int c);
 
-	Line(Point inp1, Point inp2, unsigned int c) : p1(inp1), p2(inp2), color(c) 
-	{
-		p1.color = Color(color);
-		p2.color = Color(color);
-	}
-
-	Line(const Point& origin, int length, int angle, Rect* parent = nullptr, unsigned int c = 0xffffffff) : p1(origin), color(c)
-	{
-		auto radianAngle = getRadianFromDegree(angle);
-		auto opposite = length * std::sin(radianAngle);
-		auto adjacent = length * std::cos(radianAngle);
-        p2 = Point{ origin.x + static_cast<int>(adjacent), origin.y + static_cast<int>(opposite), origin.z, parent , color};
-		if (p1.parent != parent)
-		{
-			p1.parent = parent;
-		}
-		p1.color = Color(color);
-	}
+	Line(const Point& origin, int length, int angle, Rect* parent = nullptr, unsigned int c = 0xffffffff);
 
 	Point p1;
 	Point p2;
 	unsigned int color;
 
-	auto toGlobalCoordinate() const
-	{
-		return std::make_tuple<Point, Point>(p1.toGlobalCoordinate(), p2.toGlobalCoordinate());
-	}
+	std::tuple<Point, Point> toGlobalCoordinate() const;
 
-	void setParent(Rect* parent)
-	{
-		p1.parent = parent;
-		p2.parent = parent;
-	}
+	void setParent(Rect* parent);
 
-	bool connected(const Line& other) const
-	{
-		return (p1 == other.p1 || p1 == other.p2 || p2 == other.p1 || p2 == other.p2);
-	}
+	bool connected(const Line& other) const;
 
-	std::array<Point, 3> getTriangleVertices(const Line& other) const
-	{
-		if (connected(other))
-		{
-			if (p1 == other.p1)
-			{
-				return std::array<Point, 3>{p1, p2, other.p2};
-			}
-			else if (p1 == other.p2)
-			{
-				return std::array<Point, 3>{other.p1, p2, other.p2};
-			}
-			else if (p2 == other.p1)
-			{
-				return std::array<Point, 3>{p1, p2, other.p2};
-			}
-			else
-			{
-				return std::array<Point, 3>{p1, p2, other.p1};
-			}
-		}
-		else
-		{
-			throw std::invalid_argument("Lines must connect.");
-		}
-	}
-
+	std::array<Point, 3> getTriangleVertices(const Line& other) const;
 };
 
 class Polygon
 {
 public:
-	explicit Polygon(std::vector<Point>&& v, Rect* parent = nullptr) : _vertices(v), _parent(parent)
-	{
-		std::for_each(_vertices.begin(), _vertices.end(), [parent](Point& p) {p.parent = parent; });
-	}
+	explicit Polygon(std::vector<Point>&& v, Rect* parent = nullptr);
+	
+	std::vector<Point> vertices() const;
 
-	std::vector<Point> vertices() const
-	{
-		return _vertices;
-	}
-
-	Rect* parent() const
-	{
-		return _parent;
-	}
+	const Rect* parent() const;
 
 private:
 	std::vector<Point> _vertices;
-	Rect* _parent;
+	const Rect* _parent;
 };
 
 class Triangle
 {
 public:
-	Triangle(const std::array<Point, 3>& vertices, Rect* parent = nullptr) : _vertices(vertices), _parent(parent) 
-	{
-        std::for_each(_vertices.begin(), _vertices.end(), [parent](auto& vertex) {vertex.parent = parent; });
-	}
+	Triangle(const std::array<Point, 3>& vertices, const Rect* parent = nullptr);
 
-	Triangle(const Line& line1, const Line& line2)
-	{
-		if (line1.connected(line2))
-		{
-			_vertices = line1.getTriangleVertices(line2);
-			_parent = line1.p1.parent;
-		}
-		else
-		{
-			throw std::invalid_argument("Lines must connect.");
-		}
-	}
+	Triangle(const Line& line1, const Line& line2);
 
-	auto vertices() const
-	{
-		return _vertices;
-	}
+	std::array<Point, 3> vertices() const;
 
-	Rect* parent() const
-	{
-		return _parent;
-	}
+	const Rect* parent() const;
 
 private:
-	Rect* _parent;
+	const Rect* _parent;
 	std::array<Point, 3> _vertices;
 };
