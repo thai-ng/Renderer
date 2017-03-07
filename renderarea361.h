@@ -1,8 +1,9 @@
 #ifndef RENDERAREA_H
 #define RENDERAREA_H
 
-#include <QWidget>
 #include "drawable.h"
+#pragma warning ( disable : 4127 )
+#include <QWidget>
 
 class RenderArea361 : public QWidget, public Drawable
 {

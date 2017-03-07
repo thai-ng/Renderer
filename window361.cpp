@@ -1,6 +1,7 @@
+#include "window361.h"
+
 #include <iostream>
 #include <QGridLayout>
-#include "window361.h"
 
 Window361::Window361() : renderArea(std::make_unique<RenderArea361>(nullptr)),
 						 nextPageButton(std::make_unique<QPushButton>("next page"))

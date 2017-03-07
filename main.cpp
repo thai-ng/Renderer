@@ -1,7 +1,9 @@
-#include "window361.h"
-#include "client.h"
-#include <QApplication>
 
+#include "client.h"
+#include "window361.h"
+
+#pragma warning ( disable : 4127 )
+#include <QApplication>
 
 // you can rewrite main(.cpp/.h) and client(.cpp/.h) and add more files.
 // Leave renderarea(.cpp/.h) and window(.cpp/.h) unchanged.

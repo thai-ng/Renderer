@@ -2,11 +2,13 @@
 #define WINDOW_H
 
 #include <memory>
-#include <QWidget>
-#include <QPushButton>
+
 #include "pageturner.h"
 #include "drawable.h"
 #include "renderarea361.h"
+
+#include <QWidget>
+#include <QPushButton>
 
 class Window361 : public QWidget
 {
