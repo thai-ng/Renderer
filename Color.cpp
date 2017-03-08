@@ -1,5 +1,34 @@
 #include "Color.hpp"
 
+unsigned char denormalizeColor(double color)
+{
+	unsigned char result;
+	if (color > 1.0)
+	{
+		result = 255;
+	}
+	else if (color < 0)
+	{
+		result = 0;
+	}
+	else
+	{
+		result = static_cast<unsigned char>(color * 255.0);
+	}
+
+	return result;
+}
+
+Color Color::getDenormalizedColor(double r, double g, double b)
+{
+	Color result{ 0, 0, 0 };
+	result.r = static_cast<unsigned char>(denormalizeColor(r));
+	result.g = static_cast<unsigned char>(denormalizeColor(g));
+	result.b = static_cast<unsigned char>(denormalizeColor(b));
+	return result;
+}
+
+
 Color::Color(double color)
 {
 	r = static_cast<unsigned char>(0x00ffffff << 8 >> 24);

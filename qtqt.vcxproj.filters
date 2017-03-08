@@ -142,6 +142,9 @@
     <ClCompile Include="command.cpp">
       <Filter>Source Files\Simp File Parsing</Filter>
     </ClCompile>
+    <ClCompile Include="assignment3.cpp">
+      <Filter>Source Files\Assignments</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="drawable.h">
@@ -191,6 +194,9 @@
     </ClInclude>
     <ClInclude Include="SimpFile.hpp">
       <Filter>Header Files\Simp File Parsing</Filter>
+    </ClInclude>
+    <ClInclude Include="assignment3.hpp">
+      <Filter>Header Files\Assigments</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

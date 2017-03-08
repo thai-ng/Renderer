@@ -1,8 +1,8 @@
+line (10, 10, 0, 0, 0, 1) (-70, -70, 200, 0, 0, 1)
+
+translate 0, 0, 100
+scale 50, 50, 50
+rotate X 10
 {
-    translate 0, 0, 0        
-    rotate X 45
-    rotate Y 45
-    scale 50, 50, 50
-    #wire
-    file "cube"
+	file "cube2"
 }

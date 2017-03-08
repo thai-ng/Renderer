@@ -154,6 +154,7 @@ copy "$(ProjectDir)*.simp" "$(OutDir)"</Command>
   <ItemGroup>
     <ClCompile Include="assignment1.cpp" />
     <ClCompile Include="assignment2.cpp" />
+    <ClCompile Include="assignment3.cpp" />
     <ClCompile Include="client.cpp" />
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="command.cpp" />
@@ -187,6 +188,7 @@ copy "$(ProjectDir)*.simp" "$(OutDir)"</Command>
   <ItemGroup>
     <ClInclude Include="assignment1.hpp" />
     <ClInclude Include="assignment2.hpp" />
+    <ClInclude Include="assignment3.hpp" />
     <ClInclude Include="client.h" />
     <ClInclude Include="Color.hpp" />
     <ClInclude Include="command.hpp" />

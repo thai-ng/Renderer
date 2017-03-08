@@ -6,6 +6,8 @@
 #include <variant>
 #include <cstdlib>
 
+#include "primitives.hpp"
+
 enum class Axis
 {
 	X,
@@ -15,7 +17,7 @@ enum class Axis
 
 using Vector3 = std::array<double, 3>;
 using PolygonParams = std::array<Vector3, 3>;
-using LineParams = std::array<Vector3, 2>;
+using LineParams = std::array<Point4D, 2>;
 using RotateParams = std::pair<Axis, int>;
 using FileParam = std::string;
 using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam>;
@@ -34,7 +36,15 @@ public:
 		Polygon,
 		File,
 		Wire,
-		Filled
+		Filled,
+		Camera,
+		ObjectFile,
+		Ambient,
+		Depth,
+		Surface,
+		Vertex,
+		VertexNormal,
+		Face
 	};
 
 

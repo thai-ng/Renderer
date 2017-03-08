@@ -1,6 +1,6 @@
 #include "primitives.hpp"
 
-Point::Point(int x, int y, int z, const Rect* parent, const Color& color) : x(x), y(y), z(z), parent(parent), color(color) {}
+Point::Point(int x, int y, int z, const Rect* parent, const Color& color) : x(static_cast<int>(x)), y(static_cast<int>(y)), z(static_cast<int>(z)), parent(parent), color(color) {}
 
 
 Point Point::toGlobalCoordinate() const

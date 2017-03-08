@@ -9,7 +9,7 @@
 
 using Vector4_t = std::array<double, 4>;
 using Triangle_t = std::array<Vector4_t, 3>;
-using Line_t = std::array<Vector4_t, 2>;
+using Line_t = std::array<Point4D, 2>;
 
 class RenderEngine
 {
@@ -28,7 +28,7 @@ public:
 
 private:
 	Color getColorFromZ(int z) const;
-
+	Color getColorWithDepth(const Color& baseColor, int z) const;
 	Lerp<int> redLerp;
 	Lerp<int> greenLerp;
 	Lerp<int> blueLerp;

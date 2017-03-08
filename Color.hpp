@@ -7,7 +7,7 @@ class Color
 {
 public:
 	Color(unsigned char red, unsigned char green, unsigned char blue) : r(red), g(green), b(blue) {}
-	
+
 	Color(double color);
 
 	Color(unsigned int color);
@@ -17,6 +17,8 @@ public:
 	ColorChannels getColorChannels() const;
 
 	bool operator==(const Color& other) const;
+
+	static Color getDenormalizedColor(double r, double g, double b);
 private:
 	unsigned char r;
 	unsigned char g;

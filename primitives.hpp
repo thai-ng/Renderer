@@ -31,6 +31,22 @@ struct Point
 	Point flipped() const;
 };
 
+struct Point4D
+{
+	Point4D(const std::array<double, 4>& vector, const Color& color) : x(vector[0]), y(vector[1]), z(vector[2]), w(vector[3]), color(color) {}
+	Point4D(double x, double y, double z, double w, const Color& color) : x(x), y(y), z(z), w(w), color(color) {}
+	
+	std::array<double, 4> getVector()
+	{
+		return std::array<double, 4> {x, y, z, w};
+	}
+
+	double x;
+	double y;
+	double z;
+	double w;
+	Color color;
+};
 
 struct Rect
 {
