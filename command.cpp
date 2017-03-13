@@ -36,9 +36,21 @@ Command::Command(const std::vector<std::string>& tokens)
 	{
 		case Command::Operation::Polygon:
 		{
-			params = PolygonParams{ Vector3{ std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()) },
-									Vector3{ std::atof(tokens[4].c_str()), std::atof(tokens[5].c_str()), std::atof(tokens[6].c_str()) },
-									Vector3{ std::atof(tokens[7].c_str()), std::atof(tokens[8].c_str()), std::atof(tokens[9].c_str()) } };
+			if (tokens.size() == 10)
+			{
+				params = PolygonParams{ Point4D{ std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()), 1, Color{255, 255, 255} },
+										Point4D{ std::atof(tokens[4].c_str()), std::atof(tokens[5].c_str()), std::atof(tokens[6].c_str()), 1, Color{255, 255, 255} },
+										Point4D{ std::atof(tokens[7].c_str()), std::atof(tokens[8].c_str()), std::atof(tokens[9].c_str()), 1, Color{255, 255, 255} } };
+			}
+			else
+			{
+				auto color1 = Color::getDenormalizedColor(std::atof(tokens[4].c_str()), std::atof(tokens[5].c_str()), std::atof(tokens[6].c_str()));
+				auto color2 = Color::getDenormalizedColor(std::atof(tokens[10].c_str()), std::atof(tokens[11].c_str()), std::atof(tokens[12].c_str()));
+				auto color3 = Color::getDenormalizedColor(std::atof(tokens[16].c_str()), std::atof(tokens[17].c_str()), std::atof(tokens[18].c_str()));
+				params = PolygonParams{ Point4D{ std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()), 1, color1 },
+										Point4D{ std::atof(tokens[4].c_str()), std::atof(tokens[5].c_str()), std::atof(tokens[6].c_str()), 1, color2 },
+										Point4D{ std::atof(tokens[7].c_str()), std::atof(tokens[8].c_str()), std::atof(tokens[9].c_str()), 1, color3 } };
+			}
 		} break;
 
 		case Command::Operation::Line:

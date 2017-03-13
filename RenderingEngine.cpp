@@ -13,10 +13,10 @@ RenderEngine::RenderEngine(const Rect& viewPort, Drawable* drawSurface, const Co
 {
 	zBuffer = Matrix2D<int>(_viewPort.width, std::vector<int>(_viewPort.height, zThreshold));
 
-	auto scaleMatrix = Matrix<4, 4, double>{ viewPort.width / 200.0, 0.0,					  0.0, 0.0,
+	auto scaleMatrix = Matrix<4, 4, double>{ viewPort.width / 200.0, 0.0,					   0.0, 0.0,
 											 0.0,				     -viewPort.height / 200.0, 0.0, 0.0,
-											 0.0,				     0.0,					  1.0, 0.0,
-											 0.0,				     0.0,					  0.0, 1.0 };
+											 0.0,				     0.0,					   1.0, 0.0,
+											 0.0,				     0.0,					   0.0, 1.0 };
 
 	auto translationMatrix = Matrix<4, 4, double>{ 1.0, 0.0, 0.0, viewPort.width / 2.0,
 												   0.0, 1.0, 0.0, viewPort.height / 2.0,
@@ -30,16 +30,16 @@ RenderEngine::RenderEngine(const Rect& viewPort, Drawable* drawSurface, const Co
 void RenderEngine::RenderTriangle(const Triangle_t& triangle, RenderMode renderMode)
 {
 	// Translate to screen space
-	auto v1 = triangle[0];
-	v1 = viewPortTransformationMatrix * v1;
-	auto v2 = triangle[1];
-	v2 = viewPortTransformationMatrix * v2;
-	auto v3 = triangle[2];
-	v3 = viewPortTransformationMatrix * v3;
+	auto p1 = triangle[0];
+	auto v1 = viewPortTransformationMatrix * p1.getVector();
+	auto p2 = triangle[1];
+	auto v2 = viewPortTransformationMatrix * p2.getVector();
+	auto p3 = triangle[2];
+	auto v3 = viewPortTransformationMatrix * p3.getVector();
 
-	Point point1 = Point{ static_cast<int>(std::round(v1[0])), static_cast<int>(std::round(v1[1])), static_cast<int>(std::round(v1[2])), &_viewPort, getColorFromZ(static_cast<int>(std::round(v1[2]))) };
-	Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, getColorFromZ(static_cast<int>(std::round(v2[2]))) };
-	Point point3 = Point{ static_cast<int>(std::round(v3[0])), static_cast<int>(std::round(v3[1])), static_cast<int>(std::round(v3[2])), &_viewPort, getColorFromZ(static_cast<int>(std::round(v3[2]))) };
+	Point point1 = Point{ static_cast<int>(std::round(v1[0])), static_cast<int>(std::round(v1[1])), static_cast<int>(std::round(v1[2])), &_viewPort, getColorWithDepth(p1.color, static_cast<int>(std::round(v1[2]))) };
+	Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, getColorWithDepth(p2.color, static_cast<int>(std::round(v2[2]))) };
+	Point point3 = Point{ static_cast<int>(std::round(v3[0])), static_cast<int>(std::round(v3[1])), static_cast<int>(std::round(v3[2])), &_viewPort, getColorWithDepth(p3.color, static_cast<int>(std::round(v3[2]))) };
 
 	if (renderMode == RenderMode::Filled)
 	{
@@ -63,7 +63,6 @@ void RenderEngine::RenderLine(const Line_t& line)
 	Point point1 = Point{ static_cast<int>(std::round(v1[0])), static_cast<int>(std::round(v1[1])), static_cast<int>(std::round(v1[2])), &_viewPort, getColorWithDepth(p1.color, static_cast<int>(std::round(v1[2]))) };
 	Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, getColorWithDepth(p2.color, static_cast<int>(std::round(v2[2]))) };
 
-	// This takes global coordinate, fix first
 	point1 = point1.toGlobalCoordinate();
 	point2 = point2.toGlobalCoordinate();
 	renderLine(point1, point2, _drawSurface, DDALineRenderer, 1.0, &zBuffer, &_viewPort);

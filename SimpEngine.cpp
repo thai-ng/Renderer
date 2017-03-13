@@ -74,15 +74,18 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 			case Command::Operation::Polygon:
 			{
 				auto params = std::get<PolygonParams>(command.parameters());
-				auto point1 = std::array<double, 4>{ params[0][0], params[0][1], params[0][2], 1 };
-				auto point2 = std::array<double, 4>{ params[1][0], params[1][1], params[1][2], 1 };
-				auto point3 = std::array<double, 4>{ params[2][0], params[2][1], params[2][2], 1 };
+				auto point1 = std::array<double, 4>{ params[0].x, params[0].y, params[0].z, 1 };
+				auto point2 = std::array<double, 4>{ params[1].x, params[1].y, params[1].z, 1 };
+				auto point3 = std::array<double, 4>{ params[2].x, params[2].y, params[2].z, 1 };
 				auto transformedPoint1 = CTM * point1;
 				auto transformedPoint2 = CTM * point2;
 				auto transformedPoint3 = CTM * point3;
 
 				// Send to rendering engine to render
-				_renderEngine.RenderTriangle(Triangle_t{ transformedPoint1, transformedPoint2, transformedPoint3 }, currentRenderMode);
+				_renderEngine.RenderTriangle(Triangle_t{ Point4D{transformedPoint1, params[0].color},
+														 Point4D{transformedPoint2, params[1].color},
+														 Point4D{transformedPoint3, params[2].color} },
+											 currentRenderMode);
 			} break;
 		}
 	}

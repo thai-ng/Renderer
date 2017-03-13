@@ -16,7 +16,7 @@ enum class Axis
 };
 
 using Vector3 = std::array<double, 3>;
-using PolygonParams = std::array<Vector3, 3>;
+using PolygonParams = std::array<Point4D, 3>;
 using LineParams = std::array<Point4D, 2>;
 using RotateParams = std::pair<Axis, int>;
 using FileParam = std::string;

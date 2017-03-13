@@ -8,7 +8,7 @@
 #include "primitives.hpp"
 
 using Vector4_t = std::array<double, 4>;
-using Triangle_t = std::array<Vector4_t, 3>;
+using Triangle_t = std::array<Point4D, 3>;
 using Line_t = std::array<Point4D, 2>;
 
 class RenderEngine
