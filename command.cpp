@@ -89,6 +89,21 @@ Command::Command(const std::vector<std::string>& tokens)
 			params = fileName;
 		} break;
 
+		case Command::Operation::Ambient:
+		{
+			params = Color::getDenormalizedColor( std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()));
+		} break;
+
+		case Command::Operation::Camera:
+		{
+			params = CameraParams{ std::atof(tokens[1].c_str()),	// xLow
+								   std::atof(tokens[2].c_str()),	// xHigh
+								   std::atof(tokens[3].c_str()),	// yLow
+								   std::atof(tokens[4].c_str()),	// yHigh
+								   std::atof(tokens[5].c_str()),	// near
+								   std::atof(tokens[6].c_str()) };	// far
+		} break;
+
 		default:
 		{
 

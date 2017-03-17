@@ -1,7 +1,11 @@
 #include "RenderingEngine.hpp"
 #include "Matrix.hpp"
-#include "lineRenderer.hpp"
-#include "polygonRenderer.hpp"
+#include "PointGenerator.hpp"
+#include "PointsRenderer.hpp"
+#include "PointLighter.hpp"
+
+//#include "lineRenderer.hpp"
+//#include "polygonRenderer.hpp"
 
 RenderEngine::RenderEngine(const Rect& viewPort, Drawable* drawSurface, const Color& maxColor) :
 	_viewPort(viewPort),
@@ -9,7 +13,7 @@ RenderEngine::RenderEngine(const Rect& viewPort, Drawable* drawSurface, const Co
 	redLerp(0, 200, std::get<0>(maxColor.getColorChannels()), 0),
 	greenLerp(0, 200, std::get<1>(maxColor.getColorChannels()), 0),
 	blueLerp(0, 200, std::get<2>(maxColor.getColorChannels()), 0),
-	_maxColor(maxColor)
+	ambientColor(maxColor)
 {
 	zBuffer = Matrix2D<int>(_viewPort.width, std::vector<int>(_viewPort.height, zThreshold));
 
@@ -41,14 +45,18 @@ void RenderEngine::RenderTriangle(const Triangle_t& triangle, RenderMode renderM
 	Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, getColorWithDepth(p2.color, static_cast<int>(std::round(v2[2]))) };
 	Point point3 = Point{ static_cast<int>(std::round(v3[0])), static_cast<int>(std::round(v3[1])), static_cast<int>(std::round(v3[2])), &_viewPort, getColorWithDepth(p3.color, static_cast<int>(std::round(v3[2]))) };
 
+	std::vector<Point> points;
 	if (renderMode == RenderMode::Filled)
 	{
-		renderPolygon(Polygon{ std::vector<Point>{ point1, point2, point3 }, &_viewPort }, _drawSurface, 1.0, &zBuffer);
+		points = std::move(PointGenerator::generatePolygonPoints(std::vector<Point>{point1, point2, point3}));
 	}
 	else
 	{
-		renderPolygonWireframe(Polygon{ std::vector<Point>{ point1, point2, point3 }, &_viewPort }, _drawSurface, &zBuffer);
+		points = std::move(PointGenerator::generateWireframePoints(std::vector<Point>{point1, point2, point3}));
 	}
+
+	PointLighter::calculateLight(points, ambientColor);
+	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort);
 }
 
 void RenderEngine::RenderLine(const Line_t& line)
@@ -65,7 +73,9 @@ void RenderEngine::RenderLine(const Line_t& line)
 
 	point1 = point1.toGlobalCoordinate();
 	point2 = point2.toGlobalCoordinate();
-	renderLine(point1, point2, _drawSurface, DDALineRenderer, 1.0, &zBuffer, &_viewPort);
+	auto points = std::move(PointGenerator::generateLinePoints(point1, point2));
+	PointLighter::calculateLight(points, ambientColor);
+	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort);
 }
 
 Color RenderEngine::getColorFromZ(int z) const
@@ -79,7 +89,7 @@ Color RenderEngine::getColorFromZ(int z) const
 	}
 	else if (z < 0)
 	{
-		return _maxColor;
+		return ambientColor;
 	}
 	else
 	{
@@ -108,4 +118,14 @@ Color RenderEngine::getColorWithDepth(const Color& baseColor, int z) const
 	{
 		return Color{ 0, 0, 0 };
 	}
+}
+
+void RenderEngine::SetAmbientColor(const Color& color)
+{
+	ambientColor = color;
+}
+
+void RenderEngine::SetCamera(const Camera& camera)
+{
+	_camera = camera;
 }

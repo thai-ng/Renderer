@@ -15,12 +15,22 @@ enum class Axis
 	Z
 };
 
+struct CameraParams
+{
+	double xLow;
+	double xHigh;
+	double yLow;
+	double yHigh;
+	double near;
+	double far;
+};
+
 using Vector3 = std::array<double, 3>;
 using PolygonParams = std::array<Point4D, 3>;
 using LineParams = std::array<Point4D, 2>;
 using RotateParams = std::pair<Axis, int>;
 using FileParam = std::string;
-using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam>;
+using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam, Color, CameraParams>;
 
 class Command
 {

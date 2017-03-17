@@ -58,6 +58,15 @@ ColorChannels Color::getColorChannels() const
 	return std::make_tuple(r, g, b);
 }
 
+NormalizedColorChannels Color::getNormalizedColorChannels() const
+{
+	auto red = static_cast<double>(r) / 255.0;
+	auto green = static_cast<double>(g) / 255.0;
+	auto blue = static_cast<double>(b) / 255.0;
+
+	return std::make_tuple(red, green, blue);
+}
+
 bool Color::operator==(const Color& other) const
 {
 	return other.asUnsigned() == asUnsigned();

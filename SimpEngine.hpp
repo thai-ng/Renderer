@@ -3,14 +3,13 @@
 #include <stack>
 #include <vector>
 
+#include "CommonTypeAliases.hpp"
 #include "command.hpp"
-#include "Matrix.hpp"
 #include "RenderingEngine.hpp"
 
 class SimpEngine
 {
 public:
-	using CTM_t = Matrix<4, 4, double>;
 	SimpEngine(RenderEngine renderEngine) : _renderEngine(renderEngine) {}
 
 	void runCommands(const std::vector<Command>& commands);

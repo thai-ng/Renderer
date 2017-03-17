@@ -168,6 +168,9 @@ copy "$(ProjectDir)*.simp" "$(OutDir)"</Command>
     <ClCompile Include="lineRenderer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="point.cpp" />
+    <ClCompile Include="PointGenerator.cpp" />
+    <ClCompile Include="PointLighter.cpp" />
+    <ClCompile Include="PointsRenderer.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="polygonRenderer.cpp" />
     <ClCompile Include="primitives.cpp" />
@@ -189,11 +192,16 @@ copy "$(ProjectDir)*.simp" "$(OutDir)"</Command>
     <ClInclude Include="assignment1.hpp" />
     <ClInclude Include="assignment2.hpp" />
     <ClInclude Include="assignment3.hpp" />
+    <ClInclude Include="Camera.hpp" />
     <ClInclude Include="client.h" />
     <ClInclude Include="Color.hpp" />
     <ClInclude Include="command.hpp" />
+    <ClInclude Include="CommonTypeAliases.hpp" />
     <ClInclude Include="drawable.h" />
     <ClInclude Include="Matrix.hpp" />
+    <ClInclude Include="PointGenerator.hpp" />
+    <ClInclude Include="PointLighter.hpp" />
+    <ClInclude Include="PointsRenderer.hpp" />
     <ClInclude Include="RenderingEngine.hpp" />
     <ClInclude Include="SimpEngine.hpp" />
     <ClInclude Include="SimpFile.hpp" />

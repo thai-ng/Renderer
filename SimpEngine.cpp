@@ -87,11 +87,23 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 														 Point4D{transformedPoint3, params[2].color} },
 											 currentRenderMode);
 			} break;
+
+			case Command::Operation::Ambient:
+			{
+				auto color = std::get<Color>(command.parameters());
+				_renderEngine.SetAmbientColor(color);
+			} break;
+
+			case Command::Operation::Camera:
+			{
+				auto params = std::get<CameraParams>(command.parameters());
+				auto camera = Camera{ CTM, params.xLow, params.xHigh, params.yLow, params.yHigh, params.near, params.far };
+				_renderEngine.SetCamera(camera);
+			} break;
 		}
 	}
 }
 
-using CTM_t = Matrix<4, 4, double>;
 CTM_t SimpEngine::getRotationMatrix(const Axis& axis, int degree) const
 {
 	auto radian = -getRadianFromDegree(degree);

@@ -145,6 +145,15 @@
     <ClCompile Include="assignment3.cpp">
       <Filter>Source Files\Assignments</Filter>
     </ClCompile>
+    <ClCompile Include="PointGenerator.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PointsRenderer.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLighter.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="drawable.h">
@@ -197,6 +206,21 @@
     </ClInclude>
     <ClInclude Include="assignment3.hpp">
       <Filter>Header Files\Assigments</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.hpp">
+      <Filter>Source Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonTypeAliases.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PointGenerator.hpp">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="PointsRenderer.hpp">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLighter.hpp">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

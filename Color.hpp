@@ -2,7 +2,7 @@
 #include <tuple>
 
 typedef std::tuple<unsigned char, unsigned char, unsigned char> ColorChannels;
-
+typedef std::tuple<double, double, double> NormalizedColorChannels;
 class Color
 {
 public:
@@ -15,6 +15,8 @@ public:
 	unsigned int asUnsigned() const;
 
 	ColorChannels getColorChannels() const;
+
+	NormalizedColorChannels getNormalizedColorChannels() const;
 
 	bool operator==(const Color& other) const;
 
