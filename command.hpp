@@ -25,12 +25,19 @@ struct CameraParams
 	double far;
 };
 
+struct DepthParams
+{
+	double near;
+	double far;
+	Color color;
+};
+
 using Vector3 = std::array<double, 3>;
 using PolygonParams = std::array<Point4D, 3>;
 using LineParams = std::array<Point4D, 2>;
 using RotateParams = std::pair<Axis, int>;
 using FileParam = std::string;
-using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam, Color, CameraParams>;
+using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam, Color, CameraParams, DepthParams>;
 
 class Command
 {

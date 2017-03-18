@@ -100,6 +100,12 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 				auto camera = Camera{ CTM, params.xLow, params.xHigh, params.yLow, params.yHigh, params.near, params.far };
 				_renderEngine.SetCamera(camera);
 			} break;
+
+			case Command::Operation::Depth:
+			{
+				auto params = std::get<DepthParams>(command.parameters());
+				_renderEngine.SetDepth(Depth{ params.near, params.far, params.color });
+			} break;
 		}
 	}
 }

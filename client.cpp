@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "assignment2.hpp"
+#include "assignment3.hpp"
 
 Client::Client(Drawable *drawable)
 {
@@ -11,7 +11,7 @@ Client::Client(Drawable *drawable)
 
 void Client::nextPage() 
 {
-	assignment2::doNextPage(this);
+	assignment3::doNextPage(this);
 }
 
 Drawable* Client::getDrawable() const

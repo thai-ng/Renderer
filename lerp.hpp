@@ -17,10 +17,11 @@ public:
 		auto currentVal1 = beginVal1;
 		auto currentVal2 = static_cast<double>(beginVal2);
 
-		steps.reserve(deltaVal1 + 1);
+		auto size = static_cast<int>(deltaVal1) + 1;
+		steps.reserve(size);
 		
 		std::generate_n(std::back_inserter(steps),
-			deltaVal1 + 1,
+			size,
 			[&currentVal1, &currentVal2, slope]
 		{
 			auto result = std::make_pair(currentVal1, currentVal2);

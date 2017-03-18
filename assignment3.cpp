@@ -31,7 +31,7 @@ void assignment3::doNextPage(Client * client)
 	draw_rect(client, viewPort.x, viewPort.y, viewPort.right(), viewPort.bottom(), 0x00000000);
 
 	SimpFile file("test.simp");
-	RenderEngine renderer{ viewPort, client->getDrawable(), Color{255, 0, 0} };
+	RenderEngine renderer{ viewPort, client->getDrawable(), Color{255, 255, 255} };
 	SimpEngine simpEngine(renderer);
 	simpEngine.runCommands(file.commands());
 

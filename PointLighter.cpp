@@ -1,6 +1,7 @@
 #include "PointLighter.hpp"
+#include "lerp.hpp"
 
-void PointLighter::calculateLight(std::vector<Point>& points, const Color& ambientColor)
+void PointLighter::calculateAmbientLight(std::vector<Point>& points, const Color& ambientColor)
 {
 	auto colorChannels = ambientColor.getNormalizedColorChannels();
 	auto ambientRed = std::get<0>(colorChannels);
@@ -16,5 +17,29 @@ void PointLighter::calculateLight(std::vector<Point>& points, const Color& ambie
 
 		auto newColor = Color::getDenormalizedColor(ambientRed * pointRed, ambientGreen * pointGreen, ambientBlue * pointBlue);
 		point.color = newColor;
+	}
+}
+
+void PointLighter::calcuateDepthShading(std::vector<Point>& points, const Depth & depth)
+{
+	auto zLerp = Lerp<double>(depth.near, depth.far, 0.0, 1.0);
+
+	for (auto& point : points)
+	{
+		if (point.z > depth.far)
+		{
+			point.color = depth.color;
+		}
+		else if (point.z > depth.near)
+		{
+			auto depthColorFactor = zLerp[static_cast<int>(point.z - depth.near)].second;
+			auto depthColorChannels = depth.color.getNormalizedColorChannels();
+			auto pointColorChannels = point.color.getNormalizedColorChannels();
+			auto newRed = ((1 - depthColorFactor) * std::get<0>(pointColorChannels)) + (depthColorFactor * std::get<0>(depthColorChannels));
+			auto newGreen = ((1 - depthColorFactor) * std::get<1>(pointColorChannels)) + (depthColorFactor * std::get<1>(depthColorChannels));
+			auto newBlue = ((1 - depthColorFactor) * std::get<2>(pointColorChannels)) + (depthColorFactor * std::get<2>(depthColorChannels));
+
+			point.color = Color::getDenormalizedColor(newRed, newGreen, newBlue);
+		}
 	}
 }

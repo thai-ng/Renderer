@@ -207,9 +207,6 @@
     <ClInclude Include="assignment3.hpp">
       <Filter>Header Files\Assigments</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.hpp">
-      <Filter>Source Files\Rendering Helpers</Filter>
-    </ClInclude>
     <ClInclude Include="CommonTypeAliases.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -221,6 +218,12 @@
     </ClInclude>
     <ClInclude Include="PointLighter.hpp">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.hpp">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Depth.hpp">
+      <Filter>Header Files\Rendering Helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

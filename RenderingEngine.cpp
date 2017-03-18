@@ -55,7 +55,8 @@ void RenderEngine::RenderTriangle(const Triangle_t& triangle, RenderMode renderM
 		points = std::move(PointGenerator::generateWireframePoints(std::vector<Point>{point1, point2, point3}));
 	}
 
-	PointLighter::calculateLight(points, ambientColor);
+	PointLighter::calculateAmbientLight(points, ambientColor);
+	PointLighter::calcuateDepthShading(points, _depth);
 	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort);
 }
 
@@ -74,7 +75,8 @@ void RenderEngine::RenderLine(const Line_t& line)
 	point1 = point1.toGlobalCoordinate();
 	point2 = point2.toGlobalCoordinate();
 	auto points = std::move(PointGenerator::generateLinePoints(point1, point2));
-	PointLighter::calculateLight(points, ambientColor);
+	PointLighter::calculateAmbientLight(points, ambientColor);
+	PointLighter::calcuateDepthShading(points, _depth);
 	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort);
 }
 
@@ -128,4 +130,9 @@ void RenderEngine::SetAmbientColor(const Color& color)
 void RenderEngine::SetCamera(const Camera& camera)
 {
 	_camera = camera;
+}
+
+void RenderEngine::SetDepth(const Depth& depth)
+{
+	_depth = depth;
 }

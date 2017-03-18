@@ -3,10 +3,11 @@
 
 #include "Camera.hpp"
 #include "Color.hpp"
+#include "CommonTypeAliases.hpp"
+#include "Depth.hpp"
 #include "drawable.h"
 #include "lerp.hpp"
 #include "primitives.hpp"
-#include "CommonTypeAliases.hpp"
 
 class RenderEngine
 {
@@ -27,6 +28,8 @@ public:
 
 	void SetCamera(const Camera& camera);
 
+	void SetDepth(const Depth& depth);
+
 private:
 	Color getColorFromZ(int z) const;
 	Color getColorWithDepth(const Color& baseColor, int z) const;
@@ -45,7 +48,7 @@ private:
 	Drawable* _drawSurface;
 	
 	Camera _camera;
-	
+	Depth _depth = Depth{ 0, 200, Color{0, 0, 0} };
 	CTM_t viewPortTransformationMatrix = CTM_t { 1.0, 0.0, 0.0, 0.0,
 												 0.0, 1.0, 0.0, 0.0,
 												 0.0, 0.0, 1.0, 0.0,
