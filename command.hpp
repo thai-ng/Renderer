@@ -37,7 +37,8 @@ using PolygonParams = std::array<Point4D, 3>;
 using LineParams = std::array<Point4D, 2>;
 using RotateParams = std::pair<Axis, int>;
 using FileParam = std::string;
-using FaceParam = std::vector<int>;
+using Vertex = std::array<int, 3>;
+using FaceParam = std::vector<Vertex>;
 using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam, Color, CameraParams, DepthParams, Point4D, FaceParam>;
 
 class Command

@@ -137,28 +137,37 @@ Command::Command(const std::vector<std::string>& tokens)
 								auto normalDelimIndex = token.find("//");
 								if (normalDelimIndex != std::string::npos)
 								{
+									auto vertex = std::atoi(std::string(token.begin(), token.begin() + normalDelimIndex + 1).c_str());
+									auto normal = std::atoi(std::string(token.begin() + normalDelimIndex + 3, token.end()).c_str());
+
+									return Vertex{ vertex, 0, normal };
 								}
 								else
 								{
-									auto textureDelimIndex = token.find("//");
+									auto textureDelimIndex = token.find("/");
 									// texture
 									if (textureDelimIndex != std::string::npos)
 									{
+										auto vertex = std::atoi(std::string(token.begin(), token.begin() + textureDelimIndex + 1).c_str());
 										normalDelimIndex = token.find("/", textureDelimIndex + 1);
 										// texture + normal
 										if (normalDelimIndex != std::string::npos)
 										{
-
+											auto texture = std::atoi(std::string(token.begin() + textureDelimIndex + 2, token.begin() + normalDelimIndex + 1).c_str());
+											auto normal = std::atoi(std::string(token.begin() + normalDelimIndex + 2, token.end()).c_str());
+											return Vertex{ vertex, texture, normal };
 										}
 										else
 										{
-
+											auto texture = std::atoi(std::string(token.begin() + textureDelimIndex + 2, token.end()).c_str());
+											return Vertex{ vertex, texture, 0 };
 										}
 									}
 									// vertex only
 									else
 									{
-										return std::atoi(token.c_str()); 
+										auto vertex = std::atoi(token.c_str());
+										return Vertex{ vertex, 0, 0 };
 									}
 								}
 						   });
