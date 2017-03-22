@@ -128,7 +128,40 @@ Command::Command(const std::vector<std::string>& tokens)
 		{
 			FaceParam faceParams;
 			faceParams.resize(tokens.size() - 1);
-			std::transform(std::next(tokens.begin()), tokens.end(), faceParams.begin(), [](auto& token) { return std::atoi(token.c_str()); });
+			std::transform(std::next(tokens.begin()), 
+						   tokens.end(), 
+						   faceParams.begin(), 
+						   [](auto& token) 
+						   {
+								// normal
+								auto normalDelimIndex = token.find("//");
+								if (normalDelimIndex != std::string::npos)
+								{
+								}
+								else
+								{
+									auto textureDelimIndex = token.find("//");
+									// texture
+									if (token.find("/" != std::string::npos)
+									{
+										normalDelimIndex = token.find("/", textureDelimIndex + 1);
+										// texture + normal
+										if (normalDelimIndex != std::string::npos)
+										{
+
+										}
+										else
+										{
+
+										}
+									}
+									// vertex only
+									else
+									{
+										return std::atoi(token.c_str()); 
+									}
+								}
+						   });
 
 			params = faceParams;
 		} break;
