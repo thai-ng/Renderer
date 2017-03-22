@@ -70,15 +70,24 @@ void SimpFile::parseAndAddLine(const std::string& line)
 	if (tokens.size() > 0 && (OperationTokens.find(tokens[0]) != OperationTokens.end()))
 	{
 		Command command(tokens);
-		if (command.operation() == Command::Operation::File)
+		if (command.operation() == Command::Operation::File ||
+			command.operation() == Command::Operation::ObjectFile)
 		{
 			auto fileName = std::get<std::string>(command.parameters());
+			
+			if (command.operation() == Command::Operation::ObjectFile)
+			{
+				_commands.push_back(command);
+			}
+			
 			SimpFile childFile(fileName);
 			auto childCommands = childFile.commands();
-			std::for_each(childCommands.begin(), childCommands.end(), [this](auto command)
+			_commands.insert(_commands.end(), childCommands.begin(), childCommands.end());
+			
+			if (command.operation() == Command::Operation::ObjectFile)
 			{
-				this->_commands.push_back(std::move(command));
-			});
+				_commands.push_back(Command{ Command::Operation::ObjectFile, "ENDOFOBJECTFILE"s });
+			}
 		}
 		else
 		{

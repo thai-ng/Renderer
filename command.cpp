@@ -52,6 +52,7 @@ Command::Command(const std::vector<std::string>& tokens)
 			}
 		} break;
 
+		case Command::Operation::VertexNormal:
 		case Command::Operation::Translate:
 		case Command::Operation::Scale:
 		{
@@ -125,6 +126,11 @@ Command::Command(const std::vector<std::string>& tokens)
 
 		case Command::Operation::Face:
 		{
+			FaceParam faceParams;
+			faceParams.resize(tokens.size() - 1);
+			std::transform(std::next(tokens.begin()), tokens.end(), faceParams.begin(), [](auto& token) { return std::atoi(token.c_str()); });
+
+			params = faceParams;
 		} break;
 
 		default:

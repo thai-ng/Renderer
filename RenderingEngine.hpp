@@ -20,7 +20,7 @@ public:
 		Wireframe
 	};
 
-	void RenderTriangle(const Triangle_t& triangle, RenderMode renderMode);
+	void RenderTriangle(const Polygon_t& triangle, RenderMode renderMode);
 
 	void RenderLine(const Line_t& line);
 

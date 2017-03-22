@@ -31,36 +31,28 @@ RenderEngine::RenderEngine(const Rect& viewPort, Drawable* drawSurface, const Co
 	viewPortTransformationMatrix = viewPortTransformationMatrix * scaleMatrix;
 }
 
-void RenderEngine::RenderTriangle(const Triangle_t& triangle, RenderMode renderMode)
+void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMode)
 {
 	// Translate to screen space
-	auto p1 = triangle[0];
-	auto v1 = perspectiveTransformationMatrix * p1.getVector();
-	v1 = viewPortTransformationMatrix * v1;
-	v1 = v1 / v1[3];
-	
-	auto p2 = triangle[1];
-	auto v2 = perspectiveTransformationMatrix * p2.getVector();
-	v2 = viewPortTransformationMatrix * v2;
-	v2 = v2 / v2[3];
-	
-	auto p3 = triangle[2];
-	auto v3 = perspectiveTransformationMatrix * p3.getVector();
-	v3 = viewPortTransformationMatrix * v3;
-	v3 = v3 / v3[3];
+	std::vector<Point> vertices;
+	vertices.resize(triangle.size());
+	std::transform(triangle.begin(), triangle.end(), vertices.begin(), [this](auto& p)
+	{
+		auto v = perspectiveTransformationMatrix * p.getVector();
+		v = viewPortTransformationMatrix * v;
+		v = v / v[3];
 
-	Point point1 = Point{ static_cast<int>(std::round(v1[0])), static_cast<int>(std::round(v1[1])), static_cast<int>(std::round(v1[2])), &_viewPort, p1.color };
-	Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, p2.color };
-	Point point3 = Point{ static_cast<int>(std::round(v3[0])), static_cast<int>(std::round(v3[1])), static_cast<int>(std::round(v3[2])), &_viewPort, p3.color };
+		return Point{ static_cast<int>(std::round(v[0])), static_cast<int>(std::round(v[1])), static_cast<int>(std::round(v[2])), &this->_viewPort, p.color };
+	});
 
 	std::vector<Point> points;
 	if (renderMode == RenderMode::Filled)
 	{
-		points = std::move(PointGenerator::generatePolygonPoints(std::vector<Point>{point1, point2, point3}));
+		points = std::move(PointGenerator::generatePolygonPoints(vertices));
 	}
 	else
 	{
-		points = std::move(PointGenerator::generateWireframePoints(std::vector<Point>{point1, point2, point3}));
+		points = std::move(PointGenerator::generateWireframePoints(vertices));
 	}
 
 	PointLighter::calculateAmbientLight(points, ambientColor);

@@ -82,7 +82,7 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 				auto transformedPoint3 = CTM * point3;
 
 				// Send to rendering engine to render
-				_renderEngine.RenderTriangle(Triangle_t{ Point4D{transformedPoint1, params[0].color},
+				_renderEngine.RenderTriangle(Polygon_t{ Point4D{transformedPoint1, params[0].color},
 														 Point4D{transformedPoint2, params[1].color},
 														 Point4D{transformedPoint3, params[2].color} },
 											 currentRenderMode);
@@ -105,6 +105,33 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 			{
 				auto params = std::get<DepthParams>(command.parameters());
 				_renderEngine.SetDepth(Depth{ params.near, params.far, params.color });
+			} break;
+
+			case Command::Operation::Vertex:
+			{
+				vertices.push_back(std::get<Point4D>(command.parameters()));
+			} break;
+
+			case Command::Operation::Face:
+			{
+
+			} break;
+
+			case Command::Operation::ObjectFile:
+			{
+				if (std::get<std::string>(command.parameters()) == "ENDOFOBJECTFILE"s)
+				{ 
+					if (!objFileVerticesStack.empty())
+					{
+						vertices = objFileVerticesStack.top();
+						objFileVerticesStack.pop();
+					}
+				}
+				else
+				{
+					objFileVerticesStack.push(vertices);
+					vertices.clear();
+				}
 			} break;
 		}
 	}
