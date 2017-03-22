@@ -71,6 +71,13 @@ Command::Command(const std::vector<std::string>& tokens)
 			params = fileName;
 		} break;
 
+		case Command::Operation::ObjectFile:
+		{
+			auto fileName = std::string(std::next(tokens[1].cbegin()), std::prev(tokens[1].cend()));
+			fileName += ".obj";
+			params = fileName;
+		} break;
+
 		case Command::Operation::Ambient:
 		{
 			params = Color::getDenormalizedColor( std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()));

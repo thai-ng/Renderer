@@ -1,8 +1,8 @@
 ambient (1, .5, 1)
-depth 0 200 (1, 1, 1)
+depth 0 180 (0, 0, 0)
 surface (1, 1, 0)
 
-scale 20, 20, 1
+#scale 20, 20, 20
 
 #wire
 {
@@ -14,10 +14,11 @@ scale 20, 20, 1
 
 
 {
-	translate -100, -100, 100
-	scale 200, 200, 200
-	rotate X 10
-	rotate Y 15
+	translate 10, -40, 100
+	#translate 10, -40, 78.7
+	rotate X 20
+	rotate Y 145
 
-	file "cube2"
+	#file "cube2"
+	obj "lost_empire"
 }

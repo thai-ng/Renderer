@@ -38,7 +38,7 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 	vertices.resize(triangle.size());
 	std::transform(triangle.begin(), triangle.end(), vertices.begin(), [this](auto& p)
 	{
-		auto v = perspectiveTransformationMatrix * p.getVector();
+		auto v = /*perspectiveTransformationMatrix **/ p.getVector();
 		v = viewPortTransformationMatrix * v;
 		v = v / v[3];
 

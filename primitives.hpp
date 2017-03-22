@@ -33,6 +33,7 @@ struct Point
 
 struct Point4D
 {
+	Point4D() : x(0), y(0), z(0), w(0), color(0xffffffff) {}
 	Point4D(const std::array<double, 4>& vector, const Color& color) : x(vector[0]), y(vector[1]), z(vector[2]), w(vector[3]), color(color) {}
 	Point4D(double x, double y, double z, double w, const Color& color) : x(x), y(y), z(z), w(w), color(color) {}
 	

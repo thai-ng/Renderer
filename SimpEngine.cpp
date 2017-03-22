@@ -83,8 +83,8 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 
 				// Send to rendering engine to render
 				_renderEngine.RenderTriangle(Polygon_t{ Point4D{transformedPoint1, params[0].color},
-														 Point4D{transformedPoint2, params[1].color},
-														 Point4D{transformedPoint3, params[2].color} },
+														Point4D{transformedPoint2, params[1].color},
+														Point4D{transformedPoint3, params[2].color} },
 											 currentRenderMode);
 			} break;
 
@@ -114,7 +114,26 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 
 			case Command::Operation::Face:
 			{
+				FaceParam params = std::get<FaceParam>(command.parameters());
+				std::vector<Point4D> faceVertices;
+				faceVertices.resize(params.size());
+				std::transform(params.begin(), params.end(), faceVertices.begin(), [this](auto& vertex) 
+				{
+					if (vertex[0] > 0)
+					{
+						auto v =  this->vertices[vertex[0] - 1];
+						v = CTM * v;
+						return v;
+					}
+					else
+					{
+						auto v = this->vertices[this->vertices.size() + vertex[0]];
+						v = CTM * v;
+						return v;
+					}
+				});
 
+				_renderEngine.RenderTriangle(faceVertices, currentRenderMode);
 			} break;
 
 			case Command::Operation::ObjectFile:

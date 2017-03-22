@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <algorithm>
+#include "primitives.hpp"
 
 template <int width, int height, typename T>
 class Matrix
@@ -108,6 +109,14 @@ auto operator*(const Matrix<4, 4, T>& matrix, const std::array<T, 4>& vector)
 							  matrix.getElement<2, 0>() * vector[0] + matrix.getElement<2, 1>() * vector[1] + matrix.getElement<2, 2>() * vector[2] + matrix.getElement<2, 3>() * vector[3],
 							  matrix.getElement<3, 0>() * vector[0] + matrix.getElement<3, 1>() * vector[1] + matrix.getElement<3, 2>() * vector[2] + matrix.getElement<3, 3>() * vector[3] };
 }
+
+template <typename T>
+auto operator*(const Matrix<4, 4, T>& matrix, const Point4D& vector)
+{
+	auto v = std::array<T, 4>{vector.x, vector.y, vector.z, vector.w};
+	return Point4D{ matrix * v, vector.color };
+}
+
 
 template <typename T>
 auto operator/(const std::array<T, 4>& vector, T divident)

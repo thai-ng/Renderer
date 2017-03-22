@@ -371,7 +371,7 @@ namespace PointGenerator
 			auto linePoints = generateLinePoints(leftPoint, rightPoint);
 			result.insert(result.end(), linePoints.begin(), linePoints.end());
 
-			if (y == leftLine.p2.y && leftLine.p2 != bottomPoint)
+			if (y >= leftLine.p2.y && leftLine.p2 != bottomPoint)
 			{
 				leftIter = std::next(leftIter);
 				leftLine = Line{ leftLine.p2, *leftIter };
@@ -386,7 +386,7 @@ namespace PointGenerator
 				leftCount = 0;
 			}
 
-			if (y == rightLine.p2.y && rightLine.p2 != bottomPoint)
+			if (y >= rightLine.p2.y && rightLine.p2 != bottomPoint)
 			{
 				rightIter = std::next(rightIter);
 				rightLine = Line{ rightLine.p2, *rightIter };
