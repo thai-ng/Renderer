@@ -18,8 +18,8 @@ enum class Axis
 struct CameraParams
 {
 	double xLow;
-	double xHigh;
 	double yLow;
+	double xHigh;
 	double yHigh;
 	double near;
 	double far;

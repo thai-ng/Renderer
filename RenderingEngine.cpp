@@ -35,11 +35,19 @@ void RenderEngine::RenderTriangle(const Triangle_t& triangle, RenderMode renderM
 {
 	// Translate to screen space
 	auto p1 = triangle[0];
-	auto v1 = viewPortTransformationMatrix * p1.getVector();
+	auto v1 = perspectiveTransformationMatrix * p1.getVector();
+	v1 = viewPortTransformationMatrix * v1;
+	v1 = v1 / v1[3];
+	
 	auto p2 = triangle[1];
-	auto v2 = viewPortTransformationMatrix * p2.getVector();
+	auto v2 = perspectiveTransformationMatrix * p2.getVector();
+	v2 = viewPortTransformationMatrix * v2;
+	v2 = v2 / v2[3];
+	
 	auto p3 = triangle[2];
-	auto v3 = viewPortTransformationMatrix * p3.getVector();
+	auto v3 = perspectiveTransformationMatrix * p3.getVector();
+	v3 = viewPortTransformationMatrix * v3;
+	v3 = v3 / v3[3];
 
 	Point point1 = Point{ static_cast<int>(std::round(v1[0])), static_cast<int>(std::round(v1[1])), static_cast<int>(std::round(v1[2])), &_viewPort, getColorWithDepth(p1.color, static_cast<int>(std::round(v1[2]))) };
 	Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, getColorWithDepth(p2.color, static_cast<int>(std::round(v2[2]))) };
