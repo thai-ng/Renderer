@@ -142,7 +142,7 @@ Command::Command(const std::vector<std::string>& tokens)
 								{
 									auto textureDelimIndex = token.find("//");
 									// texture
-									if (token.find("/" != std::string::npos)
+									if (textureDelimIndex != std::string::npos)
 									{
 										normalDelimIndex = token.find("/", textureDelimIndex + 1);
 										// texture + normal

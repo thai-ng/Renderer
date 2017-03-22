@@ -18,13 +18,18 @@ private:
 	CTM_t getRotationMatrix(const Axis& axis, int degree) const;
 
 	RenderEngine _renderEngine;
+	
 	RenderEngine::RenderMode currentRenderMode = RenderEngine::RenderMode::Filled;
+	
 	CTM_t CTM = CTM_t{ 1.0, 0.0, 0.0, 0.0,
 					   0.0, 1.0, 0.0, 0.0,
 					   0.0, 0.0, 1.0, 0.0,
 					   0.0, 0.0, 0.0, 1.0 };
-
 	std::stack<CTM_t> TransformStack;
+
 	std::vector<Point4D> vertices;
 	std::stack<std::vector<Point4D>> objFileVerticesStack;
+
+	std::vector<Vector3> normals;
+	std::stack<std::vector<Vector3>> objFileNormalsStack;
 };

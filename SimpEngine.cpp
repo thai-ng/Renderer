@@ -126,11 +126,20 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 						vertices = objFileVerticesStack.top();
 						objFileVerticesStack.pop();
 					}
+
+					if (!objFileNormalsStack.empty())
+					{
+						normals = objFileNormalsStack.top();
+						objFileNormalsStack.pop();
+					}
 				}
 				else
 				{
 					objFileVerticesStack.push(vertices);
 					vertices.clear();
+
+					objFileNormalsStack.push(normals);
+					normals.clear();
 				}
 			} break;
 		}
