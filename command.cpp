@@ -2,27 +2,6 @@
 
 using namespace std::string_literals;
 
-static const std::unordered_map<std::string, Command::Operation> OperationTokens{
-	{ "{"s, Command::Operation::OpenBrace },
-	{ "}"s, Command::Operation::CloseBrace },
-	{ "scale"s, Command::Operation::Scale },
-	{ "rotate"s, Command::Operation::Rotate },
-	{ "translate"s, Command::Operation::Translate },
-	{ "line"s, Command::Operation::Line },
-	{ "polygon"s, Command::Operation::Polygon },
-	{ "file"s, Command::Operation::File },
-	{ "wire"s, Command::Operation::Wire },
-	{ "filled"s, Command::Operation::Filled },
-	{ "camera"s, Command::Operation::Camera},
-	{ "obj"s, Command::Operation::ObjectFile},
-	{ "ambient"s, Command::Operation::Ambient},
-	{ "depth"s, Command::Operation::Depth},
-	{ "surface"s, Command::Operation::Surface},
-	{ "v"s, Command::Operation::Vertex},
-	{ "vn"s, Command::Operation::VertexNormal},
-	{ "f"s, Command::Operation::Face}
-};
-
 static const std::unordered_map<std::string, Axis> AxisTokens{
 	{ "X"s, Axis::X },
 	{ "Y"s, Axis::Y },
@@ -31,6 +10,8 @@ static const std::unordered_map<std::string, Axis> AxisTokens{
 
 Command::Command(const std::vector<std::string>& tokens)
 {
+	static Color defaultVertexColor = Color{ 255, 255, 255 };
+
 	_op = OperationTokens.at(tokens[0]);
 	switch (_op)
 	{
@@ -38,9 +19,9 @@ Command::Command(const std::vector<std::string>& tokens)
 		{
 			if (tokens.size() == 10)
 			{
-				params = PolygonParams{ Point4D{ std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()), 1, Color{255, 255, 255} },
-										Point4D{ std::atof(tokens[4].c_str()), std::atof(tokens[5].c_str()), std::atof(tokens[6].c_str()), 1, Color{255, 255, 255} },
-										Point4D{ std::atof(tokens[7].c_str()), std::atof(tokens[8].c_str()), std::atof(tokens[9].c_str()), 1, Color{255, 255, 255} } };
+				params = PolygonParams{ Point4D{ std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()), 1, defaultVertexColor },
+										Point4D{ std::atof(tokens[4].c_str()), std::atof(tokens[5].c_str()), std::atof(tokens[6].c_str()), 1, defaultVertexColor },
+										Point4D{ std::atof(tokens[7].c_str()), std::atof(tokens[8].c_str()), std::atof(tokens[9].c_str()), 1, defaultVertexColor } };
 			}
 			else
 			{
@@ -58,8 +39,8 @@ Command::Command(const std::vector<std::string>& tokens)
 			// no color
 			if (tokens.size() == 7)
 			{
-				params = LineParams{ Point4D{ std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()), 1, Color{ 255, 255, 255 } },
-									 Point4D{ std::atof(tokens[4].c_str()), std::atof(tokens[5].c_str()), std::atof(tokens[6].c_str()), 1, Color{ 255, 255, 255 } } };
+				params = LineParams{ Point4D{ std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()), 1, defaultVertexColor },
+									 Point4D{ std::atof(tokens[4].c_str()), std::atof(tokens[5].c_str()), std::atof(tokens[6].c_str()), 1, defaultVertexColor } };
 			}
 			else
 			{
@@ -109,6 +90,41 @@ Command::Command(const std::vector<std::string>& tokens)
 			params = DepthParams{ std::atof(tokens[1].c_str()),
 								  std::atof(tokens[2].c_str()),
 								  Color::getDenormalizedColor(std::atof(tokens[3].c_str()), std::atof(tokens[4].c_str()), std::atof(tokens[5].c_str())) };
+		} break;
+
+		case Command::Operation::Surface:
+		{
+			defaultVertexColor = Color::getDenormalizedColor(std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()));
+		} break;
+
+		case Command::Operation::Vertex:
+		{
+			// v x y z w r g b
+			if (tokens.size() == 8)
+			{
+				auto color = Color::getDenormalizedColor(std::atof(tokens[5].c_str()), std::atof(tokens[6].c_str()), std::atof(tokens[7].c_str()));
+				params = Point4D{ std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()), std::atof(tokens[4].c_str()), color };
+			}
+			// v x y z r g b
+			else if (tokens.size() == 7)
+			{
+				auto color = Color::getDenormalizedColor(std::atof(tokens[4].c_str()), std::atof(tokens[5].c_str()), std::atof(tokens[6].c_str()));
+				params = Point4D{ std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()), 1, color };
+			}
+			// v x y z w
+			else if (tokens.size() == 5)
+			{
+				params = Point4D{ std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()), std::atof(tokens[4].c_str()), defaultVertexColor };
+			}
+			// v x y z
+			else
+			{
+				params = Point4D{ std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()), 1, defaultVertexColor };
+			}
+		} break;
+
+		case Command::Operation::Face:
+		{
 		} break;
 
 		default:

@@ -67,7 +67,7 @@ std::vector<std::string> SimpFile::getTokens(const std::string& line)
 void SimpFile::parseAndAddLine(const std::string& line)
 {
 	auto tokens = getTokens(line);
-	if (tokens.size() > 0 && tokens[0] != "#" && tokens[0][0] != '#')
+	if (tokens.size() > 0 && (OperationTokens.find(tokens[0]) != OperationTokens.end()))
 	{
 		Command command(tokens);
 		if (command.operation() == Command::Operation::File)

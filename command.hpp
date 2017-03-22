@@ -37,7 +37,8 @@ using PolygonParams = std::array<Point4D, 3>;
 using LineParams = std::array<Point4D, 2>;
 using RotateParams = std::pair<Axis, int>;
 using FileParam = std::string;
-using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam, Color, CameraParams, DepthParams>;
+using FaceParam = std::array<int, 3>;
+using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam, Color, CameraParams, DepthParams, Point4D>;
 
 class Command
 {
@@ -76,4 +77,27 @@ public:
 private:
 	Operation _op;
 	CommandParams params;
+};
+
+using namespace std::string_literals;
+
+static const std::unordered_map<std::string, Command::Operation> OperationTokens{
+	{ "{"s, Command::Operation::OpenBrace },
+	{ "}"s, Command::Operation::CloseBrace },
+	{ "scale"s, Command::Operation::Scale },
+	{ "rotate"s, Command::Operation::Rotate },
+	{ "translate"s, Command::Operation::Translate },
+	{ "line"s, Command::Operation::Line },
+	{ "polygon"s, Command::Operation::Polygon },
+	{ "file"s, Command::Operation::File },
+	{ "wire"s, Command::Operation::Wire },
+	{ "filled"s, Command::Operation::Filled },
+	{ "camera"s, Command::Operation::Camera },
+	{ "obj"s, Command::Operation::ObjectFile },
+	{ "ambient"s, Command::Operation::Ambient },
+	{ "depth"s, Command::Operation::Depth },
+	{ "surface"s, Command::Operation::Surface },
+	{ "v"s, Command::Operation::Vertex },
+	{ "vn"s, Command::Operation::VertexNormal },
+	{ "f"s, Command::Operation::Face }
 };

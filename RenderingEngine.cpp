@@ -49,9 +49,9 @@ void RenderEngine::RenderTriangle(const Triangle_t& triangle, RenderMode renderM
 	v3 = viewPortTransformationMatrix * v3;
 	v3 = v3 / v3[3];
 
-	Point point1 = Point{ static_cast<int>(std::round(v1[0])), static_cast<int>(std::round(v1[1])), static_cast<int>(std::round(v1[2])), &_viewPort, getColorWithDepth(p1.color, static_cast<int>(std::round(v1[2]))) };
-	Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, getColorWithDepth(p2.color, static_cast<int>(std::round(v2[2]))) };
-	Point point3 = Point{ static_cast<int>(std::round(v3[0])), static_cast<int>(std::round(v3[1])), static_cast<int>(std::round(v3[2])), &_viewPort, getColorWithDepth(p3.color, static_cast<int>(std::round(v3[2]))) };
+	Point point1 = Point{ static_cast<int>(std::round(v1[0])), static_cast<int>(std::round(v1[1])), static_cast<int>(std::round(v1[2])), &_viewPort, p1.color };
+	Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, p2.color };
+	Point point3 = Point{ static_cast<int>(std::round(v3[0])), static_cast<int>(std::round(v3[1])), static_cast<int>(std::round(v3[2])), &_viewPort, p3.color };
 
 	std::vector<Point> points;
 	if (renderMode == RenderMode::Filled)
@@ -77,8 +77,8 @@ void RenderEngine::RenderLine(const Line_t& line)
 	auto v2 = viewPortTransformationMatrix * p2.getVector();
 
 	// Assign z Color
-	Point point1 = Point{ static_cast<int>(std::round(v1[0])), static_cast<int>(std::round(v1[1])), static_cast<int>(std::round(v1[2])), &_viewPort, getColorWithDepth(p1.color, static_cast<int>(std::round(v1[2]))) };
-	Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, getColorWithDepth(p2.color, static_cast<int>(std::round(v2[2]))) };
+	Point point1 = Point{ static_cast<int>(std::round(v1[0])), static_cast<int>(std::round(v1[1])), static_cast<int>(std::round(v1[2])), &_viewPort, p1.color };
+	Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, p2.color };
 
 	point1 = point1.toGlobalCoordinate();
 	point2 = point2.toGlobalCoordinate();
@@ -109,24 +109,24 @@ Color RenderEngine::getColorFromZ(int z) const
 
 Color RenderEngine::getColorWithDepth(const Color& baseColor, int z) const
 {
-	if (z >= 0 && z < 200)
+	if (z >= _depth.near && z < _depth.far)
 	{
-		Lerp<int> rLerp(0, 200, std::get<0>(baseColor.getColorChannels()), 0);
-		Lerp<int> gLerp(0, 200, std::get<1>(baseColor.getColorChannels()), 0);
-		Lerp<int> bLerp(0, 200, std::get<2>(baseColor.getColorChannels()), 0);
+		Lerp<double> rLerp(_depth.near, _depth.far, std::get<0>(baseColor.getColorChannels()), 0);
+		Lerp<double> gLerp(_depth.near, _depth.far, std::get<1>(baseColor.getColorChannels()), 0);
+		Lerp<double> bLerp(_depth.near, _depth.far, std::get<2>(baseColor.getColorChannels()), 0);
 
 		auto r = static_cast<unsigned char>(rLerp[z].second);
 		auto g = static_cast<unsigned char>(gLerp[z].second);
 		auto b = static_cast<unsigned char>(bLerp[z].second);
 		return Color{ r, g, b };
 	}
-	else if (z < 0)
+	else if (z < _depth.near)
 	{
 		return baseColor;
 	}
 	else
 	{
-		return Color{ 0, 0, 0 };
+		return _depth.color;
 	}
 }
 

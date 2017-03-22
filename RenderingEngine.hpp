@@ -39,7 +39,7 @@ private:
 	Lerp<int> blueLerp;
 	
 	Matrix2D<int> zBuffer;
-	int zThreshold = 200;
+	int zThreshold = std::numeric_limits<int>::max();
 	
 	Rect _viewPort;
 	
