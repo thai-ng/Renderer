@@ -19,7 +19,7 @@ struct Point
 	const Rect* parent;
 	Color color;
 
-	Point() : x(0), y(0), parent(nullptr), color(0xffffffff) {}
+	Point() : x(0), y(0), z(0), parent(nullptr), color(0xffffffff) {}
 	Point(int x, int y, int z = 0, const Rect* parent = nullptr, const Color& color = 0xffffffff);
 
 	Point toGlobalCoordinate() const;
@@ -67,7 +67,7 @@ double getRadianFromDegree(int angle);
 
 struct Line
 {
-	Line(Point inp1, Point inp2) : p1(inp1), p2(inp2) {}
+	Line(Point inp1, Point inp2) : p1(inp1), p2(inp2), color(0xffffffff) {}
 
 	Line(Point inp1, Point inp2, unsigned int c);
 
@@ -79,7 +79,7 @@ struct Line
 
 	std::tuple<Point, Point> toGlobalCoordinate() const;
 
-	void setParent(Rect* parent);
+	void setParent(const Rect* parent);
 
 	bool connected(const Line& other) const;
 

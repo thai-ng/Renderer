@@ -161,7 +161,7 @@ namespace assignment1
 			}
 
 			auto triangle = Triangle(*it, *nextIt);
-			unsigned int color;
+			unsigned int color = 0u;
 			if (opacity != 1.0)
 			{
 				color = 0xffffffff;
@@ -238,7 +238,7 @@ namespace assignment1
 		{
 			for (auto col = 0; col < 9; ++col)
 			{
-				unsigned int color;
+				unsigned int color = 0u;
 				if (opacity != 1.0)
 				{
 					color = 0xffffffff;

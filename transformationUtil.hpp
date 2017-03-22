@@ -13,10 +13,10 @@ T rotate(const T& shape, int angle, const Point& center)
 			      vertices.end(), 
 		          [radianAngle, &center](auto& point) 
 				  { 
-						auto x = point.x - center.x;
-						auto y = point.y - center.y;
-						auto c = cos(radianAngle);
-						auto s = sin(radianAngle);
+						const auto x = point.x - center.x;
+						const auto y = point.y - center.y;
+						const auto c = cos(radianAngle);
+						const auto s = sin(radianAngle);
 						point.x = static_cast<int>(c * x - s * y) + center.x;
 						point.y = static_cast<int>(s * x + c * y) + center.y;
 				  });

@@ -24,7 +24,7 @@ std::tuple<Point, Point> Line::toGlobalCoordinate() const
 	return std::make_tuple<Point, Point>(p1.toGlobalCoordinate(), p2.toGlobalCoordinate());
 }
 
-void Line::setParent(Rect* parent)
+void Line::setParent(const Rect* parent)
 {
 	p1.parent = parent;
 	p2.parent = parent;
