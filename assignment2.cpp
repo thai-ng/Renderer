@@ -225,17 +225,10 @@ namespace assignment2
 			} break;
 
 			case 8:
+			default:
 			{
 				SimpFile file("test3.simp");
 				RenderEngine renderEngine(viewPort, client->getDrawable(), Color(255, 255, 255));
-				SimpEngine simpEngine(renderEngine);
-				simpEngine.runCommands(file.commands());
-			} break;
-
-			default:
-			{
-				SimpFile file("test.simp");
-				RenderEngine renderEngine(viewPort, client->getDrawable(), Color(0, 255, 255));
 				SimpEngine simpEngine(renderEngine);
 				simpEngine.runCommands(file.commands());
 			} break;

@@ -1,70 +1,44 @@
 {
-	{
-	    translate -40 -20 00
-	    rotate X 20
-	    rotate Y 35
-	 
-	    file "page4assembly"
-	
-	}
-	{
-	    translate -20 -10 25
-	    rotate X 20
-	    rotate Y 35
-	 
-	    file "page4assembly"
-	
-	}
-	{
-	    translate 0 0 50
-	    rotate X 20
-	    rotate Y 35
-	 
-	    file "page4assembly"
-	
-	}
-	{
-		translate 20 10 100
-		rotate X 20
-		rotate Y 35
-		
-		file "page4assembly"
-	}
-	{
-		translate 40 20 150
-		rotate X 20
-		rotate Y 35
-		
-		file "page4assembly"
-	}
-	{
-		translate 60 30 200
-		rotate X 20
-		rotate Y 35
-		
-		file "page4assembly"
-	}
+    translate -20, 0, 0        
+    rotate X 45
+    rotate Y -50
+    scale 50, 50, 50
+    #wire
+    file "cube"
 }
+
 {
-	{
-		translate -85 -40 20
-		rotate X 25
-		rotate Y 45
-		scale 30 30 30
-		file "cube"
-	}
-	{
-		translate -30 -80 10
-		rotate X 25
-		rotate Y 45
-		scale 30 30 30
-		file "cube"
-	}
-	{
-		translate 30 -110 10
-		rotate X 25
-		rotate Y 45
-		scale 30 30 30
-		file "cube"
-	}
+    translate 60, 60, 100    
+    rotate X 45
+    rotate Y -70
+    scale 30, 30, 30
+    #wire
+    file "cube"
+}
+
+{
+    translate 60, 20, 160    
+    rotate X 90
+    rotate Y -70
+    scale 30, 30, 30
+    #wire
+    file "cube"
+}
+
+{
+    translate 60, -60, 90    
+    rotate X -10
+    rotate Y -70
+    scale 10, 10, 10
+    #wire
+    file "cube"
+}
+
+{
+    translate -20, 60, 200    
+    rotate X 10
+    rotate Y 40
+    scale 40, 40, 40
+    #wire
+    file "cube"
 }
