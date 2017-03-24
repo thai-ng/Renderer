@@ -2,16 +2,21 @@
 
 #include <iostream>
 
-#include "assignment2.hpp"
+#include "assignment3.hpp"
 
 Client::Client(Drawable *drawable)
 {
     this->drawable = drawable;
 }
 
+Client::Client(Drawable * drawable, const std::string & fileName) : _fileName(fileName)
+{
+	this->drawable = drawable;
+}
+
 void Client::nextPage() 
 {
-	assignment2::doNextPage(this);
+	assignment3::doNextPage(this, _fileName);
 }
 
 Drawable* Client::getDrawable() const

@@ -1,4 +1,4 @@
-
+#include <string>
 #include "client.h"
 #include "window361.h"
 
@@ -21,7 +21,14 @@ int main(int argc, char *argv[])
 
     Drawable *sheet = window.getDrawable();
 
-    Client client(sheet);           // the client (your program) gets a (Drawable *)
+	std::string fileName("");
+
+	if (argc > 1)
+	{
+		fileName = argv[1];
+	} 
+
+    Client client(sheet, fileName); // the client (your program) gets a (Drawable *)
     window.setPageTurner(&client);  // the window must be given a (PageTurner *)
                                     // I made the client a PageTurner, but it doesn't have to
                                     // be that way.

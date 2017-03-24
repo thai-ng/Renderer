@@ -1,24 +1,25 @@
 ambient (1, .5, 1)
-depth 0 300 (0, 0, 0)
+depth 0 200 (0, 0, 0)
 surface (1, 1, 0)
 
-scale 2.5, 2.5, 2.5
-
-#wire
 {
-	rotate X 30
-	rotate Y 45
+	translate 0, 0, -150
+	#rotate Y 35
+	#rotate X 30
 
-	#polygon (50, 0, 0, 0, 0, 1) (50, 50, 0, 0, 1, 0) (0, 50, 0, 1, 0, 0)
+	camera -100 -100 100 100 80 500
 }
 
 
+#wire
 {
-	translate 10, -40, 60
-	#translate 10, -40, 78.7
-	rotate X 20
-	rotate Y 145
+	#translate 0, 60, 10
+	#scale 50, 50, 50
+	rotate X 30
+	rotate Y 130
 
 	#file "cube2"
 	obj "lost_empire"
+
+	#line (50, 0, 102) (100, 0, 102)
 }

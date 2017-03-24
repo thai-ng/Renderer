@@ -18,22 +18,22 @@ namespace PointsRenderer
 		drawSurface->setPixel(screenPoint.x, screenPoint.y, colorToPaint.asUnsigned());
 	}
 
-	void drawPixel(const Point& screenPoint, Drawable* drawSurface, const Color& colorToPaint, Matrix2D<int>& zBuffer, const Rect& viewPort)
+	void drawPixel(const Point& screenPoint, Drawable* drawSurface, const Color& colorToPaint, Matrix2D<int>& zBuffer, const Rect& viewPort, const Camera& camera)
 	{
-		if (screenPoint.z < zBuffer[screenPoint.x - viewPort.x][screenPoint.y - viewPort.y] && screenPoint.z >= 0)
+		if (screenPoint.z < zBuffer[screenPoint.x - viewPort.x][screenPoint.y - viewPort.y] && screenPoint.z >= camera.near)
 		{
 			zBuffer[screenPoint.x - viewPort.x][screenPoint.y - viewPort.y] = screenPoint.z;
 			drawToSurface(screenPoint, drawSurface, colorToPaint);
 		}
 	}
 
-	void PointsRenderer::renderPoints(const std::vector<Point>& points, Drawable * drawSurface, Matrix2D<int>& zBuffer, const Rect & viewPort)
+	void PointsRenderer::renderPoints(const std::vector<Point>& points, Drawable * drawSurface, Matrix2D<int>& zBuffer, const Rect & viewPort, const Camera& camera)
 	{
 		for (const auto& point : points)
 		{
 			if (pointInRect(point, viewPort))
 			{
-				drawPixel(point, drawSurface, point.color, zBuffer, viewPort);
+				drawPixel(point, drawSurface, point.color, zBuffer, viewPort, camera);
 			}
 		}
 	}

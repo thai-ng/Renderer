@@ -17,10 +17,13 @@ RenderEngine::RenderEngine(const Rect& viewPort, Drawable* drawSurface, const Co
 {
 	zBuffer = Matrix2D<int>(_viewPort.width, std::vector<int>(_viewPort.height, zThreshold));
 
-	auto scaleMatrix = Matrix<4, 4, double>{ viewPort.width / 200.0, 0.0,					   0.0, 0.0,
-											 0.0,				     -viewPort.height / 200.0, 0.0, 0.0,
-											 0.0,				     0.0,					   1.0, 0.0,
-											 0.0,				     0.0,					   0.0, 1.0 };
+	auto viewPlaneWidth = 200.0;
+	auto viewPlaneHeight = 200.0;
+
+	auto scaleMatrix = Matrix<4, 4, double>{ viewPort.width / viewPlaneWidth, 0.0,								  0.0, 0.0,
+											 0.0,							  -viewPort.height / viewPlaneHeight, 0.0, 0.0,
+											 0.0,							  0.0,								  1.0, 0.0,
+											 0.0,							  0.0,								  0.0, 1.0 };
 
 	auto translationMatrix = Matrix<4, 4, double>{ 1.0, 0.0, 0.0, viewPort.width / 2.0,
 												   0.0, 1.0, 0.0, viewPort.height / 2.0,
@@ -38,7 +41,7 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 	vertices.resize(triangle.size());
 	std::transform(triangle.begin(), triangle.end(), vertices.begin(), [this](auto& p)
 	{
-		auto v = /*perspectiveTransformationMatrix **/ p.getVector();
+		auto v = perspectiveTransformationMatrix * p.getVector();
 		v = viewPortTransformationMatrix * v;
 		v = v / v[3];
 
@@ -57,27 +60,27 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 
 	PointLighter::calculateAmbientLight(points, ambientColor);
 	PointLighter::calcuateDepthShading(points, _depth);
-	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort);
+	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort, _camera);
 }
 
 void RenderEngine::RenderLine(const Line_t& line)
 {
-	// Translate to screen space
-	auto p1 = line[0];
-	auto v1 = viewPortTransformationMatrix * p1.getVector();
-	auto p2 = line[1];
-	auto v2 = viewPortTransformationMatrix * p2.getVector();
+	std::vector<Point> vertices;
+	vertices.resize(line.size());
+	std::transform(line.begin(), line.end(), vertices.begin(), [this](auto& p)
+	{
+		auto v = perspectiveTransformationMatrix * p.getVector();
+		v = viewPortTransformationMatrix * v;
+		v = v / v[3];
 
-	// Assign z Color
-	Point point1 = Point{ static_cast<int>(std::round(v1[0])), static_cast<int>(std::round(v1[1])), static_cast<int>(std::round(v1[2])), &_viewPort, p1.color };
-	Point point2 = Point{ static_cast<int>(std::round(v2[0])), static_cast<int>(std::round(v2[1])), static_cast<int>(std::round(v2[2])), &_viewPort, p2.color };
+		return Point{ static_cast<int>(std::round(v[0])), static_cast<int>(std::round(v[1])), static_cast<int>(std::round(v[2])), &this->_viewPort, p.color };
+	});
 
-	point1 = point1.toGlobalCoordinate();
-	point2 = point2.toGlobalCoordinate();
-	auto points = std::move(PointGenerator::generateLinePoints(point1, point2));
+	auto points = std::move(PointGenerator::generateLinePoints(vertices[0], vertices[1]));
+	points.erase(std::remove_if(points.begin(), points.end(), [this](auto& p) { return  p.z > this->_camera.far || p.z < this->_camera.near; }), points.end());
 	PointLighter::calculateAmbientLight(points, ambientColor);
 	PointLighter::calcuateDepthShading(points, _depth);
-	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort);
+	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort, _camera);
 }
 
 Color RenderEngine::getColorFromZ(int z) const
@@ -130,6 +133,47 @@ void RenderEngine::SetAmbientColor(const Color& color)
 void RenderEngine::SetCamera(const Camera& camera)
 {
 	_camera = camera;
+	auto viewPlaneWidth = _camera.xHigh - _camera.xLow;
+	auto viewPlaneHeight = _camera.yHigh - _camera.yLow;
+
+	auto scaleMatrix = Matrix<4, 4, double>{ _viewPort.width / viewPlaneWidth, 0.0,								   0.0, 0.0,
+											 0.0,							  -_viewPort.height / viewPlaneHeight, 0.0, 0.0,
+											 0.0,							   0.0,								   1.0, 0.0,
+											 0.0,							   0.0,								   0.0, 1.0 };
+
+	auto translationMatrix = Matrix<4, 4, double>{ 1.0, 0.0, 0.0, _viewPort.width / 2.0,
+												   0.0, 1.0, 0.0, _viewPort.height / 2.0,
+												   0.0, 0.0, 1.0, 0.0,
+												   0.0, 0.0, 0.0, 1.0 };
+
+	auto cameraProjectionScale = 1.0;
+	if (_camera.near != 0.0)
+	{
+		cameraProjectionScale = _camera.near;
+	}
+
+	auto projectionScaleMatrix = Matrix<4, 4, double>{ cameraProjectionScale, 0.0,					 0.0, 0.0,
+													   0.0,					  cameraProjectionScale, 0.0, 0.0,
+													   0.0,					  0.0,					 1.0, 0.0,
+													   0.0,					  0.0,					 0.0, 1.0 };
+
+
+	viewPortTransformationMatrix = CTM_t{ 1.0, 0.0, 0.0, 0.0,
+										  0.0, 1.0, 0.0, 0.0,
+										  0.0, 0.0, 1.0, 0.0,
+										  0.0, 0.0, 0.0, 1.0 };
+
+	viewPortTransformationMatrix = viewPortTransformationMatrix * translationMatrix;
+	viewPortTransformationMatrix = viewPortTransformationMatrix * scaleMatrix;
+	viewPortTransformationMatrix = viewPortTransformationMatrix * projectionScaleMatrix;
+
+	for (auto& r : zBuffer)
+	{
+		for (auto& e : r)
+		{
+			e = static_cast<int>(std::round(_camera.far + 1));
+		}
+	}
 }
 
 void RenderEngine::SetDepth(const Depth& depth)

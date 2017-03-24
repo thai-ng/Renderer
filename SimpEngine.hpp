@@ -25,6 +25,13 @@ private:
 					   0.0, 1.0, 0.0, 0.0,
 					   0.0, 0.0, 1.0, 0.0,
 					   0.0, 0.0, 0.0, 1.0 };
+
+
+	CTM_t cameraCTMInv = CTM_t{ 1.0, 0.0, 0.0, 0.0,
+								0.0, 1.0, 0.0, 0.0,
+								0.0, 0.0, 1.0, 0.0,
+								0.0, 0.0, 0.0, 1.0 };
+
 	std::stack<CTM_t> TransformStack;
 
 	std::vector<Point4D> vertices;

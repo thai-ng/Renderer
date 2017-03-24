@@ -64,8 +64,8 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 				auto params = std::get<LineParams>(command.parameters());
 				auto point1 = std::array<double, 4>{ params[0].x, params[0].y, params[0].z, 1 };
 				auto point2 = std::array<double, 4>{ params[1].x, params[1].y, params[1].z, 1 };
-				auto transformedPoint1 = CTM * point1;
-				auto transformedPoint2 = CTM * point2;
+				auto transformedPoint1 = cameraCTMInv * (CTM * point1);
+				auto transformedPoint2 = cameraCTMInv * (CTM * point2);
 
 				// Send to rendering engine to render
 				_renderEngine.RenderLine(Line_t { Point4D {transformedPoint1, params[0].color}, Point4D{transformedPoint2, params[1].color} });
@@ -77,9 +77,9 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 				auto point1 = std::array<double, 4>{ params[0].x, params[0].y, params[0].z, 1 };
 				auto point2 = std::array<double, 4>{ params[1].x, params[1].y, params[1].z, 1 };
 				auto point3 = std::array<double, 4>{ params[2].x, params[2].y, params[2].z, 1 };
-				auto transformedPoint1 = CTM * point1;
-				auto transformedPoint2 = CTM * point2;
-				auto transformedPoint3 = CTM * point3;
+				auto transformedPoint1 = cameraCTMInv * (CTM * point1);
+				auto transformedPoint2 = cameraCTMInv * (CTM * point2);
+				auto transformedPoint3 = cameraCTMInv * (CTM * point3);
 
 				// Send to rendering engine to render
 				_renderEngine.RenderTriangle(Polygon_t{ Point4D{transformedPoint1, params[0].color},
@@ -97,7 +97,8 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 			case Command::Operation::Camera:
 			{
 				auto params = std::get<CameraParams>(command.parameters());
-				auto camera = Camera{ CTM, params.xLow, params.xHigh, params.yLow, params.yHigh, params.near, params.far };
+				cameraCTMInv = invert(CTM);
+				auto camera = Camera{ cameraCTMInv, params.xLow, params.xHigh, params.yLow, params.yHigh, params.near, params.far };
 				_renderEngine.SetCamera(camera);
 			} break;
 
@@ -123,12 +124,14 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 					{
 						auto v =  this->vertices[vertex[0] - 1];
 						v = CTM * v;
+						v = cameraCTMInv * v;
 						return v;
 					}
 					else
 					{
 						auto v = this->vertices[this->vertices.size() + vertex[0]];
 						v = CTM * v;
+						v = cameraCTMInv * v;
 						return v;
 					}
 				});

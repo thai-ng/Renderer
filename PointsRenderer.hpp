@@ -4,8 +4,9 @@
 #include "drawable.h"
 #include "primitives.hpp"
 #include "CommonTypeAliases.hpp"
+#include "Camera.hpp"
 
 namespace PointsRenderer
 {
-	void renderPoints(const std::vector<Point>& points, Drawable* drawSurface, Matrix2D<int>& zBuffer, const Rect& viewPort);
+	void renderPoints(const std::vector<Point>& points, Drawable* drawSurface, Matrix2D<int>& zBuffer, const Rect& viewPort, const Camera& camera);
 }
