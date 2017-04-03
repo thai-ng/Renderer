@@ -348,7 +348,7 @@ void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, do
 		Lerp<decltype(point1.x)> posLerp(point1.x, point2.x, point1.y, point2.y);
 		Lerp<decltype(point1.x)> zLerp(point1.x, point2.x, point1.z, point2.z);
 
-		for (auto i = 0u; i < posLerp.size(); ++i)
+		for (auto i = 0; i < posLerp.size(); ++i)
 		{
 			auto point = posLerp[i];
 			auto x = point.first;
@@ -378,7 +378,7 @@ void DDALineRenderer(const Point& p1, const Point& p2, Drawable* drawSurface, do
 		Lerp<decltype(point1.x)> posLerp(point1.x, point2.x, point1.y, point2.y);
 		Lerp<decltype(point1.x)> zLerp(point1.x, point2.x, point1.z, point2.z);
 
-		for (auto i = 0u; i < posLerp.size(); ++i)
+		for (auto i = 0; i < posLerp.size(); ++i)
 		{
 			auto point = posLerp[i];
 			auto x = point.first;

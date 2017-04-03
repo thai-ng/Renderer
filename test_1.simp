@@ -1,0 +1,25 @@
+ambient (.5, .75, .25)
+surface (1, 1, 1)
+depth 50 300 (0, 0, 0)
+
+{
+	translate 0, 0, -170
+	#rotate Y 35
+	#rotate X 30
+
+	camera -100 -100 100 100 80 500
+}
+
+
+#wire
+{
+	translate 0, -50, 0
+	scale 40, 40, 40	
+	#rotate X 30
+	rotate Y 180
+
+	#file "cube2"
+	obj "sportsCar"
+
+	#line (50, 0, 102) (100, 0, 102)
+}

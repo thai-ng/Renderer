@@ -4,6 +4,7 @@
 #include "PointsRenderer.hpp"
 #include "PointLighter.hpp"
 
+
 //#include "lineRenderer.hpp"
 //#include "polygonRenderer.hpp"
 
@@ -43,7 +44,15 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 	{
 		auto v = perspectiveTransformationMatrix * p.getVector();
 		v = viewPortTransformationMatrix * v;
-		v = v / v[3];
+		// HACK
+		if ((v[3] - 0) > 0.00001)
+		{
+			v = v / v[3];
+		}
+		else
+		{
+			v = v / 0.01;
+		}
 
 		return Point{ static_cast<int>(std::round(v[0])), static_cast<int>(std::round(v[1])), static_cast<int>(std::round(v[2])), &this->_viewPort, p.color };
 	});
@@ -59,7 +68,12 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 	}
 
 	PointLighter::calculateAmbientLight(points, ambientColor);
-	PointLighter::calcuateDepthShading(points, _depth);
+
+	if (depthSet)
+	{
+		PointLighter::calcuateDepthShading(points, _depth);
+	}
+
 	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort, _camera);
 }
 
@@ -71,7 +85,15 @@ void RenderEngine::RenderLine(const Line_t& line)
 	{
 		auto v = perspectiveTransformationMatrix * p.getVector();
 		v = viewPortTransformationMatrix * v;
-		v = v / v[3];
+		// HACK		
+		if (v[3] != 0)
+		{
+			v = v / v[3];
+		}
+		else
+		{
+			v = v / _camera.near;
+		}
 
 		return Point{ static_cast<int>(std::round(v[0])), static_cast<int>(std::round(v[1])), static_cast<int>(std::round(v[2])), &this->_viewPort, p.color };
 	});
@@ -79,7 +101,12 @@ void RenderEngine::RenderLine(const Line_t& line)
 	auto points = std::move(PointGenerator::generateLinePoints(vertices[0], vertices[1]));
 	points.erase(std::remove_if(points.begin(), points.end(), [this](auto& p) { return  p.z > this->_camera.far || p.z < this->_camera.near; }), points.end());
 	PointLighter::calculateAmbientLight(points, ambientColor);
-	PointLighter::calcuateDepthShading(points, _depth);
+
+	if (depthSet)
+	{
+		PointLighter::calcuateDepthShading(points, _depth);
+	}
+
 	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort, _camera);
 }
 
@@ -146,18 +173,6 @@ void RenderEngine::SetCamera(const Camera& camera)
 												   0.0, 0.0, 1.0, 0.0,
 												   0.0, 0.0, 0.0, 1.0 };
 
-	auto cameraProjectionScale = 1.0;
-	if (_camera.near != 0.0)
-	{
-		cameraProjectionScale = _camera.near;
-	}
-
-	auto projectionScaleMatrix = Matrix<4, 4, double>{ cameraProjectionScale, 0.0,					 0.0, 0.0,
-													   0.0,					  cameraProjectionScale, 0.0, 0.0,
-													   0.0,					  0.0,					 1.0, 0.0,
-													   0.0,					  0.0,					 0.0, 1.0 };
-
-
 	viewPortTransformationMatrix = CTM_t{ 1.0, 0.0, 0.0, 0.0,
 										  0.0, 1.0, 0.0, 0.0,
 										  0.0, 0.0, 1.0, 0.0,
@@ -165,7 +180,6 @@ void RenderEngine::SetCamera(const Camera& camera)
 
 	viewPortTransformationMatrix = viewPortTransformationMatrix * translationMatrix;
 	viewPortTransformationMatrix = viewPortTransformationMatrix * scaleMatrix;
-	viewPortTransformationMatrix = viewPortTransformationMatrix * projectionScaleMatrix;
 
 	for (auto& r : zBuffer)
 	{
@@ -178,5 +192,6 @@ void RenderEngine::SetCamera(const Camera& camera)
 
 void RenderEngine::SetDepth(const Depth& depth)
 {
+	depthSet = true;
 	_depth = depth;
 }

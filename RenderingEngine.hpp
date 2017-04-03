@@ -45,10 +45,12 @@ private:
 	
 	Color ambientColor = Color(0, 0, 0);
 	
+	bool depthSet = false;
+
 	Drawable* _drawSurface;
 	
 	Camera _camera;
-	Depth _depth = Depth{ 0, 200, Color{0, 0, 0} };
+	Depth _depth = Depth{ 0, std::numeric_limits<double>::max(), Color{0, 0, 0} };
 	CTM_t viewPortTransformationMatrix = CTM_t { 1.0, 0.0, 0.0, 0.0,
 												 0.0, 1.0, 0.0, 0.0,
 												 0.0, 0.0, 1.0, 0.0,

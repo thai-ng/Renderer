@@ -10,28 +10,22 @@ class Lerp
 public:
 	Lerp<T>(T beginVal1, T endVal1, T beginVal2, T endVal2)
 	{
-		auto deltaVal1 = endVal1 - beginVal1;
+		steps = static_cast<int>(endVal1 - beginVal1);
 		auto deltaVal2 = endVal2 - beginVal2;
-		auto slope = static_cast<double>(deltaVal2) / static_cast<double>(deltaVal1);
-
-		auto currentVal1 = beginVal1;
-		auto currentVal2 = static_cast<double>(beginVal2);
-
-		auto size = static_cast<int>(deltaVal1) + 1;
-		steps.reserve(size);
-		
-		std::generate_n(std::back_inserter(steps),
-			size,
-			[&currentVal1, &currentVal2, slope]
+		if (steps != 0)
 		{
-			auto result = std::make_pair(currentVal1, currentVal2);
-			++currentVal1;
-			currentVal2 += slope;
-			return result;
-		});
-	}
+			slope = static_cast<double>(deltaVal2) / static_cast<double>(steps);
+		}
+		else
+		{
+			slope = 0;
+		}
 
+		start1 = beginVal1;
+		start2 = beginVal2;
+	}
 	typedef typename std::pair<T, double> value_t;
+/*
 
 	typedef typename std::vector<value_t>::iterator iterator;
 	typedef typename std::vector<value_t>::const_iterator const_iterator;
@@ -43,18 +37,27 @@ public:
 	iterator end() { return steps.end(); }
 	const_iterator end() const { return steps.end(); }
 	const_iterator cendn() const { return steps.cend(); }
-
+*/
 	auto operator[](int i) const
 	{
-		return steps[i];
+		if (i > steps)
+		{
+			throw std::invalid_argument("Accessing lerp value out of bound.");
+		}
+		auto current1 = start1 + i;
+		auto current2 = start2 + static_cast<double>(i)*slope;
+		return std::make_pair(current1, current2);
 	}
 
 	auto size() const
 	{
-		return steps.size();
+		return steps;
 	}
 
 
 private:
-	std::vector<value_t> steps;
+	double slope;
+	T start1;
+	int steps;
+	double start2;
 };
