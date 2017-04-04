@@ -203,6 +203,7 @@ copy "$(ProjectDir)*.simp" "$(OutDir)"</Command>
     <ClInclude Include="CommonTypeAliases.hpp" />
     <ClInclude Include="Depth.hpp" />
     <ClInclude Include="drawable.h" />
+    <ClInclude Include="LineClipper.h" />
     <ClInclude Include="Matrix.hpp" />
     <ClInclude Include="PointGenerator.hpp" />
     <ClInclude Include="PointLighter.hpp" />
