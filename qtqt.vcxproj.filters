@@ -228,6 +228,9 @@
     <ClInclude Include="LineClipper.h">
       <Filter>Header Files\Rendering Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="Light.hpp">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">

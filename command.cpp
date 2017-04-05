@@ -182,6 +182,30 @@ Command::Command(const std::vector<std::string>& tokens)
 			params = faceParams;
 		} break;
 
+		case Command::Operation::Light:
+		{
+			params = LightParams{ std::atof(tokens[1].c_str()),		// Red
+								  std::atof(tokens[2].c_str()),		// Green
+								  std::atof(tokens[3].c_str()),		// Blue
+								  std::atof(tokens[4].c_str()),		// A attenuation
+								  std::atof(tokens[5].c_str()) };	// B attentuation
+		} break;
+
+		case Command::Operation::Phong:
+		{
+			params = LightingMethod::Phong;
+		} break;
+
+		case Command::Operation::Gouraud:
+		{
+			params = LightingMethod::Gouraud;
+		} break;
+
+		case Command::Operation::Flat:
+		{
+			params = LightingMethod::Flat;
+		} break;
+
 		default:
 		{
 

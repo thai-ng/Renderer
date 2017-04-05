@@ -7,6 +7,7 @@
 #include "Depth.hpp"
 #include "drawable.h"
 #include "lerp.hpp"
+#include "Light.hpp"
 #include "primitives.hpp"
 
 class RenderEngine
@@ -29,6 +30,10 @@ public:
 	void SetCamera(const Camera& camera);
 
 	void SetDepth(const Depth& depth);
+
+	void AddLight(const Light& light);
+
+	void SetLightingMethod(const LightingMethod& lightingMethod);
 
 private:
 	Color getColorFromZ(int z) const;
@@ -61,4 +66,7 @@ private:
 												   0.0, 1.0, 0.0,  0.0,
 												   0.0, 0.0, 1.0,  0.0,
 												   0.0, 0.0, 1.0,  0.0 };
+
+	std::vector<Light> lights;
+	LightingMethod currentLightingMethod;
 };

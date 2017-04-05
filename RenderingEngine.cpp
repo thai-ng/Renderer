@@ -195,3 +195,13 @@ void RenderEngine::SetDepth(const Depth& depth)
 	depthSet = true;
 	_depth = depth;
 }
+
+void RenderEngine::AddLight(const Light& light)
+{
+	lights.push_back(light);
+}
+
+void RenderEngine::SetLightingMethod(const LightingMethod& lightingMethod)
+{
+	currentLightingMethod = lightingMethod;
+}

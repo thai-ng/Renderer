@@ -39,7 +39,8 @@ using RotateParams = std::pair<Axis, int>;
 using FileParam = std::string;
 using Vertex = std::array<int, 3>;
 using FaceParam = std::vector<Vertex>;
-using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam, Color, CameraParams, DepthParams, Point4D, FaceParam>;
+using LightParams = std::array<double, 5>;
+using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam, Color, CameraParams, DepthParams, Point4D, FaceParam, LightParams, LightingMethod>;
 
 class Command
 {
@@ -63,7 +64,11 @@ public:
 		Surface,
 		Vertex,
 		VertexNormal,
-		Face
+		Face,
+		Light,
+		Phong,
+		Gouraud,
+		Flat
 	};
 
 
@@ -100,5 +105,9 @@ static const std::unordered_map<std::string, Command::Operation> OperationTokens
 	{ "surface"s, Command::Operation::Surface },
 	{ "v"s, Command::Operation::Vertex },
 	{ "vn"s, Command::Operation::VertexNormal },
-	{ "f"s, Command::Operation::Face }
+	{ "f"s, Command::Operation::Face },
+	{ "light"s, Command::Operation::Light },
+	{ "phong"s, Command::Operation::Phong },
+	{ "gouraud"s, Command::Operation::Gouraud },
+	{ "flat"s, Command::Operation::Flat }
 };

@@ -1,4 +1,5 @@
 #include "SimpEngine.hpp"
+#include "Light.hpp"
 
 void SimpEngine::runCommands(const std::vector<Command>& commands)
 {
@@ -163,6 +164,30 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 					objFileNormalsStack.push(normals);
 					normals.clear();
 				}
+			} break;
+
+			case Command::Operation::Light:
+			{
+				auto params = std::get<LightParams>(command.parameters());
+				auto lightColor = Color::getDenormalizedColor(params[0], params[1], params[2]);
+				auto lightPosition = CTM * Vector4_t{ 0, 0, 0, 1 };
+				auto light = Light{ lightPosition, lightColor, params[3], params[4] };
+				// Render engine add light
+			} break;
+
+			case Command::Operation::Phong:
+			{
+
+			} break;
+
+			case Command::Operation::Gouraud:
+			{
+
+			} break;
+
+			case Command::Operation::Flat:
+			{
+
 			} break;
 		}
 	}

@@ -116,3 +116,10 @@ private:
 	const Rect* _parent;
 	std::array<Point, 3> _vertices;
 };
+
+enum class LightingMethod
+{
+	Phong,
+	Gouraud,
+	Flat
+};
