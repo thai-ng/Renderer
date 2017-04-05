@@ -28,3 +28,5 @@ private:
 };
 
 Color colorWithOpacity(const Color& newColor, const Color& oldColor, double opacity);
+Color operator*(const Color& l, const Color& r);
+

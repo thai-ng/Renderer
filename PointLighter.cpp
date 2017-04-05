@@ -19,6 +19,14 @@ void PointLighter::calculateAmbientLight(std::vector<Point>& points, const Color
 		point.color = newColor;
 	}
 }
+//
+//void PointLighter::calculateLighting(std::vector<Point>& points, const Color & ambientColor, std::vector<Light>& lights, double A, double B)
+//{
+//	Color pointColor{ 255, 255, 255 };
+//	auto ambientTerm = pointColor * ambientColor;
+//
+//
+//}
 
 void PointLighter::calcuateDepthShading(std::vector<Point>& points, const Depth & depth)
 {
