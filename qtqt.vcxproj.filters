@@ -145,14 +145,14 @@
     <ClCompile Include="assignment3.cpp">
       <Filter>Source Files\Assignments</Filter>
     </ClCompile>
-    <ClCompile Include="PointGenerator.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="PointsRenderer.cpp">
-      <Filter>Generated Files</Filter>
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="PointLighter.cpp">
-      <Filter>Generated Files</Filter>
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="PointGenerator.cpp">
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
