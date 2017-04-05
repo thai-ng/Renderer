@@ -166,28 +166,27 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 				}
 			} break;
 
+			case Command::Operation::Surface:
+			{
+				auto params = std::get<SurfaceParams>(command.parameters());
+				_renderEngine.SetSpecularCoefficient(params[0]);
+				_renderEngine.SetSpecularExponent(params[1]);
+			} break;
+
 			case Command::Operation::Light:
 			{
 				auto params = std::get<LightParams>(command.parameters());
 				auto lightColor = Color::getDenormalizedColor(params[0], params[1], params[2]);
 				auto lightPosition = CTM * Vector4_t{ 0, 0, 0, 1 };
 				auto light = Light{ lightPosition, lightColor, params[3], params[4] };
-				// Render engine add light
+				_renderEngine.AddLight(light);
 			} break;
 
 			case Command::Operation::Phong:
-			{
-
-			} break;
-
 			case Command::Operation::Gouraud:
-			{
-
-			} break;
-
 			case Command::Operation::Flat:
 			{
-
+				_renderEngine.SetLightingMethod(std::get<LightingMethod>(command.parameters()));
 			} break;
 		}
 	}

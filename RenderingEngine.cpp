@@ -205,3 +205,13 @@ void RenderEngine::SetLightingMethod(const LightingMethod& lightingMethod)
 {
 	currentLightingMethod = lightingMethod;
 }
+
+void RenderEngine::SetSpecularCoefficient(double value)
+{
+	ks = value;
+}
+
+void RenderEngine::SetSpecularExponent(double value)
+{
+	p = value;
+}

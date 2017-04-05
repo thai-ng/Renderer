@@ -103,6 +103,7 @@ Command::Command(const std::vector<std::string>& tokens)
 		case Command::Operation::Surface:
 		{
 			defaultVertexColor = Color::getDenormalizedColor(std::atof(tokens[1].c_str()), std::atof(tokens[2].c_str()), std::atof(tokens[3].c_str()));
+			params = SurfaceParams{ std::atof(tokens[4].c_str()), std::atof(tokens[5].c_str()) };
 		} break;
 
 		case Command::Operation::Vertex:

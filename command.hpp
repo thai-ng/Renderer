@@ -40,7 +40,8 @@ using FileParam = std::string;
 using Vertex = std::array<int, 3>;
 using FaceParam = std::vector<Vertex>;
 using LightParams = std::array<double, 5>;
-using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam, Color, CameraParams, DepthParams, Point4D, FaceParam, LightParams, LightingMethod>;
+using SurfaceParams = std::array<double, 2>;
+using CommandParams = std::variant<Vector3, PolygonParams, LineParams, RotateParams, FileParam, Color, CameraParams, DepthParams, Point4D, FaceParam, LightParams, LightingMethod, SurfaceParams>;
 
 class Command
 {

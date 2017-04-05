@@ -35,6 +35,10 @@ public:
 
 	void SetLightingMethod(const LightingMethod& lightingMethod);
 
+	void SetSpecularCoefficient(double value);
+	
+	void SetSpecularExponent(double value);
+
 private:
 	Color getColorFromZ(int z) const;
 	Color getColorWithDepth(const Color& baseColor, int z) const;
@@ -69,4 +73,7 @@ private:
 
 	std::vector<Light> lights;
 	LightingMethod currentLightingMethod;
+
+	double ks;
+	double p;
 };
