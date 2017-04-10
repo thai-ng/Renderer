@@ -138,7 +138,7 @@ copy "$(ProjectDir)*.simp" "$(OutDir)"</Command>
       <IgnoreImportLibrary>true</IgnoreImportLibrary>
       <OutputFile>$(OutDir)\qtqt.exe</OutputFile>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </Link>
     <Midl>
@@ -156,8 +156,6 @@ copy "$(ProjectDir)*.simp" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="assignment1.cpp" />
-    <ClCompile Include="assignment2.cpp" />
     <ClCompile Include="assignment3.cpp" />
     <ClCompile Include="client.cpp" />
     <ClCompile Include="Color.cpp" />
@@ -169,14 +167,13 @@ copy "$(ProjectDir)*.simp" "$(OutDir)"</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="line.cpp" />
-    <ClCompile Include="lineRenderer.cpp" />
+    <ClCompile Include="LineClipper.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="point.cpp" />
     <ClCompile Include="PointGenerator.cpp" />
     <ClCompile Include="PointLighter.cpp" />
     <ClCompile Include="PointsRenderer.cpp" />
     <ClCompile Include="polygon.cpp" />
-    <ClCompile Include="polygonRenderer.cpp" />
     <ClCompile Include="primitives.cpp" />
     <ClCompile Include="rect.cpp" />
     <ClCompile Include="Release\moc_renderarea361.cpp">

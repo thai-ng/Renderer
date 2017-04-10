@@ -97,12 +97,6 @@
     <ClCompile Include="Release\moc_window361.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="lineRenderer.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="polygonRenderer.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="triangle.cpp">
       <Filter>Source Files\Rendering Helpers</Filter>
     </ClCompile>
@@ -124,14 +118,8 @@
     <ClCompile Include="RenderingEngine.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="assignment2.cpp">
-      <Filter>Source Files\Assignments</Filter>
-    </ClCompile>
     <ClCompile Include="primitives.cpp">
       <Filter>Source Files\Rendering Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="assignment1.cpp">
-      <Filter>Source Files\Assignments</Filter>
     </ClCompile>
     <ClCompile Include="SimpFile.cpp">
       <Filter>Source Files\Simp File Parsing</Filter>
@@ -153,6 +141,9 @@
     </ClCompile>
     <ClCompile Include="PointGenerator.cpp">
       <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="LineClipper.cpp">
+      <Filter>Source Files\Rendering Helpers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

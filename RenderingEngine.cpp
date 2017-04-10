@@ -16,7 +16,7 @@ RenderEngine::RenderEngine(const Rect& viewPort, Drawable* drawSurface, const Co
 	blueLerp(0, 200, std::get<2>(maxColor.getColorChannels()), 0),
 	ambientColor(maxColor)
 {
-	zBuffer = Matrix2D<int>(_viewPort.width, std::vector<int>(_viewPort.height, zThreshold));
+	zBuffer = Matrix2D<double>(_viewPort.width, std::vector<double>(_viewPort.height, zThreshold));
 
 	auto viewPlaneWidth = 200.0;
 	auto viewPlaneHeight = 200.0;
@@ -37,44 +37,53 @@ RenderEngine::RenderEngine(const Rect& viewPort, Drawable* drawSurface, const Co
 
 void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMode)
 {
-	// Translate to screen space
-	std::vector<Point> vertices;
-	vertices.resize(triangle.size());
-	std::transform(triangle.begin(), triangle.end(), vertices.begin(), [this](auto& p)
+	if (std::any_of(triangle.begin(), triangle.end(), [this](auto& p) {return p.z >= _camera.near; }))
 	{
-		auto v = perspectiveTransformationMatrix * p.getVector();
-		v = viewPortTransformationMatrix * v;
-		// HACK
-		if ((v[3] - 0) > 0.00001)
+		// Points in camera space
+		// Clip to near (far)
+
+		// Perspective divide
+
+		// Translate to screen space
+		std::vector<Point> vertices;
+		vertices.resize(triangle.size());
+		std::transform(triangle.begin(), triangle.end(), vertices.begin(), [this](auto& p)
 		{
-			v = v / v[3];
+			auto v = perspectiveTransformationMatrix * p.getVector();
+			// Clip near plane
+			// HACK
+			if ((v[3] - 0) > 0.00001)
+			{
+				v = v / v[3];
+			}
+			else
+			{
+				v = v / 0.01;
+			}
+			v = viewPortTransformationMatrix * v;
+
+			return Point{ v[0], v[1], v[2], &this->_viewPort, p.color };
+		});
+
+		std::vector<Point> points;
+		if (renderMode == RenderMode::Filled)
+		{
+			points = std::move(PointGenerator::generatePolygonPoints(vertices));
 		}
 		else
 		{
-			v = v / 0.01;
+			points = std::move(PointGenerator::generateWireframePoints(vertices));
 		}
 
-		return Point{ static_cast<int>(std::round(v[0])), static_cast<int>(std::round(v[1])), static_cast<int>(std::round(v[2])), &this->_viewPort, p.color };
-	});
+		PointLighter::calculateAmbientLight(points, ambientColor);
 
-	std::vector<Point> points;
-	if (renderMode == RenderMode::Filled)
-	{
-		points = std::move(PointGenerator::generatePolygonPoints(vertices));
+		if (depthSet)
+		{
+			PointLighter::calcuateDepthShading(points, _depth);
+		}
+
+		PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort, _camera);
 	}
-	else
-	{
-		points = std::move(PointGenerator::generateWireframePoints(vertices));
-	}
-
-	PointLighter::calculateAmbientLight(points, ambientColor);
-
-	if (depthSet)
-	{
-		PointLighter::calcuateDepthShading(points, _depth);
-	}
-
-	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort, _camera);
 }
 
 void RenderEngine::RenderLine(const Line_t& line)
@@ -95,7 +104,7 @@ void RenderEngine::RenderLine(const Line_t& line)
 			v = v / _camera.near;
 		}
 
-		return Point{ static_cast<int>(std::round(v[0])), static_cast<int>(std::round(v[1])), static_cast<int>(std::round(v[2])), &this->_viewPort, p.color };
+		return Point{ v[0], v[1], v[2], &this->_viewPort, p.color };
 	});
 
 	auto points = std::move(PointGenerator::generateLinePoints(vertices[0], vertices[1]));
@@ -108,48 +117,6 @@ void RenderEngine::RenderLine(const Line_t& line)
 	}
 
 	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort, _camera);
-}
-
-Color RenderEngine::getColorFromZ(int z) const
-{
-	if (z >= 0 && z < 200)
-	{
-		auto r = static_cast<unsigned char>(redLerp[z].second);
-		auto g = static_cast<unsigned char>(greenLerp[z].second);
-		auto b = static_cast<unsigned char>(blueLerp[z].second);
-		return Color{ r, g, b };
-	}
-	else if (z < 0)
-	{
-		return ambientColor;
-	}
-	else
-	{
-		return Color{ 0, 0, 0 };
-	}
-}
-
-Color RenderEngine::getColorWithDepth(const Color& baseColor, int z) const
-{
-	if (z >= _depth.near && z < _depth.far)
-	{
-		Lerp<double> rLerp(_depth.near, _depth.far, std::get<0>(baseColor.getColorChannels()), 0);
-		Lerp<double> gLerp(_depth.near, _depth.far, std::get<1>(baseColor.getColorChannels()), 0);
-		Lerp<double> bLerp(_depth.near, _depth.far, std::get<2>(baseColor.getColorChannels()), 0);
-
-		auto r = static_cast<unsigned char>(rLerp[z].second);
-		auto g = static_cast<unsigned char>(gLerp[z].second);
-		auto b = static_cast<unsigned char>(bLerp[z].second);
-		return Color{ r, g, b };
-	}
-	else if (z < _depth.near)
-	{
-		return baseColor;
-	}
-	else
-	{
-		return _depth.color;
-	}
 }
 
 void RenderEngine::SetAmbientColor(const Color& color)
@@ -188,6 +155,10 @@ void RenderEngine::SetCamera(const Camera& camera)
 			e = static_cast<int>(std::round(_camera.far + 1));
 		}
 	}
+
+	nearPlane = { Point4D{ _camera.xLow, _camera.yLow, _camera.near, 1.0 },
+				  Point4D{ _camera.xHigh, _camera.yLow, _camera.near, 1.0 },
+				  Point4D{ _camera.xHigh, _camera.yHigh, _camera.near, 1.0 } };
 }
 
 void RenderEngine::SetDepth(const Depth& depth)

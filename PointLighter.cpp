@@ -51,3 +51,17 @@ void PointLighter::calcuateDepthShading(std::vector<Point>& points, const Depth 
 		}
 	}
 }
+
+//for (auto& point : points)
+//{
+//	if (point.z > depth.far)
+//	{
+//		point.color = depth.color;
+//	}
+//	else if (point.z > depth.near)
+//	{
+//		auto factor = (point.z - depth.near) / (depth.far - depth.near);
+//		auto newColor = point.color * factor + (1 - factor) * depth.color;
+//		point.color = newColor;
+//	}
+//}

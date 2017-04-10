@@ -87,6 +87,21 @@ Color operator*(const Color& l, const Color& r)
 	return Color::getDenormalizedColor(lr*rr, lg*rg, lb*rb);
 }
 
+Color operator+(const Color & l, const Color & r)
+{
+	auto leftChannels = l.getNormalizedColorChannels();
+	auto lr = std::get<0>(leftChannels);
+	auto lg = std::get<1>(leftChannels);
+	auto lb = std::get<2>(leftChannels);
+
+	auto rightChannels = r.getNormalizedColorChannels();
+	auto rr = std::get<0>(rightChannels);
+	auto rg = std::get<1>(rightChannels);
+	auto rb = std::get<2>(rightChannels);
+
+	return Color::getDenormalizedColor(lr+rr, lg+rg, lb+rb);
+}
+
 Color colorWithOpacity(const Color& newColor, const Color& oldColor, double opacity)
 {
 	auto oldColorChannels = oldColor.getColorChannels();

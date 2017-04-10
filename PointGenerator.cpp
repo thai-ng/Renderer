@@ -1,14 +1,14 @@
 #include "PointGenerator.hpp"
 
-#include <algorithm>
+#include <iostream>
 #include <cmath>
+#include <algorithm>
+#include <numeric>
 
 #include "lerp.hpp"
 
 namespace PointGenerator
 {
-
-
 	// Position helpers
 	enum class Octant
 	{
@@ -169,7 +169,7 @@ namespace PointGenerator
 	}
 
 	// Color helpers
-	std::tuple<Lerp<int>, Lerp<int>, Lerp<int>> getColorLerp(const Point& point1, const Point& point2)
+	std::tuple<Lerp<double>, Lerp<double>, Lerp<double>> getColorLerp(const Point& point1, const Point& point2)
 	{
 		auto p1ColorChannels = point1.color.getColorChannels();
 		auto p1Red = std::get<0>(p1ColorChannels);
@@ -182,15 +182,15 @@ namespace PointGenerator
 		auto p2Blue = std::get<2>(p2ColorChannels);
 
 
-		Lerp<int> redLerp(point1.x, point2.x, p1Red, p2Red);
-		Lerp<int> greenLerp(point1.x, point2.x, p1Green, p2Green);
-		Lerp<int> blueLerp(point1.x, point2.x, p1Blue, p2Blue);
+		Lerp<double> redLerp(point1.x, point2.x, p1Red, p2Red);
+		Lerp<double> greenLerp(point1.x, point2.x, p1Green, p2Green);
+		Lerp<double> blueLerp(point1.x, point2.x, p1Blue, p2Blue);
 
 
 		return std::make_tuple(redLerp, greenLerp, blueLerp);
 	}
 
-	Color getColorFromLerp(int colorIndex, const std::tuple<Lerp<int>, Lerp<int>, Lerp<int>>& colorLerps)
+	Color getColorFromLerp(int colorIndex, const std::tuple<Lerp<double>, Lerp<double>, Lerp<double>>& colorLerps)
 	{
 		auto redLerp = std::get<0>(colorLerps);
 		auto greenLerp = std::get<1>(colorLerps);
@@ -225,7 +225,7 @@ namespace PointGenerator
 							auto y = point.second;
 							auto z = zLerp[currentIndex].second;
 							auto newColor = getColorFromLerp(currentIndex, colorLerps);
-							auto screenPoint = fromFirstOctant(octant, Point{ x, static_cast<int>(std::round(y)), static_cast<int>(std::round(z)), nullptr, newColor });
+							auto screenPoint = fromFirstOctant(octant, Point{ x, y, z, nullptr, newColor });
 							++currentIndex;
 							return screenPoint;
 						});
@@ -268,13 +268,55 @@ namespace PointGenerator
 		}
 	}
 
-	template <typename T, typename F>
-	T sortVertices(const T& vertices, F comp)
+	//template <typename T, typename F>
+	//T sortVertices(const T& vertices, F comp)
+	//{
+	//	T sortedVertices{ vertices };
+	//	std::sort(sortedVertices.begin(), sortedVertices.end(), comp);
+	//	return sortedVertices;
+	//}
+
+	template <typename T>
+	T getCenterPoint(const std::vector<T>& points)
+	{
+		auto centerPoint = std::accumulate(points.begin(), points.end(), T{ 0.0, 0.0, 0.0});
+		centerPoint = centerPoint / static_cast<double>(points.size());
+		return centerPoint;
+	}
+
+	template <typename T>
+	T sortVertices(const T& vertices)
 	{
 		T sortedVertices{ vertices };
-		std::sort(sortedVertices.begin(), sortedVertices.end(), comp);
+		auto center = getCenterPoint(vertices);
+		std::sort(sortedVertices.begin(), sortedVertices.end(), [&center](const auto& a, const auto& b)
+		{
+			if (a.x - center.x >= 0 && b.x - center.x < 0)
+				return false;
+			if (a.x - center.x < 0 && b.x - center.x >= 0)
+				return true;
+			if (a.x - center.x == 0 && b.x - center.x == 0) {
+				if (a.y - center.y >= 0 || b.y - center.y >= 0)
+					return a.y < b.y;
+				return b.y < a.y;
+			}
+
+			// compute the cross product of vectors (center -> a) x (center -> b)
+			auto det = (a.x - center.x) * (b.y - center.y) - (b.x - center.x) * (a.y - center.y);
+			if (det < 0)
+				return false;
+			if (det > 0)
+				return true;
+
+			// points a and b are on the same line from the center
+			// check which point is closer to the center
+			auto d1 = (a.x - center.x) * (a.x - center.x) + (a.y - center.y) * (a.y - center.y);
+			auto d2 = (b.x - center.x) * (b.x - center.x) + (b.y - center.y) * (b.y - center.y);
+			return d1 < d2;
+		});
 		return sortedVertices;
 	}
+
 
 	template<typename T, typename F>
 	std::tuple<T, T> splitVertices(const T& vertices, F sortComp)
@@ -282,7 +324,7 @@ namespace PointGenerator
 		std::vector<Point> leftChain = { vertices.front(), vertices.back() };
 		std::vector<Point> rightChain = { vertices.front(), vertices.back() };
 
-		auto centerX = 0;
+		auto centerX = 0.0;
 		for (auto point : vertices)
 		{
 			centerX += point.x;
@@ -307,129 +349,201 @@ namespace PointGenerator
 		std::sort(rightChain.begin(), rightChain.end(), sortComp);
 		return std::make_tuple(leftChain, rightChain);
 	}
-
-	std::vector<Point> generatePolygonPoints(const std::vector<Point>& points)
+	
+	double edgeFunction(const Point& p1, const Point& p2, const Point& p)
 	{
-		auto sortedVertices = sortVertices(points, comparePoints);
-		auto topPoint = sortedVertices.front();
-		auto bottomPoint = sortedVertices.back();
+		return ((p.x - p1.x) * (p2.y - p1.y)) - ((p.y - p1.y) * (p2.x - p1.x));
+	}
 
-		auto vertexChains = splitVertices(sortedVertices, comparePoints);
+	std::vector<Point> generateTrianglePoints(const std::vector<Point>& vertices)
+	{
+		auto minX = std::floor((*std::min_element(vertices.begin(), vertices.end(), [](const auto& a, const auto& b) {return a.x < b.x; })).x);
+		auto minY = std::floor((*std::min_element(vertices.begin(), vertices.end(), [](const auto& a, const auto& b) {return a.y < b.y; })).y);
+		auto maxX = std::ceil((*std::max_element(vertices.begin(), vertices.end(), [](const auto& a, const auto& b) {return a.x < b.x; })).x);
+		auto maxY = std::ceil((*std::max_element(vertices.begin(), vertices.end(), [](const auto& a, const auto& b) {return a.y < b.y; })).y);
 
-		// Left line chain
-		auto leftChain = std::get<0>(vertexChains);
-		auto leftIter = std::next(leftChain.begin());
-		Line leftLine{ leftChain.front(), *leftIter };
-		Lerp<int> leftLerp(leftLine.p1.y, leftLine.p2.y, leftLine.p1.x, leftLine.p2.x);
-		Lerp<int> leftZLerp(leftLine.p1.y, leftLine.p2.y, leftLine.p1.z, leftLine.p2.z);
+		auto area = edgeFunction(vertices[0], vertices[1], vertices[2]);
 
-		auto leftColorLerps = getColorLerp(leftLine.p1.flipped(), leftLine.p2.flipped());
-		auto leftRedLerp = std::get<0>(leftColorLerps);
-		auto leftGreenLerp = std::get<1>(leftColorLerps);
-		auto leftBlueLerp = std::get<2>(leftColorLerps);
-
-		auto leftCount = 0;
-
-		// Right line chain
-		auto rightChain = std::get<1>(vertexChains);
-		auto rightIter = std::next(rightChain.begin());
-		Line rightLine{ rightChain.front(), *rightIter };
-		Lerp<int> rightLerp(rightLine.p1.y, rightLine.p2.y, rightLine.p1.x, rightLine.p2.x);
-		Lerp<int> rightZLerp(rightLine.p1.y, rightLine.p2.y, rightLine.p1.z, rightLine.p2.z);
-
-		auto rightColorLerps = getColorLerp(rightLine.p1.flipped(), rightLine.p2.flipped());
-		auto rightRedLerp = std::get<0>(rightColorLerps);
-		auto rightGreenLerp = std::get<1>(rightColorLerps);
-		auto rightBlueLerp = std::get<2>(rightColorLerps);
-
-		auto rightCount = 0;
-
+		
 		std::vector<Point> result;
 
-		for (auto y = topPoint.y; y <= bottomPoint.y; ++y)
+		for (auto x = minX; x <= maxX; ++x)
 		{
-			auto xl = leftLerp[leftCount].second;
-			auto zl = leftZLerp[leftCount].second;
-			auto r = static_cast<unsigned char>(leftRedLerp[leftCount].second);
-			auto g = static_cast<unsigned char>(leftGreenLerp[leftCount].second);
-			auto b = static_cast<unsigned char>(leftBlueLerp[leftCount].second);
-			++leftCount;
-			auto leftColor = Color(r, g, b);
-
-			auto xr = rightLerp[rightCount].second;
-			auto zr = rightZLerp[rightCount].second;
-
-			r = static_cast<unsigned char>(rightRedLerp[rightCount].second);
-			g = static_cast<unsigned char>(rightGreenLerp[rightCount].second);
-			b = static_cast<unsigned char>(rightBlueLerp[rightCount].second);
-			++rightCount;
-			auto rightColor = Color(r, g, b);
-
-			auto leftPoint = Point{ static_cast<int>(std::round(xl)), y, static_cast<int>(std::round(zl)), topPoint.parent, leftColor };
-			auto rightPoint = Point{ static_cast<int>(std::round(xr)), y,  static_cast<int>(std::round(zr)), topPoint.parent, rightColor };
-
-			auto linePoints = generateLinePoints(leftPoint, rightPoint);
-			result.insert(result.end(), linePoints.begin(), linePoints.end());
-
-			if (y >= leftLine.p2.y && leftLine.p2 != bottomPoint)
+			for (auto y = minY; y <= maxY; ++y)
 			{
-				leftIter = std::next(leftIter);
-				leftLine = Line{ leftLine.p2, *leftIter };
-				leftLerp = Lerp<int>(leftLine.p1.y, leftLine.p2.y, leftLine.p1.x, leftLine.p2.x);
-				leftZLerp = Lerp<int>(leftLine.p1.y, leftLine.p2.y, leftLine.p1.z, leftLine.p2.z);
+				Point p{ x, y };
+				auto w0= edgeFunction(vertices[0], vertices[1], p);
+				auto w1= edgeFunction(vertices[1], vertices[2], p);
+				auto w2= edgeFunction(vertices[2], vertices[0], p);
 
-				leftColorLerps = getColorLerp(leftLine.p1.flipped(), leftLine.p2.flipped());
-				leftRedLerp = std::get<0>(leftColorLerps);
-				leftGreenLerp = std::get<1>(leftColorLerps);
-				leftBlueLerp = std::get<2>(leftColorLerps);
+				if (w0 <= 0 && w1 <= 0 && w2 <= 0)
+				{
+					w0 /= area;
+					w1 /= area;
+					w2 /= area;
+					
+					auto z0 = 1 / vertices[0].z;
+					auto z1 = 1 / vertices[1].z;
+					auto z2 = 1 / vertices[2].z;
 
-				leftCount = 0;
-			}
+					auto oneOverZ = std::fma(z0, w0, std::fma(z1, w1, z2 * w2));
+					auto z = 1.0 / oneOverZ;
 
-			if (y >= rightLine.p2.y && rightLine.p2 != bottomPoint)
-			{
-				rightIter = std::next(rightIter);
-				rightLine = Line{ rightLine.p2, *rightIter };
-				rightLerp = Lerp<int>(rightLine.p1.y, rightLine.p2.y, rightLine.p1.x, rightLine.p2.x);
-				rightZLerp = Lerp<int>(rightLine.p1.y, rightLine.p2.y, rightLine.p1.z, rightLine.p2.z);
-
-
-				rightColorLerps = getColorLerp(rightLine.p1.flipped(), rightLine.p2.flipped());
-				rightRedLerp = std::get<0>(rightColorLerps);
-				rightGreenLerp = std::get<1>(rightColorLerps);
-				rightBlueLerp = std::get<2>(rightColorLerps);
-				rightCount = 0;
+					auto color = vertices[0].color * w0 + vertices[1].color * w1 + vertices[2].color * w2;
+					result.push_back(Point{ x, y, z, nullptr, color });
+				}
 			}
 		}
 
 		return result;
 	}
 
-	std::vector<Point> generateWireframePoints(const std::vector<Point>& points)
+	std::vector<Point> generatePolygonPoints(const std::vector<Point>& points)
 	{
-		auto sortedVertices = sortVertices(points, comparePoints);
-		auto vertexChains = splitVertices(sortedVertices, comparePoints);
-
-		auto leftChain = std::get<0>(vertexChains);
-		auto currentPointLeft = *(leftChain.begin());
-
+		auto vertices = sortVertices(points);
 		std::vector<Point> result;
 
-		std::for_each(std::next(leftChain.begin()), leftChain.end(), [&currentPointLeft, &result](auto point)
+		if (vertices.size() > 3)
 		{
-			auto linePoints = generateLinePoints(currentPointLeft, point);
-			result.insert(result.end(), linePoints.begin(), linePoints.end());
-			currentPointLeft = point;
-		});
+			std::vector<std::vector<Point>> triangles;
+			for (auto i = 1u; i < vertices.size() - 1; ++i)
+			{
+				std::vector<Point> triangle;
+				triangle.push_back(vertices[0]);
+				triangle.push_back(vertices[i]);
+				triangle.push_back(vertices[i + 1]);
+				triangles.push_back(triangle);
+			}
 
-		auto rightChain = std::get<1>(vertexChains);
-		auto currentPointRight = *(rightChain.begin());
-		std::for_each(std::next(rightChain.begin()), rightChain.end(), [&currentPointRight, &result](auto point)
+			for (auto& triangle : triangles)
+			{
+				auto trianglePoints = generateTrianglePoints(triangle);
+				result.insert(result.end(), trianglePoints.begin(), trianglePoints.end());
+			}
+
+			return result;
+		}
+		else
 		{
-			auto linePoints = generateLinePoints(currentPointRight, point);
+			return generateTrianglePoints(vertices);
+		}
+	}
+
+	//std::vector<Point> generatePolygonPoints(const std::vector<Point>& points)
+	//{
+	//	//auto sortedVertices = sortVertices(points, comparePoints);
+	//	auto sortedVertices = sortVertices(points);
+	//	auto topPoint = sortedVertices.front();
+	//	auto bottomPoint = sortedVertices.back();
+
+	//	auto vertexChains = splitVertices(sortedVertices, comparePoints);
+
+	//	// Left line chain
+	//	auto leftChain = std::get<0>(vertexChains);
+	//	auto leftIter = std::next(leftChain.begin());
+	//	Line leftLine{ leftChain.front(), *leftIter };
+	//	Lerp<double> leftLerp(leftLine.p1.y, leftLine.p2.y, leftLine.p1.x, leftLine.p2.x);
+	//	Lerp<double> leftZLerp(leftLine.p1.y, leftLine.p2.y, leftLine.p1.z, leftLine.p2.z);
+
+	//	auto leftColorLerps = getColorLerp(leftLine.p1.flipped(), leftLine.p2.flipped());
+	//	auto leftRedLerp = std::get<0>(leftColorLerps);
+	//	auto leftGreenLerp = std::get<1>(leftColorLerps);
+	//	auto leftBlueLerp = std::get<2>(leftColorLerps);
+
+	//	auto leftCount = 0;
+
+	//	// Right line chain
+	//	auto rightChain = std::get<1>(vertexChains);
+	//	auto rightIter = std::next(rightChain.begin());
+	//	Line rightLine{ rightChain.front(), *rightIter };
+	//	Lerp<double> rightLerp(rightLine.p1.y, rightLine.p2.y, rightLine.p1.x, rightLine.p2.x);
+	//	Lerp<double> rightZLerp(rightLine.p1.y, rightLine.p2.y, rightLine.p1.z, rightLine.p2.z);
+
+	//	auto rightColorLerps = getColorLerp(rightLine.p1.flipped(), rightLine.p2.flipped());
+	//	auto rightRedLerp = std::get<0>(rightColorLerps);
+	//	auto rightGreenLerp = std::get<1>(rightColorLerps);
+	//	auto rightBlueLerp = std::get<2>(rightColorLerps);
+
+	//	auto rightCount = 0;
+
+	//	std::vector<Point> result;
+
+	//	for (auto y = static_cast<int>(topPoint.y); y <= bottomPoint.y; ++y)
+	//	{
+	//		auto xl = leftLerp[leftCount].second;
+	//		auto zl = leftZLerp[leftCount].second;
+	//		auto r = static_cast<unsigned char>(leftRedLerp[leftCount].second);
+	//		auto g = static_cast<unsigned char>(leftGreenLerp[leftCount].second);
+	//		auto b = static_cast<unsigned char>(leftBlueLerp[leftCount].second);
+	//		++leftCount;
+	//		auto leftColor = Color(r, g, b);
+
+	//		auto xr = rightLerp[rightCount].second;
+	//		auto zr = rightZLerp[rightCount].second;
+
+	//		r = static_cast<unsigned char>(rightRedLerp[rightCount].second);
+	//		g = static_cast<unsigned char>(rightGreenLerp[rightCount].second);
+	//		b = static_cast<unsigned char>(rightBlueLerp[rightCount].second);
+	//		++rightCount;
+	//		auto rightColor = Color(r, g, b);
+
+	//		auto leftPoint = Point{ xl, static_cast<double>(y), zl, topPoint.parent, leftColor };
+	//		auto rightPoint = Point{ xr, static_cast<double>(y),  zr, topPoint.parent, rightColor };
+
+	//		auto linePoints = generateLinePoints(leftPoint, rightPoint);
+	//		result.insert(result.end(), linePoints.begin(), linePoints.end());
+
+	//		if (y >= static_cast<int>(std::round(leftLine.p2.y)) && leftLine.p2 != bottomPoint)
+	//		{
+	//			leftIter = std::next(leftIter);
+	//			leftLine = Line{ leftLine.p2, *leftIter };
+	//			leftLerp = Lerp<double>(leftLine.p1.y, leftLine.p2.y, leftLine.p1.x, leftLine.p2.x);
+	//			leftZLerp = Lerp<double>(leftLine.p1.y, leftLine.p2.y, leftLine.p1.z, leftLine.p2.z);
+
+	//			leftColorLerps = getColorLerp(leftLine.p1.flipped(), leftLine.p2.flipped());
+	//			leftRedLerp = std::get<0>(leftColorLerps);
+	//			leftGreenLerp = std::get<1>(leftColorLerps);
+	//			leftBlueLerp = std::get<2>(leftColorLerps);
+
+	//			leftCount = 0;
+	//		}
+
+	//		if (y >= static_cast<int>(std::round(rightLine.p2.y)) && rightLine.p2 != bottomPoint)
+	//		{
+	//			rightIter = std::next(rightIter);
+	//			rightLine = Line{ rightLine.p2, *rightIter };
+	//			rightLerp = Lerp<double>(rightLine.p1.y, rightLine.p2.y, rightLine.p1.x, rightLine.p2.x);
+	//			rightZLerp = Lerp<double>(rightLine.p1.y, rightLine.p2.y, rightLine.p1.z, rightLine.p2.z);
+
+
+	//			rightColorLerps = getColorLerp(rightLine.p1.flipped(), rightLine.p2.flipped());
+	//			rightRedLerp = std::get<0>(rightColorLerps);
+	//			rightGreenLerp = std::get<1>(rightColorLerps);
+	//			rightBlueLerp = std::get<2>(rightColorLerps);
+	//			rightCount = 0;
+	//		}
+	//	}
+
+	//	return result;
+	//}
+
+	std::vector<Point> generateWireframePoints(const std::vector<Point>& points)
+	{
+		//auto sortedVertices = sortVertices(points, comparePoints);
+		auto sortedVertices = sortVertices(points);
+		
+		std::vector<Point> result;
+
+		for (auto i = 0u; i < sortedVertices.size(); ++i)
+		{
+			auto j = i + 1;
+			if (j == sortedVertices.size())
+			{
+				j = 0;
+			}
+			auto linePoints = generateLinePoints(sortedVertices[i], sortedVertices[j]);
 			result.insert(result.end(), linePoints.begin(), linePoints.end());
-			currentPointRight = point;
-		});
+		}
 
 		return result;
 	}

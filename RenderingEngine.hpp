@@ -8,6 +8,7 @@
 #include "drawable.h"
 #include "lerp.hpp"
 #include "Light.hpp"
+#include "LineClipper.h"
 #include "primitives.hpp"
 
 class RenderEngine
@@ -40,15 +41,12 @@ public:
 	void SetSpecularExponent(double value);
 
 private:
-	Color getColorFromZ(int z) const;
-	Color getColorWithDepth(const Color& baseColor, int z) const;
-	
 	Lerp<int> redLerp;
 	Lerp<int> greenLerp;
 	Lerp<int> blueLerp;
 	
-	Matrix2D<int> zBuffer;
-	int zThreshold = std::numeric_limits<int>::max();
+	Matrix2D<double> zBuffer;
+	double zThreshold = std::numeric_limits<double>::max();
 	
 	Rect _viewPort;
 	
@@ -73,6 +71,9 @@ private:
 
 	std::vector<Light> lights;
 	LightingMethod currentLightingMethod;
+
+	Plane_t nearPlane;
+	//Plane_t farPlane;
 
 	double ks;
 	double p;

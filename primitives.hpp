@@ -13,14 +13,14 @@ struct Rect;
 
 struct Point
 {
-	int x;
-	int y;
-	int z;
+	double x;
+	double y;
+	double z;
 	const Rect* parent;
 	Color color;
 
-	Point() : x(0), y(0), z(0), parent(nullptr), color(0xffffffff) {}
-	Point(int x, int y, int z = 0, const Rect* parent = nullptr, const Color& color = 0xffffffff);
+	Point() : x(0.0), y(0.0), z(0.0), parent(nullptr), color(0xffffffff) {}
+	Point(double x, double y, double z = 0.0, const Rect* parent = nullptr, const Color& color = 0xffffffff);
 
 	Point toGlobalCoordinate() const;
 
@@ -31,11 +31,16 @@ struct Point
 	Point flipped() const;
 };
 
+Point operator*(const Point& p, double s);
+Point operator+(const Point& p1, const Point& p2);
+Point operator/(const Point& p, double s);
+
 struct Point4D
 {
 	Point4D() : x(0), y(0), z(0), w(0), color(0xffffffff) {}
 	Point4D(const std::array<double, 4>& vector, const Color& color) : x(vector[0]), y(vector[1]), z(vector[2]), w(vector[3]), color(color) {}
 	Point4D(double x, double y, double z, double w, const Color& color) : x(x), y(y), z(z), w(w), color(color) {}
+	Point4D(double x, double y, double z, double w) : x(x), y(y), z(z), w(w), color(0xffffffff) {}
 	
 	std::array<double, 4> getVector() const
 	{
@@ -48,6 +53,17 @@ struct Point4D
 	double w;
 	Color color;
 };
+
+Point4D operator*(const Point4D& p, double s);
+Point4D operator/(const Point4D& p, double s);
+Point4D operator-(const Point4D& x, const Point4D& y);
+Point4D operator+(const Point4D& x, const Point4D& y);
+
+double dot(const Point4D& v1, const Point4D& v2);
+Point4D cross(const Point4D& v1, const Point4D& v2);
+
+double length(const Point4D& v);
+Point4D normalize(const Point4D& v);
 
 struct Rect
 {

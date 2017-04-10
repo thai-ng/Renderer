@@ -25,19 +25,7 @@ public:
 		start2 = beginVal2;
 	}
 	typedef typename std::pair<T, double> value_t;
-/*
 
-	typedef typename std::vector<value_t>::iterator iterator;
-	typedef typename std::vector<value_t>::const_iterator const_iterator;
-
-	iterator begin() { return steps.begin(); }
-	const_iterator begin() const { return steps.begin(); }
-	const_iterator cbegin() const { return steps.cbegin(); }
-
-	iterator end() { return steps.end(); }
-	const_iterator end() const { return steps.end(); }
-	const_iterator cendn() const { return steps.cend(); }
-*/
 	auto operator[](int i) const
 	{
 		if (i > steps)
@@ -54,6 +42,10 @@ public:
 		return steps;
 	}
 
+	static T lerp(T first, T second, double step)
+	{
+		return first * (1 - step) + second * step;
+	}
 
 private:
 	double slope;
@@ -61,3 +53,4 @@ private:
 	int steps;
 	double start2;
 };
+
