@@ -4,7 +4,6 @@
 #include "PointsRenderer.hpp"
 #include "PointLighter.hpp"
 
-
 //#include "lineRenderer.hpp"
 //#include "polygonRenderer.hpp"
 
@@ -43,31 +42,55 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 		// Clip to near (far)
 		
 		// Translate to screen space
+		//auto cameraVertices = sortVertices(triangle);
+		auto cameraVertices = triangle;
 		std::vector<Point4D> vertices;
-		vertices.resize(triangle.size());
-		std::transform(triangle.begin(), triangle.end(), vertices.begin(), [this](auto& p)
+		vertices.resize(cameraVertices.size());
+		std::transform(cameraVertices.begin(), cameraVertices.end(), vertices.begin(), [this](auto& p)
 		{
 			auto v = perspectiveTransformationMatrix * p.getVector();
-			// Clip near plane
-			// HACK
-			if ((v[3] - 0) > 0.00001)
-			{
-				v = v / v[3];
-			}
-			else
-			{
-				v = v / 0.01;
-			}
+			v = v / v[3];
+
 			v = viewPortTransformationMatrix * v;
+
 			if (p.normal.has_value())
 			{
 				return Point4D{ v[0], v[1], v[2], v[3], p.color, p.normal.value() };
 			}
 			else
 			{
-				return Point4D{ v[0], v[1], v[2], v[3], p.color};
+				return Point4D{ v[0], v[1], v[2], v[3], p.color };
 			}
 		});
+
+		// Flat
+		if (currentLightingMethod == LightingMethod::Flat)
+		{
+			Point normal;
+			// If any vertice has no normal
+			if (std::any_of(vertices.begin(), vertices.end(), [](auto p) { return !p.normal.has_value(); }))
+			{
+				// Calculate face normal
+				Plane_t face = { cameraVertices[0], cameraVertices[1], cameraVertices[2] };
+				auto normal4D = normalize(getNormal(face));
+				normal = Point{ normal4D.x, normal4D.y, normal4D.z };
+			}
+			// Average normal
+			else
+			{
+				auto normal4D = normalize((cameraVertices[0].normal.value() + cameraVertices[1].normal.value() + cameraVertices[2].normal.value()) / 3);
+				normal = Point{ normal4D.x, normal4D.y, normal4D.z };
+			}
+
+			// Lighting at center
+			auto centerPoint = getCenterPoint(cameraVertices);
+			centerPoint.normal = normal;
+			auto color = PointLighter::calculateLights(centerPoint, lights, ks, p);
+			for (auto& v : vertices)
+			{
+				v.color = color;
+			}
+		}
 
 		std::vector<Point4D> points;
 		if (renderMode == RenderMode::Filled)

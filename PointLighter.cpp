@@ -38,16 +38,17 @@ Point4D reflect(const Point4D& l, const Point4D& n)
 	return l - n * 2 * dot(l, n);
 }
 
-auto calculateLightAtPixel(const Point4D& p, const Point4D& vN, const Light& l, double ks, double kp)
+Color PointLighter::calculateLightAtPixel(const Point4D& p, const Point4D& vN, const Light& l, double ks, double kp)
 {
-	auto vl = normalize(Point4D{ l.Location[0], l.Location[1], l.Location[2], l.Location[3] });
+	auto pl = Point4D{ l.Location[0], l.Location[1], l.Location[2], l.Location[3] };
+	auto vl = normalize(pl - p);
 	auto vr = reflect(vl, vN);
 
-	auto lightColor = l.color * fatt(l.A, l.B, distance(vl, p)) * (p.color * dot(vN, vl - p) + ks * std::pow(dot(p, vr), kp));
+	auto lightColor = l.color * fatt(l.A, l.B, distance(pl, p)) * (p.color * dot(vN, vl) + ks * std::pow(dot(normalize(p), vr), kp));
 	return lightColor;
 }
 
-auto calculateLights(Point4D & p, std::vector<Light> & lights, double ks, double kp)
+Color PointLighter::calculateLights(Point4D & p, std::vector<Light> & lights, double ks, double kp)
 {
 	auto vN = normalize(p.normal.value());
 	Color c{ 0.0 };

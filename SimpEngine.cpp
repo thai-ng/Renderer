@@ -215,6 +215,7 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 				auto params = std::get<LightParams>(command.parameters());
 				auto lightColor = Color::getDenormalizedColor(params[0], params[1], params[2]);
 				auto lightPosition = CTM * Vector4_t{ 0, 0, 0, 1 };
+				lightPosition = cameraCTMInv * lightPosition;
 				auto light = Light{ lightPosition, lightColor, params[3], params[4] };
 				_renderEngine.AddLight(light);
 			} break;
