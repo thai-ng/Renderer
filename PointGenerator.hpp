@@ -3,7 +3,7 @@
 #include "primitives.hpp"
 namespace PointGenerator
 {
-	std::vector<Point> generateLinePoints(const Point& p1, const Point& p2);
-	std::vector<Point> generatePolygonPoints(const std::vector<Point>& points);
-	std::vector<Point> generateWireframePoints(const std::vector<Point>& points);
+	std::vector<Point4D> generateLinePoints(const Point4D& p1, const Point4D& p2);
+	std::vector<Point4D> generatePolygonPoints(const std::vector<Point4D>& points);
+	std::vector<Point4D> generateWireframePoints(const std::vector<Point4D>& points);
 }

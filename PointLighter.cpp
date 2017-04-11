@@ -1,7 +1,7 @@
 #include "PointLighter.hpp"
 #include "lerp.hpp"
 
-void PointLighter::calculateAmbientLight(std::vector<Point>& points, const Color& ambientColor)
+void PointLighter::calculateAmbientLight(std::vector<Point4D>& points, const Color& ambientColor)
 {
 	auto colorChannels = ambientColor.getNormalizedColorChannels();
 	auto ambientRed = std::get<0>(colorChannels);
@@ -69,7 +69,7 @@ void PointLighter::calculateLighting(std::vector<Point4D>& points, const Color &
 	}
 }
 
-void PointLighter::calcuateDepthShading(std::vector<Point>& points, const Depth & depth)
+void PointLighter::calcuateDepthShading(std::vector<Point4D>& points, const Depth & depth)
 {
 	auto zLerp = Lerp<double>(depth.near, depth.far, 0.0, 1.0);
 

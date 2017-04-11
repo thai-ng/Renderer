@@ -41,11 +41,9 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 	{
 		// Points in camera space
 		// Clip to near (far)
-
-		// Perspective divide
-
+		
 		// Translate to screen space
-		std::vector<Point> vertices;
+		std::vector<Point4D> vertices;
 		vertices.resize(triangle.size());
 		std::transform(triangle.begin(), triangle.end(), vertices.begin(), [this](auto& p)
 		{
@@ -61,11 +59,17 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 				v = v / 0.01;
 			}
 			v = viewPortTransformationMatrix * v;
-
-			return Point{ v[0], v[1], v[2], &this->_viewPort, p.color };
+			if (p.normal.has_value())
+			{
+				return Point4D{ v[0], v[1], v[2], v[3], p.color, p.normal.value() };
+			}
+			else
+			{
+				return Point4D{ v[0], v[1], v[2], v[3], p.color};
+			}
 		});
 
-		std::vector<Point> points;
+		std::vector<Point4D> points;
 		if (renderMode == RenderMode::Filled)
 		{
 			points = std::move(PointGenerator::generatePolygonPoints(vertices));

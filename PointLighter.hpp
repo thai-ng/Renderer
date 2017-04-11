@@ -6,7 +6,7 @@
 
 namespace PointLighter
 {
-	void calculateAmbientLight(std::vector<Point>& points, const Color& ambientColor);
+	void calculateAmbientLight(std::vector<Point4D>& points, const Color& ambientColor);
 	void calculateLighting(std::vector<Point4D>& points, const Color& ambientColor, std::vector<Light>& lights, double ks, double kp);
-	void calcuateDepthShading(std::vector<Point>& points, const Depth& depth);
+	void calcuateDepthShading(std::vector<Point4D>& points, const Depth& depth);
 }

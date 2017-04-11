@@ -42,8 +42,20 @@ struct Point4D
 	Point4D() : x(0), y(0), z(0), w(0), color(0xffffffff) {}
 	Point4D(const std::array<double, 4>& vector, const Color& color) : x(vector[0]), y(vector[1]), z(vector[2]), w(vector[3]), color(color) {}
 	Point4D(double x, double y, double z, double w, const Color& color) : x(x), y(y), z(z), w(w), color(color) {}
+	Point4D(double x, double y, double z, double w, const Color& color, const Point& normal) : x(x), y(y), z(z), w(w), color(color), normal(normal) {}
 	Point4D(double x, double y, double z, double w) : x(x), y(y), z(z), w(w), color(0xffffffff) {}
 	Point4D(const Point& p) : x(p.x), y(p.y), z(p.z), w(1.0), color(p.color) {}
+
+	Point4D& operator=(const Point4D& other)
+	{
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		color = other.color;
+		normal = other.normal;
+
+		return *this;
+	}
 
 	std::array<double, 4> getVector() const
 	{

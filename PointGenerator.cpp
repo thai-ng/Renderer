@@ -22,48 +22,48 @@ namespace PointGenerator
 		Eighth
 	};
 
-	Point toFirstOctant(Octant octant, Point p)
+	Point4D toFirstOctant(Octant octant, Point4D p)
 	{
 		switch (octant)
 		{
 		case Octant::First:
 		{
-			return Point{ p.x, p.y, p.z, p.parent, p.color };
+			return Point4D{ p.x, p.y, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Second:
 		{
-			return Point{ p.y, p.x, p.z, p.parent, p.color };
+			return Point4D{ p.y, p.x, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Third:
 		{
-			return Point{ p.y, -p.x, p.z, p.parent, p.color };
+			return Point4D{ p.y, -p.x, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Fourth:
 		{
-			return Point{ -p.x, p.y, p.z, p.parent, p.color };
+			return Point4D{ -p.x, p.y, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Fifth:
 		{
-			return Point{ -p.x, -p.y, p.z, p.parent, p.color };
+			return Point4D{ -p.x, -p.y, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Sixth:
 		{
-			return Point{ -p.y, -p.x, p.z, p.parent, p.color };
+			return Point4D{ -p.y, -p.x, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Seventh:
 		{
-			return Point{ -p.y, p.x, p.z, p.parent, p.color };
+			return Point4D{ -p.y, p.x, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Eighth:
 		{
-			return Point{ p.x, -p.y, p.z, p.parent, p.color };
+			return Point4D{ p.x, -p.y, p.z, 1.0, p.color };
 		} break;
 
 		default:
@@ -73,48 +73,48 @@ namespace PointGenerator
 		}
 	}
 
-	Point fromFirstOctant(Octant octant, Point p)
+	Point4D fromFirstOctant(Octant octant, Point4D p)
 	{
 		switch (octant)
 		{
 		case Octant::First:
 		{
-			return Point{ p.x, p.y, p.z, p.parent, p.color };
+			return Point4D{ p.x, p.y, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Second:
 		{
-			return Point{ p.y, p.x, p.z, p.parent, p.color };
+			return Point4D{ p.y, p.x, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Third:
 		{
-			return Point{ -p.y, p.x, p.z, p.parent, p.color };
+			return Point4D{ -p.y, p.x, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Fourth:
 		{
-			return Point{ -p.x, p.y, p.z, p.parent, p.color };
+			return Point4D{ -p.x, p.y, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Fifth:
 		{
-			return Point{ -p.x, -p.y, p.z, p.parent, p.color };
+			return Point4D{ -p.x, -p.y, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Sixth:
 		{
-			return Point{ -p.y, -p.x, p.z, p.parent, p.color };
+			return Point4D{ -p.y, -p.x, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Seventh:
 		{
-			return Point{ p.y, -p.x, p.z, p.parent, p.color };
+			return Point4D{ p.y, -p.x, p.z, 1.0, p.color };
 		} break;
 
 		case Octant::Eighth:
 		{
-			return Point{ p.x, -p.y, p.z, p.parent, p.color };
+			return Point4D{ p.x, -p.y, p.z, 1.0, p.color };
 		} break;
 
 		default:
@@ -124,7 +124,7 @@ namespace PointGenerator
 		}
 	}
 
-	Octant getOctant(Point p)
+	Octant getOctant(Point4D p)
 	{
 		auto aboveX = p.y > 0;
 		auto rightY = p.x > 0;
@@ -169,7 +169,7 @@ namespace PointGenerator
 	}
 
 	// Color helpers
-	std::tuple<Lerp<double>, Lerp<double>, Lerp<double>> getColorLerp(const Point& point1, const Point& point2)
+	std::tuple<Lerp<double>, Lerp<double>, Lerp<double>> getColorLerp(const Point4D& point1, const Point4D& point2)
 	{
 		auto p1ColorChannels = point1.color.getColorChannels();
 		auto p1Red = std::get<0>(p1ColorChannels);
@@ -203,7 +203,7 @@ namespace PointGenerator
 		return Color{ r, g, b };
 	}
 
-	std::vector<Point> generateLinePoints(const Point& p1, const Point & p2)
+	std::vector<Point4D> generateLinePoints(const Point4D& p1, const Point4D & p2)
 	{
 		auto octant = getOctant(p2 - p1);
 		auto point1 = toFirstOctant(octant, p1);
@@ -213,7 +213,7 @@ namespace PointGenerator
 		Lerp<decltype(point1.x)> posLerp(point1.x, point2.x, point1.y, point2.y);
 		Lerp<decltype(point1.x)> zLerp(point1.x, point2.x, point1.z, point2.z);
 
-		std::vector<Point> result;
+		std::vector<Point4D> result;
 		result.reserve(posLerp.size());
 		auto currentIndex = 0;
 		std::generate_n(std::back_inserter(result), 
@@ -225,7 +225,7 @@ namespace PointGenerator
 							auto y = point.second;
 							auto z = zLerp[currentIndex].second;
 							auto newColor = getColorFromLerp(currentIndex, colorLerps);
-							auto screenPoint = fromFirstOctant(octant, Point{ x, y, z, nullptr, newColor });
+							auto screenPoint = fromFirstOctant(octant, Point4D{ x, y, z, 1.0, newColor });
 							++currentIndex;
 							return screenPoint;
 						});
@@ -279,7 +279,7 @@ namespace PointGenerator
 	template <typename T>
 	T getCenterPoint(const std::vector<T>& points)
 	{
-		auto centerPoint = std::accumulate(points.begin(), points.end(), T{ 0.0, 0.0, 0.0});
+		auto centerPoint = std::accumulate(points.begin(), points.end(), T{ 0.0, 0.0, 0.0, 1.0, 0xffffffff});
 		centerPoint = centerPoint / static_cast<double>(points.size());
 		return centerPoint;
 	}
@@ -350,12 +350,12 @@ namespace PointGenerator
 		return std::make_tuple(leftChain, rightChain);
 	}
 	
-	double edgeFunction(const Point& p1, const Point& p2, const Point& p)
+	double edgeFunction(const Point4D& p1, const Point4D& p2, const Point4D& p)
 	{
 		return ((p.x - p1.x) * (p2.y - p1.y)) - ((p.y - p1.y) * (p2.x - p1.x));
 	}
 
-	std::vector<Point> generateTrianglePoints(const std::vector<Point>& vertices)
+	std::vector<Point4D> generateTrianglePoints(const std::vector<Point4D>& vertices)
 	{
 		auto minX = std::floor((*std::min_element(vertices.begin(), vertices.end(), [](const auto& a, const auto& b) {return a.x < b.x; })).x);
 		auto minY = std::floor((*std::min_element(vertices.begin(), vertices.end(), [](const auto& a, const auto& b) {return a.y < b.y; })).y);
@@ -365,13 +365,13 @@ namespace PointGenerator
 		auto area = edgeFunction(vertices[0], vertices[1], vertices[2]);
 
 		
-		std::vector<Point> result;
+		std::vector<Point4D> result;
 
 		for (auto x = minX; x <= maxX; ++x)
 		{
 			for (auto y = minY; y <= maxY; ++y)
 			{
-				Point p{ x, y };
+				Point4D p{ x, y, 0.0, 1.0 };
 				auto w0= edgeFunction(vertices[0], vertices[1], p);
 				auto w1= edgeFunction(vertices[1], vertices[2], p);
 				auto w2= edgeFunction(vertices[2], vertices[0], p);
@@ -390,7 +390,7 @@ namespace PointGenerator
 					auto z = 1.0 / oneOverZ;
 
 					auto color = vertices[0].color * w0 + vertices[1].color * w1 + vertices[2].color * w2;
-					result.push_back(Point{ x, y, z, nullptr, color });
+					result.push_back(Point4D{ x, y, z, 1.0, color });
 				}
 			}
 		}
@@ -398,17 +398,17 @@ namespace PointGenerator
 		return result;
 	}
 
-	std::vector<Point> generatePolygonPoints(const std::vector<Point>& points)
+	std::vector<Point4D> generatePolygonPoints(const std::vector<Point4D>& points)
 	{
 		auto vertices = sortVertices(points);
-		std::vector<Point> result;
+		std::vector<Point4D> result;
 
 		if (vertices.size() > 3)
 		{
-			std::vector<std::vector<Point>> triangles;
+			std::vector<std::vector<Point4D>> triangles;
 			for (auto i = 1u; i < vertices.size() - 1; ++i)
 			{
-				std::vector<Point> triangle;
+				std::vector<Point4D> triangle;
 				triangle.push_back(vertices[0]);
 				triangle.push_back(vertices[i]);
 				triangle.push_back(vertices[i + 1]);
@@ -487,8 +487,8 @@ namespace PointGenerator
 	//		++rightCount;
 	//		auto rightColor = Color(r, g, b);
 
-	//		auto leftPoint = Point{ xl, static_cast<double>(y), zl, topPoint.parent, leftColor };
-	//		auto rightPoint = Point{ xr, static_cast<double>(y),  zr, topPoint.parent, rightColor };
+	//		auto leftPoint = Point4D{ xl, static_cast<double>(y), zl, topPoint.parent, leftColor };
+	//		auto rightPoint = Point4D{ xr, static_cast<double>(y),  zr, topPoint.parent, rightColor };
 
 	//		auto linePoints = generateLinePoints(leftPoint, rightPoint);
 	//		result.insert(result.end(), linePoints.begin(), linePoints.end());
@@ -527,12 +527,12 @@ namespace PointGenerator
 	//	return result;
 	//}
 
-	std::vector<Point> generateWireframePoints(const std::vector<Point>& points)
+	std::vector<Point4D> generateWireframePoints(const std::vector<Point4D>& points)
 	{
 		//auto sortedVertices = sortVertices(points, comparePoints);
 		auto sortedVertices = sortVertices(points);
 		
-		std::vector<Point> result;
+		std::vector<Point4D> result;
 
 		for (auto i = 0u; i < sortedVertices.size(); ++i)
 		{
