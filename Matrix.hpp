@@ -119,7 +119,8 @@ template <typename T>
 auto operator*(const Matrix<4, 4, T>& matrix, const Point4D& vector)
 {
 	auto v = std::array<T, 4>{vector.x, vector.y, vector.z, vector.w};
-	return Point4D{ matrix * v, vector.color };
+	auto newV = matrix * v;
+	return Point4D{ newV, vector.color };
 }
 
 

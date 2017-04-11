@@ -75,8 +75,8 @@ private:
 	Plane_t nearPlane;
 	//Plane_t farPlane;
 
-	double ks;
-	double p;
+	double ks = .3;
+	double p = 8;
 };
 
 void getFaceNormal(Polygon_t &cameraVertices, Point &normal);

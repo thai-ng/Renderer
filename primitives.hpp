@@ -52,6 +52,7 @@ struct Point4D
 		x = other.x;
 		y = other.y;
 		z = other.z;
+		w = other.w;
 		color = other.color;
 		normal = other.normal;
 

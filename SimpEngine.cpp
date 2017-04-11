@@ -137,8 +137,8 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 						v = this->vertices[this->vertices.size() + vertex[0]];
 					}
 
-					v = CTM * v;
-					v = cameraCTMInv * v;
+					v = this->CTM * v;
+					v = this->cameraCTMInv * v;
 
 					// Normal
 					if (vertex[2] != 0)

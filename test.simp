@@ -1,30 +1,35 @@
 ambient (0.2, 0.2, 0.2)
 #surface (1, 1, 1) 0.0 0.0
-#depth 0 500 (0, 0, 0)
+depth 0 500 (0, 0, 0)
 
 {
-	translate 2, 0, -8
+	translate 0, 0, -10
 	
 	camera -1 -1 1 1 0.1 500
 }
 
 {
-	translate 4 0 -3
+	translate 2 0 -10
 	light 1.0 0.0 1.0 .1 0.001
-	#file "cube"
 }
+
+{
+	translate -2 0 -10
+	light 0.0 1.0 1.0 .1 0.001
+}
+
 phong
 
-wire
+#wire
 {
-	translate -2, -5, 2
-	
-	scale 4, 4, 4	
-	#scale .5, .5, .5	
-	#rotate Z 140
-	rotate X -90
-	#file "z0_face"
-	file "cube"
+	#scale .1, .1, .1	
 
-	#line (50, 0, 102) (100, 0, 102)
+	#translate 4, -5, 2	
+	translate 0 0 12
+	scale 4, 4, 4	
+	#rotate Z 140
+	#rotate X -90
+	#file "z0_face"
+
+	obj "diamond"
 }
