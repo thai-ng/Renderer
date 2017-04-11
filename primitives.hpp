@@ -69,6 +69,7 @@ struct Point4D
 	double w;
 	Color color;
 	std::optional<Point> normal = std::nullopt;
+	std::optional<Point> cameraSpacePoint = std::nullopt;
 };
 
 Point4D operator*(const Point4D& p, double s);

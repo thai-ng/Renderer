@@ -70,7 +70,7 @@ private:
 												   0.0, 0.0, 1.0,  0.0 };
 
 	std::vector<Light> lights;
-	LightingMethod currentLightingMethod;
+	LightingMethod currentLightingMethod = LightingMethod::Flat;
 
 	Plane_t nearPlane;
 	//Plane_t farPlane;
@@ -78,3 +78,5 @@ private:
 	double ks;
 	double p;
 };
+
+void getFaceNormal(Polygon_t &cameraVertices, Point &normal);

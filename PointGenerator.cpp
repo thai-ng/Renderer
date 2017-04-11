@@ -348,7 +348,21 @@ namespace PointGenerator
 					auto z = 1.0 / oneOverZ;
 
 					auto color = vertices[0].color * w0 + vertices[1].color * w1 + vertices[2].color * w2;
-					result.push_back(Point4D{ x, y, z, 1.0, color });
+					auto point = Point4D{ x, y, z, 1.0, color};
+
+					if (vertices[0].cameraSpacePoint.has_value())
+					{
+						auto normal = vertices[0].normal.value() * w0 + vertices[1].normal.value() * w1 + vertices[2].normal.value() * w2;
+						point.normal = normal;
+					}
+					
+					if (vertices[0].cameraSpacePoint.has_value())
+					{
+						auto cameraPoint = vertices[0].cameraSpacePoint.value() * w0 + vertices[1].cameraSpacePoint.value() * w1 + vertices[2].cameraSpacePoint.value() * w2;
+						point.cameraSpacePoint = cameraPoint;
+					}
+
+					result.push_back(point);
 				}
 			}
 		}

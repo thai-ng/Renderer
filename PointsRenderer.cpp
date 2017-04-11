@@ -24,10 +24,17 @@ namespace PointsRenderer
 	{
 		auto x = static_cast<int>(std::round(screenPoint.x - viewPort.x));
 		auto y = static_cast<int>(std::round(screenPoint.y - viewPort.y));
-		if (screenPoint.z <= zBuffer[x][y] && screenPoint.z >= camera.near)
+		auto currentZ = zBuffer[x][y];
+		auto newZ = std::round(screenPoint.z);
+		if (newZ < currentZ && newZ >= camera.near)
 		{
-			zBuffer[x][y] = screenPoint.z;
+			zBuffer[x][y] = newZ;
 			drawToSurface(screenPoint, drawSurface, colorToPaint);
+		}
+		else
+		{
+			int a = 0;
+			a += 1;
 		}
 	}
 

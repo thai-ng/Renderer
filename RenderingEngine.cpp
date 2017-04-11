@@ -34,6 +34,13 @@ RenderEngine::RenderEngine(const Rect& viewPort, Drawable* drawSurface, const Co
 	viewPortTransformationMatrix = viewPortTransformationMatrix * scaleMatrix;
 }
 
+Point getFaceNormal(Polygon_t &cameraVertices)
+{
+	Plane_t face = { cameraVertices[0], cameraVertices[1], cameraVertices[2] };
+	auto normal4D = normalize(getNormal(face));
+	return Point{ normal4D.x, normal4D.y, normal4D.z };
+}
+
 void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMode)
 {
 	if (std::any_of(triangle.begin(), triangle.end(), [this](auto& p) {return p.z >= _camera.near; }))
@@ -62,6 +69,8 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 				return Point4D{ v[0], v[1], v[2], v[3], p.color };
 			}
 		});
+		
+		std::vector<Point4D> points;
 
 		// Flat
 		if (currentLightingMethod == LightingMethod::Flat)
@@ -71,9 +80,7 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 			if (std::any_of(vertices.begin(), vertices.end(), [](auto p) { return !p.normal.has_value(); }))
 			{
 				// Calculate face normal
-				Plane_t face = { cameraVertices[0], cameraVertices[1], cameraVertices[2] };
-				auto normal4D = normalize(getNormal(face));
-				normal = Point{ normal4D.x, normal4D.y, normal4D.z };
+				normal = getFaceNormal(cameraVertices);
 			}
 			// Average normal
 			else
@@ -88,25 +95,95 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 			auto color = PointLighter::calculateLights(centerPoint, lights, ks, p);
 			for (auto& v : vertices)
 			{
-				v.color = color;
+				v.color = v.color * ambientColor + color;
+			}
+
+			// Raster
+			if (renderMode == RenderMode::Filled)
+			{
+				points = std::move(PointGenerator::generatePolygonPoints(vertices));
+			}
+			else
+			{
+				points = std::move(PointGenerator::generateWireframePoints(vertices));
+			}
+		}
+		// Gouraud
+		else if (currentLightingMethod == LightingMethod::Gouraud)
+		{
+			// If any vertice has no normal
+			if (std::any_of(vertices.begin(), vertices.end(), [](auto p) { return !p.normal.has_value(); }))
+			{
+				// Calculate face normal
+				auto normal = getFaceNormal(cameraVertices);
+				// Set normal for each vertex
+				for (auto& v : vertices)
+				{
+					v.normal.emplace(std::move(normal));
+				}
+			}
+
+			// calculate light at each vertex
+			for (auto& v : vertices)
+			{
+				v.color = v.color * ambientColor + PointLighter::calculateLights(v, lights, ks, p);
+			}
+
+			// Raster
+			if (renderMode == RenderMode::Filled)
+			{
+				points = std::move(PointGenerator::generatePolygonPoints(vertices));
+			}
+			else
+			{
+				points = std::move(PointGenerator::generateWireframePoints(vertices));
+			}
+
+		}
+		// Phong
+		else
+		{
+			// If any vertice has no normal
+			if (std::any_of(vertices.begin(), vertices.end(), [](auto p) { return !p.normal.has_value(); }))
+			{
+				// Calculate face normal
+				auto normal = getFaceNormal(cameraVertices);
+				// Set normal for each vertex
+				for (auto& v : vertices)
+				{
+					v.normal.emplace(std::move(normal));
+				}
+			}
+
+			// Save camera space points
+			for (auto& v : vertices)
+			{
+				v.cameraSpacePoint.emplace( v.x, v.y, v.z );
+			}
+
+			if (renderMode == RenderMode::Filled)
+			{
+				points = std::move(PointGenerator::generatePolygonPoints(vertices));
+			}
+			else
+			{
+				points = std::move(PointGenerator::generateWireframePoints(vertices));
+			}
+
+			// calculate light at each vertex
+			for (auto& v : points)
+			{
+				// ASSOCIATE WITH CAMERA SPACE POINT SOMEHOW
+				auto cameraPoint = Point4D(v.cameraSpacePoint.value());
+				cameraPoint.normal = v.normal;
+				v.color = v.color * ambientColor + PointLighter::calculateLights(cameraPoint, lights, ks, p);
 			}
 		}
 
-		std::vector<Point4D> points;
-		if (renderMode == RenderMode::Filled)
-		{
-			points = std::move(PointGenerator::generatePolygonPoints(vertices));
-		}
-		else
-		{
-			points = std::move(PointGenerator::generateWireframePoints(vertices));
-		}
-
-		PointLighter::calculateAmbientLight(points, ambientColor);
 
 		if (depthSet)
 		{
-			PointLighter::calcuateDepthShading(points, _depth);
+			PointLighter::calculateDepthShading(points, _depth);
 		}
 
 		PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort, _camera);
@@ -140,7 +217,7 @@ void RenderEngine::RenderLine(const Line_t& line)
 
 	if (depthSet)
 	{
-		PointLighter::calcuateDepthShading(points, _depth);
+		PointLighter::calculateDepthShading(points, _depth);
 	}
 
 	PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort, _camera);

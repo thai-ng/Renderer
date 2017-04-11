@@ -70,7 +70,7 @@ void PointLighter::calculateLighting(std::vector<Point4D>& points, const Color &
 	}
 }
 
-void PointLighter::calcuateDepthShading(std::vector<Point4D>& points, const Depth & depth)
+void PointLighter::calculateDepthShading(std::vector<Point4D>& points, const Depth & depth)
 {
 	auto zLerp = Lerp<double>(depth.near, depth.far, 0.0, 1.0);
 
