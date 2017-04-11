@@ -3,6 +3,7 @@
 #include <tuple>
 #include <vector>
 #include <array>
+#include <optional>
 
 #include "Color.hpp"
 
@@ -21,6 +22,7 @@ struct Point
 
 	Point() : x(0.0), y(0.0), z(0.0), parent(nullptr), color(0xffffffff) {}
 	Point(double x, double y, double z = 0.0, const Rect* parent = nullptr, const Color& color = 0xffffffff);
+	Point(const std::array<double, 3> &p) : x(p[0]), y(p[1]), z(p[2]), parent(nullptr), color(0xffffffff) {}
 
 	Point toGlobalCoordinate() const;
 
@@ -41,7 +43,8 @@ struct Point4D
 	Point4D(const std::array<double, 4>& vector, const Color& color) : x(vector[0]), y(vector[1]), z(vector[2]), w(vector[3]), color(color) {}
 	Point4D(double x, double y, double z, double w, const Color& color) : x(x), y(y), z(z), w(w), color(color) {}
 	Point4D(double x, double y, double z, double w) : x(x), y(y), z(z), w(w), color(0xffffffff) {}
-	
+	Point4D(const Point& p) : x(p.x), y(p.y), z(p.z), w(1.0), color(p.color) {}
+
 	std::array<double, 4> getVector() const
 	{
 		return std::array<double, 4> {x, y, z, w};
@@ -52,6 +55,7 @@ struct Point4D
 	double z;
 	double w;
 	Color color;
+	std::optional<Point> normal = std::nullopt;
 };
 
 Point4D operator*(const Point4D& p, double s);

@@ -37,6 +37,6 @@ private:
 	std::vector<Point4D> vertices;
 	std::stack<std::vector<Point4D>> objFileVerticesStack;
 
-	std::vector<Vector3> normals;
-	std::stack<std::vector<Vector3>> objFileNormalsStack;
+	std::vector<Point> normals;
+	std::stack<std::vector<Point>> objFileNormalsStack;
 };

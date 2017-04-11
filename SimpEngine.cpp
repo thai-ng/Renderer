@@ -109,6 +109,11 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 				_renderEngine.SetDepth(Depth{ params.near, params.far, params.color });
 			} break;
 
+			case Command::Operation::VertexNormal:
+			{
+				normals.emplace_back(std::get<Vector3>(command.parameters()));
+			} break;
+
 			case Command::Operation::Vertex:
 			{
 				vertices.push_back(std::get<Point4D>(command.parameters()));
@@ -121,23 +126,55 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 				faceVertices.resize(params.size());
 				std::transform(params.begin(), params.end(), faceVertices.begin(), [this](auto& vertex) 
 				{
+					// Vertex
+					Point4D v;
 					if (vertex[0] > 0)
 					{
-						auto v =  this->vertices[vertex[0] - 1];
-						v = CTM * v;
-						v = cameraCTMInv * v;
-						return v;
+						v =  this->vertices[vertex[0] - 1];
 					}
 					else
 					{
-						auto v = this->vertices[this->vertices.size() + vertex[0]];
-						v = CTM * v;
-						v = cameraCTMInv * v;
-						return v;
+						v = this->vertices[this->vertices.size() + vertex[0]];
 					}
+
+					v = CTM * v;
+					v = cameraCTMInv * v;
+
+					// Normal
+					if (vertex[2] != 0)
+					{
+						Point normal;
+						if (vertex[2] > 0)
+						{
+							normal = this->normals[vertex[2] - 1];
+						}
+						else
+						{
+							normal = this->normals[this->normals.size() + vertex[2]];
+						}
+						v.normal.emplace(normal);
+					}
+
+					return v;
 				});
 
-				_renderEngine.RenderTriangle(faceVertices, currentRenderMode);
+				if (faceVertices.size() > 3)
+				{
+					for (auto i = 1u; i < faceVertices.size() - 1; ++i)
+					{
+						std::vector<Point4D> triangle;
+						triangle.push_back(faceVertices[0]);
+						triangle.push_back(faceVertices[i]);
+						triangle.push_back(faceVertices[i + 1]);
+					
+						_renderEngine.RenderTriangle(triangle, currentRenderMode);
+					}
+				}
+				else
+				{
+					_renderEngine.RenderTriangle(faceVertices, currentRenderMode);
+				}
+
 			} break;
 
 			case Command::Operation::ObjectFile:

@@ -19,14 +19,55 @@ void PointLighter::calculateAmbientLight(std::vector<Point>& points, const Color
 		point.color = newColor;
 	}
 }
-//
-//void PointLighter::calculateLighting(std::vector<Point>& points, const Color & ambientColor, std::vector<Light>& lights, double A, double B)
-//{
-//	Color pointColor{ 255, 255, 255 };
-//	auto ambientTerm = pointColor * ambientColor;
-//
-//
-//}
+
+inline
+double fatt(double A, double B, double d)
+{
+	return 1 / (std::fma(B, d, A));
+}
+
+inline
+double distance(const Point4D& l, const Point4D& p)
+{
+	return std::sqrt(std::pow(l.x - p.x, 2) + std::pow(l.y - p.y, 2) + std::pow(l.z - p.z, 2));
+}
+
+inline
+Point4D reflect(const Point4D& l, const Point4D& n)
+{
+	return l - n * 2 * dot(l, n);
+}
+
+auto calculateLightAtPixel(const Point4D& p, const Point4D& vN, const Light& l, double ks, double kp)
+{
+	auto vl = normalize(Point4D{ l.Location[0], l.Location[1], l.Location[2], l.Location[3] });
+	auto vr = reflect(vl, vN);
+
+	auto lightColor = l.color * fatt(l.A, l.B, distance(vl, p)) * (p.color * dot(vN, vl - p) + ks * std::pow(dot(p, vr), kp));
+	return lightColor;
+}
+
+auto calculateLights(Point4D & p, std::vector<Light> & lights, double ks, double kp)
+{
+	auto vN = normalize(p.normal.value());
+	Color c{ 0.0 };
+	for (auto& l : lights)
+	{
+		c = c + calculateLightAtPixel(p, vN, l, ks, kp);
+	}
+	return c;
+}
+
+void PointLighter::calculateLighting(std::vector<Point4D>& points, const Color & ambientColor, std::vector<Light>& lights, double ks, double kp)
+{
+	Color pointColor{ 255, 255, 255 };
+	auto ambientTerm = pointColor * ambientColor;
+
+	for (auto& p : points)
+	{
+		p.color = ambientTerm + calculateLights(p, lights, ks, kp);
+	}
+}
 
 void PointLighter::calcuateDepthShading(std::vector<Point>& points, const Depth & depth)
 {
