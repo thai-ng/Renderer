@@ -4,7 +4,7 @@
 #include <QGridLayout>
 
 Window361::Window361() : renderArea(std::make_unique<RenderArea361>(nullptr)),
-						 nextPageButton(std::make_unique<QPushButton>("next page"))
+						 nextPageButton(std::make_unique<QPushButton>("Refresh"))
 {
     //renderArea = new RenderArea361((QWidget *)0);
     //nextPageButton = new QPushButton("next page");
@@ -26,6 +26,11 @@ Drawable *Window361::getDrawable() {
 void Window361::setPageTurner(PageTurner *inPageTurner) {
     this->pageTurner = inPageTurner;
     pageTurner->nextPage();     // give them the change for the first page.
+}
+
+void Window361::setTitle(const char* title)
+{
+	setWindowTitle(tr(title));
 }
 
 void Window361::nextPageClicked() {

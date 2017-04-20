@@ -74,7 +74,7 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 
 		auto centerPoint = getCenterPoint(cameraVertices);
 		auto faceNormal = getFaceNormal(cameraVertices);
-		if (dot(centerPoint, faceNormal) >= 0)
+		if (dot(normalize(centerPoint), faceNormal) > 0)
 			return;
 
 		// Flat

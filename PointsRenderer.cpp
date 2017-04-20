@@ -26,6 +26,7 @@ namespace PointsRenderer
 		auto y = static_cast<int>(std::round(screenPoint.y - viewPort.y));
 		auto currentZ = zBuffer[x][y];
 		auto newZ = std::round(screenPoint.z);
+		//auto newZ = screenPoint.z;
 		if (newZ < currentZ && newZ >= camera.near)
 		{
 			zBuffer[x][y] = newZ;

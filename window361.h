@@ -19,7 +19,7 @@ public:
     //~Window361();
     Drawable *getDrawable();
     void setPageTurner(PageTurner *pageTurner);
-
+	void setTitle(const char* title);
 private:
     std::unique_ptr<RenderArea361> renderArea;
     std::unique_ptr<QPushButton> nextPageButton;

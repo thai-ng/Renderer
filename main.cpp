@@ -28,6 +28,11 @@ int main(int argc, char *argv[])
 		fileName = argv[1];
 	} 
 
+	if (!fileName.empty())
+	{
+		window.setTitle(fileName.c_str());
+	}
+
     Client client(sheet, fileName); // the client (your program) gets a (Drawable *)
     window.setPageTurner(&client);  // the window must be given a (PageTurner *)
                                     // I made the client a PageTurner, but it doesn't have to

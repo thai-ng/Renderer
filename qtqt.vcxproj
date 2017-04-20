@@ -104,7 +104,12 @@
     <PostBuildEvent>
       <Command>$(QTDIR)\bin\windeployqt $(OutDir)$(TargetName).exe
 
-copy "$(ProjectDir)*.simp" "$(OutDir)"</Command>
+copy "$(ProjectDir)*.simp" "$(OutDir)"
+
+copy "$(ProjectDir)*.obj" "$(OutDir)"
+
+copy "$(ProjectDir)\simp\*" "$(OutDir)"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
