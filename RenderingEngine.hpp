@@ -10,6 +10,7 @@
 #include "Light.hpp"
 #include "LineClipper.h"
 #include "primitives.hpp"
+#include "Face.hpp"
 
 class RenderEngine
 {
@@ -23,6 +24,8 @@ public:
 	};
 
 	void RenderTriangle(const Polygon_t& triangle, RenderMode renderMode);
+
+	void RenderFace(const Face& triangle, RenderMode renderMode);
 
 	void RenderLine(const Line_t& line);
 
@@ -78,5 +81,3 @@ private:
 	double ks = .3;
 	double p = 8;
 };
-
-void getFaceNormal(Polygon_t &cameraVertices, Point &normal);

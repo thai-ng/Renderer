@@ -156,7 +156,7 @@ Command::Command(const std::vector<std::string>& tokens)
 									auto vertex = std::atoi(std::string(token.begin(), token.begin() + normalDelimIndex + 1).c_str());
 									auto normal = std::atoi(std::string(token.begin() + normalDelimIndex + 3, token.end()).c_str());
 
-									return Vertex{ vertex, 0, normal };
+									return VertexParam{ vertex, 0, normal };
 								}
 								else
 								{
@@ -171,19 +171,19 @@ Command::Command(const std::vector<std::string>& tokens)
 										{
 											auto texture = std::atoi(std::string(token.begin() + textureDelimIndex + 2, token.begin() + normalDelimIndex + 1).c_str());
 											auto normal = std::atoi(std::string(token.begin() + normalDelimIndex + 2, token.end()).c_str());
-											return Vertex{ vertex, texture, normal };
+											return VertexParam{ vertex, texture, normal };
 										}
 										else
 										{
 											auto texture = std::atoi(std::string(token.begin() + textureDelimIndex + 2, token.end()).c_str());
-											return Vertex{ vertex, texture, 0 };
+											return VertexParam{ vertex, texture, 0 };
 										}
 									}
 									// vertex only
 									else
 									{
 										auto vertex = std::atoi(token.c_str());
-										return Vertex{ vertex, 0, 0 };
+										return VertexParam{ vertex, 0, 0 };
 									}
 								}
 						   });

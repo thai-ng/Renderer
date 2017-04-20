@@ -72,8 +72,8 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 		
 		std::vector<Point4D> points;
 
-		auto centerPoint = getCenterPoint(cameraVertices);
 		auto faceNormal = getFaceNormal(cameraVertices);
+		auto centerPoint = getCenterPoint(cameraVertices);
 		if (dot(normalize(centerPoint), faceNormal) > 0)
 			return;
 
@@ -196,6 +196,168 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 			}
 		}
 
+
+		if (depthSet)
+		{
+			PointLighter::calculateDepthShading(points, _depth);
+		}
+
+		PointsRenderer::renderPoints(points, _drawSurface, zBuffer, _viewPort, _camera);
+	}
+}
+
+void RenderEngine::RenderFace(const Face& face, RenderMode renderMode)
+{
+	// Basic culling
+	if (std::all_of(face.vertices.begin(), face.vertices.end(), [this](auto& p) {return p->location.z >= _camera.near && p->location.z <= _camera.far; }))
+	{
+		// If center point dot face normal positive, cull
+		std::vector<Point4D> cameraVertices;
+		cameraVertices.resize(face.vertices.size());
+		std::transform(face.vertices.begin(), face.vertices.end(), cameraVertices.begin(), [](auto& v) {return v->location; });
+		
+		auto centerPoint = getCenterPoint(cameraVertices);
+		if (dot(normalize(centerPoint), face.normal) > 0)
+			return;
+
+		// Generate projected points
+		std::vector<Point4D> projectedVertices;
+		projectedVertices.resize(face.vertices.size());
+		std::transform(face.vertices.begin(), face.vertices.end(), projectedVertices.begin(), [this](auto& p)
+		{
+			auto v = perspectiveTransformationMatrix * p->location.getVector();
+			v = v / v[3];
+
+			v = viewPortTransformationMatrix * v;
+
+			if (p->assignedNormal.has_value())
+			{
+				return Point4D{ v[0], v[1], v[2], v[3], p->location.color, p->assignedNormal.value() };
+			}
+			else
+			{
+				return Point4D{ v[0], v[1], v[2], v[3], p->location.color };
+			}
+		});
+		
+		std::vector<Point4D> points;
+
+		switch (currentLightingMethod)
+		{
+			// If flat
+			case LightingMethod::Flat:
+			{
+				//		If no assigned normal, use face normal
+				Point normal;
+				if (std::any_of(face.vertices.begin(), face.vertices.end(), [](auto& v) {return !v->assignedNormal.has_value(); }))
+				{
+					normal = Point{ face.normal.x, face.normal.y, face.normal.z };
+				}
+				// Otherwise average assigned normals
+				else
+				{
+					auto normal4D = normalize((face.vertices[0]->assignedNormal.value() + face.vertices[1]->assignedNormal.value() + face.vertices[2]->assignedNormal.value()) / 3);
+					normal = Point{ normal4D.x, normal4D.y, normal4D.z };
+				}
+				// Assign face normal to center point, calculate lighting
+				centerPoint.normal = (normal);
+				auto color = PointLighter::calculateLights(centerPoint, lights, ks, p);
+
+				// Assign lighting to vertices
+				for (auto& v : projectedVertices)
+				{
+					v.color = v.color * ambientColor + color;
+				}
+
+				// Rasterize
+				if (renderMode == RenderMode::Filled)
+				{
+					points = std::move(PointGenerator::generatePolygonPoints(projectedVertices));
+				}
+				else
+				{
+					points = std::move(PointGenerator::generateWireframePoints(projectedVertices));
+				}
+			} break;
+
+			// if Phong/Gouraud
+			case LightingMethod::Gouraud:
+			case LightingMethod::Phong:
+			{
+				// If no assigned normal, average the face normals at vertex
+				if (std::any_of(face.vertices.begin(), face.vertices.end(), [](auto& v) {return !v->assignedNormal.has_value(); }))
+				{
+					for (auto i = 0u; i < face.vertices.size(); ++i)
+					{
+						auto normal = std::accumulate(face.vertices[i]->faceNormals.begin(), face.vertices[i]->faceNormals.end(), Point4D{ 0.0, 0.0, 0.0, 1.0 });
+						normal = normal / static_cast<double>(face.vertices.size());
+						normal = normalize(normal);
+						cameraVertices[i].normal = Point{ normal.x, normal.y, normal.z };
+					}
+				}
+				// otherwise take the assigned normal
+				else
+				{
+					for (auto i = 0u; i < face.vertices.size(); ++i)
+					{
+						cameraVertices[i].normal = face.vertices[i]->assignedNormal.value();
+					}
+				}
+
+				// 	Calculate lighting at each vertex
+				for (auto i = 0u; i < cameraVertices.size(); ++i)
+				{
+					auto color = PointLighter::calculateLights(cameraVertices[i], lights, ks, p);
+					projectedVertices[i].color = color;
+				}
+
+				// If Gouraud
+				if (currentLightingMethod == LightingMethod::Gouraud)
+				{
+					
+					// Rasterize
+					if (renderMode == RenderMode::Filled)
+					{
+						points = std::move(PointGenerator::generatePolygonPoints(projectedVertices));
+					}
+					else
+					{
+						points = std::move(PointGenerator::generateWireframePoints(projectedVertices));
+					}
+				}
+
+				// If Phong
+				else
+				{
+					// Assign camera vertex and normal to projected vertex
+					for (auto i = 0u; i < cameraVertices.size(); ++i)
+					{
+						projectedVertices[i].cameraSpacePoint.emplace(cameraVertices[i].x, cameraVertices[i].y, cameraVertices[i].z);
+						projectedVertices[i].normal = cameraVertices[i].normal;
+					}
+					// 	Rasterize
+					if (renderMode == RenderMode::Filled)
+					{
+						points = std::move(PointGenerator::generatePolygonPoints(projectedVertices));
+					}
+					else
+					{
+						points = std::move(PointGenerator::generateWireframePoints(projectedVertices));
+					}
+					// 	Calculate lighting at each rasterized points
+					for (auto& v : points)
+					{
+						if (v.normal.has_value())
+						{
+							auto cameraPoint = Point4D(v.cameraSpacePoint.value());
+							cameraPoint.normal = v.normal;
+							//v.color = v.color * ambientColor + PointLighter::calculateLights(cameraPoint, lights, ks, p);
+						}
+					}
+				}
+
+			} break;
+		}
 
 		if (depthSet)
 		{

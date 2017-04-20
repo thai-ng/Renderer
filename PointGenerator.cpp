@@ -330,9 +330,9 @@ namespace PointGenerator
 			for (auto y = minY; y <= maxY; ++y)
 			{
 				Point4D p{ x, y, 0.0, 1.0 };
-				auto w0= edgeFunction(vertices[0], vertices[1], p);
-				auto w1= edgeFunction(vertices[1], vertices[2], p);
-				auto w2= edgeFunction(vertices[2], vertices[0], p);
+				auto w0= edgeFunction(vertices[1], vertices[2], p);
+				auto w1= edgeFunction(vertices[2], vertices[0], p);
+				auto w2= edgeFunction(vertices[0], vertices[1], p);
 
 				if (w0 <= 0 && w1 <= 0 && w2 <= 0)
 				{
@@ -350,13 +350,13 @@ namespace PointGenerator
 					auto color = vertices[0].color * w0 + vertices[1].color * w1 + vertices[2].color * w2;
 					auto point = Point4D{ x, y, z, 1.0, color};
 
-					if (vertices[0].normal.has_value())
+					if (std::all_of(vertices.begin(), vertices.end(), [](auto& v) {return v.normal.has_value(); }))
 					{
 						auto normal = normalize(vertices[0].normal.value() * w0 + vertices[1].normal.value() * w1 + vertices[2].normal.value() * w2);
 						point.normal = Point(normal.x, normal.y, normal.z);
 					}
 					
-					if (vertices[0].cameraSpacePoint.has_value())
+					if (std::all_of(vertices.begin(), vertices.end(), [](auto& v) {return v.cameraSpacePoint.has_value(); }))
 					{
 						auto cameraPoint = vertices[0].cameraSpacePoint.value() * w0 + vertices[1].cameraSpacePoint.value() * w1 + vertices[2].cameraSpacePoint.value() * w2;
 						point.cameraSpacePoint = cameraPoint;

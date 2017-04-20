@@ -145,6 +145,9 @@
     <ClCompile Include="LineClipper.cpp">
       <Filter>Source Files\Rendering Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="Face.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="drawable.h">
@@ -220,6 +223,12 @@
       <Filter>Header Files\Rendering Helpers</Filter>
     </ClInclude>
     <ClInclude Include="Light.hpp">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.hpp">
+      <Filter>Header Files\Rendering Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Face.hpp">
       <Filter>Header Files\Rendering Helpers</Filter>
     </ClInclude>
   </ItemGroup>

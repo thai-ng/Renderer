@@ -6,6 +6,8 @@
 #include "CommonTypeAliases.hpp"
 #include "command.hpp"
 #include "RenderingEngine.hpp"
+#include "Vertex.hpp"
+#include "Face.hpp"
 
 class SimpEngine
 {
@@ -34,8 +36,11 @@ private:
 
 	std::stack<CTM_t> TransformStack;
 
-	std::vector<Point4D> vertices;
-	std::stack<std::vector<Point4D>> objFileVerticesStack;
+	std::vector<Vertex> vertices;
+	std::stack<std::vector<Vertex>> objFileVerticesStack;
+
+	std::vector<Face> faces;
+	std::stack<std::vector<Face>> objFileFacesStack;
 
 	std::vector<Point> normals;
 	std::stack<std::vector<Point>> objFileNormalsStack;

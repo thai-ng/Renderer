@@ -116,29 +116,39 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 
 			case Command::Operation::Vertex:
 			{
-				vertices.push_back(std::get<Point4D>(command.parameters()));
+				Vertex v;
+				v.location = std::get<Point4D>(command.parameters());
+				v.location = this->CTM * v.location;
+				v.location = this->cameraCTMInv * v.location;
+
+				vertices.push_back(v);
 			} break;
 
 			case Command::Operation::Face:
 			{
 				FaceParam params = std::get<FaceParam>(command.parameters());
-				std::vector<Point4D> faceVertices;
-				faceVertices.resize(params.size());
-				std::transform(params.begin(), params.end(), faceVertices.begin(), [this](auto& vertex) 
+				std::vector<Vertex*> faceVertices;
+				faceVertices.reserve(params.size());
+
+				std::vector<int> vertexIndices;
+				vertexIndices.reserve(params.size());
+				std::for_each(params.begin(), params.end(), [this, &faceVertices, &vertexIndices](auto& vertex)
 				{
 					// Vertex
-					Point4D v;
+					Vertex* v;
+					std::size_t index;
 					if (vertex[0] > 0)
 					{
-						v =  this->vertices[vertex[0] - 1];
+						index = vertex[0] - 1;
 					}
 					else
 					{
-						v = this->vertices[this->vertices.size() + vertex[0]];
+						index = this->vertices.size() + vertex[0];
 					}
 
-					v = this->CTM * v;
-					v = this->cameraCTMInv * v;
+					v = &this->vertices.at(index);
+					faceVertices.push_back(v);
+					vertexIndices.push_back(static_cast<int>(index));
 
 					// Normal
 					if (vertex[2] != 0)
@@ -146,33 +156,73 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 						Point normal;
 						if (vertex[2] > 0)
 						{
-							normal = this->normals[vertex[2] - 1];
+							normal = this->normals.at(vertex[2] - 1);
 						}
 						else
 						{
-							normal = this->normals[this->normals.size() + vertex[2]];
+							normal = this->normals.at(this->normals.size() + vertex[2]);
 						}
-						v.normal.emplace(normal);
+						v->assignedNormal = normal;
 					}
 
 					return v;
 				});
 
+				//auto thesholdInRadian = getRadianFromDegree(45);
+				//auto cosThreshold = std::cos(thesholdInRadian);
+
 				if (faceVertices.size() > 3)
 				{
+					Face tempFace;
+					tempFace.vertices = faceVertices;
+					tempFace.vertexIndices = vertexIndices;
+					auto normal = tempFace.getFaceNormal();
+					for (auto v : tempFace.vertices)
+					{
+						/*if (v->faceNormals.size() > 0)
+						{
+							if (std::any_of(v->faceNormals.begin(), v->faceNormals.end(), [cosThreshold, &normal](auto& n) { return dot(normal, n) < cosThreshold; }))
+							{
+								v->faceNormals.push_back(normal);
+							}
+						}
+						else
+						{*/
+							v->faceNormals.push_back(normal);
+						//}
+					}
+					
 					for (auto i = 1u; i < faceVertices.size() - 1; ++i)
 					{
-						std::vector<Point4D> triangle;
-						triangle.push_back(faceVertices[0]);
-						triangle.push_back(faceVertices[i]);
-						triangle.push_back(faceVertices[i + 1]);
+						Face face;
+						face.vertices.push_back(faceVertices[0]);
+						face.vertices.push_back(faceVertices[i]);
+						face.vertices.push_back(faceVertices[i + 1]);
 					
-						_renderEngine.RenderTriangle(triangle, currentRenderMode);
+						face.vertexIndices.push_back(vertexIndices[0]);
+						face.vertexIndices.push_back(vertexIndices[i]);
+						face.vertexIndices.push_back(vertexIndices[i + 1]);
+
+						face.normal = normal;
+						faces.push_back(face);
+						//_renderEngine.RenderTriangle(triangle, currentRenderMode);
 					}
+
 				}
 				else
 				{
-					_renderEngine.RenderTriangle(faceVertices, currentRenderMode);
+					Face face;
+					face.vertices = faceVertices;
+					face.vertexIndices = vertexIndices;
+					auto normal = face.getFaceNormal();
+					for (auto v : face.vertices)
+					{
+						v->faceNormals.push_back(normal);
+					}
+					face.normal = normal;
+
+					faces.push_back(face);
+					//_renderEngine.RenderTriangle(faceVertices, currentRenderMode);
 				}
 
 			} break;
@@ -180,7 +230,18 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 			case Command::Operation::ObjectFile:
 			{
 				if (std::get<std::string>(command.parameters()) == "ENDOFOBJECTFILE"s)
-				{ 
+				{
+					// Draw all the faces
+					for (auto& f : faces)
+					{
+						f.vertices.clear();
+						for (auto i : f.vertexIndices)
+						{
+							f.vertices.push_back(&vertices[i]);
+						}
+						_renderEngine.RenderFace(f, currentRenderMode);
+					}
+
 					if (!objFileVerticesStack.empty())
 					{
 						vertices = objFileVerticesStack.top();
@@ -192,6 +253,12 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 						normals = objFileNormalsStack.top();
 						objFileNormalsStack.pop();
 					}
+
+					if (!objFileFacesStack.empty())
+					{
+						faces = objFileFacesStack.top();
+						objFileFacesStack.pop();
+					}
 				}
 				else
 				{
@@ -200,6 +267,9 @@ void SimpEngine::runCommands(const std::vector<Command>& commands)
 
 					objFileNormalsStack.push(normals);
 					normals.clear();
+
+					objFileFacesStack.push(faces);
+					faces.clear();
 				}
 			} break;
 
