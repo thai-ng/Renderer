@@ -44,7 +44,19 @@ Color PointLighter::calculateLightAtPixel(const Point4D& p, const Point4D& vN, c
 	auto vl = normalize(pl - p);
 	auto vr = reflect(vl, vN);
 
-	auto lightColor = l.color * fatt(l.A, l.B, distance(pl, p)) * (p.color * dot(vN, vl) + ks * std::pow(dot(normalize(p), vr), kp));
+	auto dotNL = dot(vN, vl);
+	if (dotNL < 0)
+	{
+		dotNL = 0;
+	}
+
+	auto dotPR = dot(normalize(p), vr);
+	if (dotPR < 0)
+	{
+		dotPR = 0;
+	}
+
+	auto lightColor = l.color * fatt(l.A, l.B, distance(pl, p)) * (p.color * dotNL + ks * std::pow(dotPR, kp));
 	return lightColor;
 }
 

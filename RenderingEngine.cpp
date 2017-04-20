@@ -43,7 +43,7 @@ Point getFaceNormal(Polygon_t &cameraVertices)
 
 void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMode)
 {
-	if (std::any_of(triangle.begin(), triangle.end(), [this](auto& p) {return p.z >= _camera.near; }))
+	if (std::all_of(triangle.begin(), triangle.end(), [this](auto& p) {return p.z >= _camera.near; }))
 	{
 		// Points in camera space
 		// Clip to near (far)
@@ -72,6 +72,11 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 		
 		std::vector<Point4D> points;
 
+		auto centerPoint = getCenterPoint(cameraVertices);
+		auto faceNormal = getFaceNormal(cameraVertices);
+		if (dot(centerPoint, faceNormal) >= 0)
+			return;
+
 		// Flat
 		if (currentLightingMethod == LightingMethod::Flat)
 		{
@@ -90,7 +95,6 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 			}
 
 			// Lighting at center
-			auto centerPoint = getCenterPoint(cameraVertices);
 			centerPoint.normal = normal;
 			auto color = PointLighter::calculateLights(centerPoint, lights, ks, p);
 			for (auto& v : vertices)
@@ -124,10 +128,17 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 			}
 
 			// calculate light at each vertex
-			for (auto& v : vertices)
+			for (auto index = 0u; index < vertices.size(); ++index)
 			{
-				v.color = v.color * ambientColor + PointLighter::calculateLights(v, lights, ks, p);
+				auto cameraVertex = cameraVertices[index];
+				cameraVertex.normal.emplace(vertices[index].normal.value());
+				vertices[index].color = vertices[index].color * ambientColor + PointLighter::calculateLights(cameraVertex, lights, ks, p);
 			}
+
+			//for (auto& v : vertices)
+			//{
+			//	v.color = v.color * ambientColor + PointLighter::calculateLights(v, lights, ks, p);
+			//}
 
 			// Raster
 			if (renderMode == RenderMode::Filled)
@@ -156,9 +167,15 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 			}
 
 			// Save camera space points
-			for (auto& v : vertices)
+			/*for (auto& v : vertices)
 			{
 				v.cameraSpacePoint.emplace( v.x, v.y, v.z );
+			}*/
+
+			for (auto index = 0u; index < vertices.size(); ++index)
+			{
+				auto cameraVertex = cameraVertices[index];
+				vertices[index].cameraSpacePoint.emplace(cameraVertex.x, cameraVertex.y, cameraVertex.x);
 			}
 
 			if (renderMode == RenderMode::Filled)
@@ -173,7 +190,6 @@ void RenderEngine::RenderTriangle(const Polygon_t& triangle, RenderMode renderMo
 			// calculate light at each vertex
 			for (auto& v : points)
 			{
-				// ASSOCIATE WITH CAMERA SPACE POINT SOMEHOW
 				auto cameraPoint = Point4D(v.cameraSpacePoint.value());
 				cameraPoint.normal = v.normal;
 				v.color = v.color * ambientColor + PointLighter::calculateLights(cameraPoint, lights, ks, p);

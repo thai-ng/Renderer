@@ -310,7 +310,8 @@ namespace PointGenerator
 	
 	double edgeFunction(const Point4D& p1, const Point4D& p2, const Point4D& p)
 	{
-		return ((p.x - p1.x) * (p2.y - p1.y)) - ((p.y - p1.y) * (p2.x - p1.x));
+		// ((p.x - p1.x) * (p2.y - p1.y)) - ((p.y - p1.y) * (p2.x - p1.x));
+		return std::fma((p.x - p1.x), (p2.y - p1.y), -((p.y - p1.y) * (p2.x - p1.x)));
 	}
 
 	std::vector<Point4D> generateTrianglePoints(const std::vector<Point4D>& vertices)
@@ -322,7 +323,6 @@ namespace PointGenerator
 
 		auto area = edgeFunction(vertices[0], vertices[1], vertices[2]);
 
-		
 		std::vector<Point4D> result;
 
 		for (auto x = minX; x <= maxX; ++x)
@@ -350,10 +350,10 @@ namespace PointGenerator
 					auto color = vertices[0].color * w0 + vertices[1].color * w1 + vertices[2].color * w2;
 					auto point = Point4D{ x, y, z, 1.0, color};
 
-					if (vertices[0].cameraSpacePoint.has_value())
+					if (vertices[0].normal.has_value())
 					{
-						auto normal = vertices[0].normal.value() * w0 + vertices[1].normal.value() * w1 + vertices[2].normal.value() * w2;
-						point.normal = normal;
+						auto normal = normalize(vertices[0].normal.value() * w0 + vertices[1].normal.value() * w1 + vertices[2].normal.value() * w2);
+						point.normal = Point(normal.x, normal.y, normal.z);
 					}
 					
 					if (vertices[0].cameraSpacePoint.has_value())

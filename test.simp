@@ -1,35 +1,55 @@
-ambient (0.2, 0.2, 0.2)
+ambient (0.1, 0.1, 0.1)
 #surface (1, 1, 1) 0.0 0.0
-depth 0 500 (0, 0, 0)
+depth 0 100 (0, 0, 0)
 
 {
-	translate 0, 0, -10
+	translate 0, 0, -12
 	
 	camera -1 -1 1 1 0.1 500
 }
 
 {
-	translate 2 0 -10
-	light 1.0 0.0 1.0 .1 0.001
+	translate -20 0 -10
+	light .5 0.0 .5 1 0.001
 }
 
 {
-	translate -2 0 -10
-	light 0.0 1.0 1.0 .1 0.001
+	translate 20 0 -10
+	light .5 0.5 0 1 0.001
+}
+
+{
+	translate 0 20 -10
+	light 0 0.5 0.5 1 0.001
+}
+
+
+flat
+{
+	translate -8 -3 7
+	{
+		scale 0.07 0.07 0.07
+		rotate X 20
+		obj "teapot"
+	}
+}
+
+gouraud
+{
+	translate 3 -3 7
+	{
+		scale 0.07 0.07 0.07
+		rotate X 20
+		obj "teapot"
+	}
 }
 
 phong
-
-#wire
 {
-	#scale .1, .1, .1	
-
-	#translate 4, -5, 2	
-	translate 0 0 12
-	scale 4, 4, 4	
-	#rotate Z 140
-	#rotate X -90
-	#file "z0_face"
-
-	obj "diamond"
+	translate 15 -3 7
+	{
+		scale 0.07 0.07 0.07
+		rotate X 20
+		obj "teapot"
+	}
 }

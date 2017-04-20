@@ -79,7 +79,8 @@ Point4D operator+(const Point4D& x, const Point4D& y)
 
 double dot(const Point4D& v1, const Point4D& v2)
 {
-	return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
+	auto result = (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
+	return result;
 }
 
 Point4D cross(const Point4D& v1, const Point4D& v2)
