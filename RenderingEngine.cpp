@@ -290,7 +290,7 @@ void RenderEngine::RenderFace(const Face& face, RenderMode renderMode)
 					for (auto i = 0u; i < face.vertices.size(); ++i)
 					{
 						auto normal = std::accumulate(face.vertices[i]->faceNormals.begin(), face.vertices[i]->faceNormals.end(), Point4D{ 0.0, 0.0, 0.0, 1.0 });
-						normal = normal / static_cast<double>(face.vertices.size());
+						//normal = normal / static_cast<double>(face.vertices.size());
 						normal = normalize(normal);
 						cameraVertices[i].normal = Point{ normal.x, normal.y, normal.z };
 					}
@@ -304,17 +304,15 @@ void RenderEngine::RenderFace(const Face& face, RenderMode renderMode)
 					}
 				}
 
-				// 	Calculate lighting at each vertex
-				for (auto i = 0u; i < cameraVertices.size(); ++i)
-				{
-					auto color = PointLighter::calculateLights(cameraVertices[i], lights, ks, p);
-					projectedVertices[i].color = color;
-				}
-
 				// If Gouraud
 				if (currentLightingMethod == LightingMethod::Gouraud)
 				{
-					
+					// 	Calculate lighting at each vertex
+					for (auto i = 0u; i < cameraVertices.size(); ++i)
+					{
+						auto color = PointLighter::calculateLights(cameraVertices[i], lights, ks, p);
+						projectedVertices[i].color = color;
+					}
 					// Rasterize
 					if (renderMode == RenderMode::Filled)
 					{
@@ -334,26 +332,36 @@ void RenderEngine::RenderFace(const Face& face, RenderMode renderMode)
 					{
 						projectedVertices[i].cameraSpacePoint.emplace(cameraVertices[i].x, cameraVertices[i].y, cameraVertices[i].z);
 						projectedVertices[i].normal = cameraVertices[i].normal;
+						projectedVertices[i].color = Color(0.0);
 					}
+
 					// 	Rasterize
 					if (renderMode == RenderMode::Filled)
 					{
 						points = std::move(PointGenerator::generatePolygonPoints(projectedVertices));
+						
+						// 	Calculate lighting at each rasterized points
+						for (auto& v : points)
+						{
+							if (v.normal.has_value())
+							{
+								auto cameraPoint = Point4D(v.cameraSpacePoint.value());
+								cameraPoint.normal = v.normal;
+								v.color = v.color * ambientColor + PointLighter::calculateLights(cameraPoint, lights, ks, p);
+							}
+						}
 					}
 					else
 					{
+						// 	Calculate lighting at each vertex
+						for (auto i = 0u; i < cameraVertices.size(); ++i)
+						{
+							auto color = PointLighter::calculateLights(cameraVertices[i], lights, ks, p);
+							projectedVertices[i].color = color;
+						}
 						points = std::move(PointGenerator::generateWireframePoints(projectedVertices));
 					}
-					// 	Calculate lighting at each rasterized points
-					for (auto& v : points)
-					{
-						if (v.normal.has_value())
-						{
-							auto cameraPoint = Point4D(v.cameraSpacePoint.value());
-							cameraPoint.normal = v.normal;
-							//v.color = v.color * ambientColor + PointLighter::calculateLights(cameraPoint, lights, ks, p);
-						}
-					}
+					
 				}
 
 			} break;
