@@ -1,0 +1,70 @@
+ambient (0.1, 0.1, 0.1)
+#surface (1, 1, 1) 0.0 0.0
+depth 0 300 (0, 0, 0)
+
+{
+	translate 0, 0, -10
+	
+	camera -1 -1 1 1 0.1 300
+	#light 0.5 0.5 0.5 1 0.001
+}
+
+{
+	translate -17 -4 -20
+	light 0.7 0.0 .7 1 0.001
+}
+
+{
+	translate 3 16 -20
+	light 0 0.7 0.7 1 0.001
+}
+
+{
+	translate 23 -4 -20
+	light 0.7 0.7 0 1 0.001
+}
+
+{
+	translate 3 -4 -10
+	#light 1 1 1 1 0.0001
+}
+
+flat
+{
+	translate 3 -13 7
+	{
+		scale 0.09 0.09 0.09
+		obj "teapot"
+	}
+}
+
+phong
+{
+	translate 3 -4 7
+	{
+		scale 0.09 0.09 0.09
+		obj "teapot"
+	}
+}
+
+gouraud
+{
+	translate 3 5 7
+	{
+		scale 0.09 0.09 0.09
+		obj "teapot"
+	}
+}
+
+phong
+flat
+{
+	translate 0 0 7
+	{
+		scale 0.15 0.15 0.15
+		#scale 2 2 2
+		rotate Y -40
+		#rotate X 30
+		#obj "teapot"
+	}
+}

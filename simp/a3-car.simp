@@ -1,0 +1,17 @@
+ambient (0.8, 0.8, 0.8)
+depth 0 300 (0, 0, 0)
+
+{
+	translate 0, 0, -10
+	
+	camera -1 -1 1 1 0.1 300
+}
+
+{
+	translate 5 -40 180
+	scale 40 40 40
+	rotate Y 180
+	rotate Y -30
+	#rotate X -10
+	obj "sportsCar"
+}

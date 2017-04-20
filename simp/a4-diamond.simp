@@ -1,0 +1,39 @@
+ambient (0.1, 0.1, 0.1)
+surface (1, 1, 1) 0.3 8.0
+depth 0 300 (0, 0, 0)
+
+{
+	translate 0, 0, -10
+	
+	camera -1 -1 1 1 0.1 300
+
+	translate 0, 0, -10
+	light 1 1 1 1 0.001
+}
+
+{
+	scale 2 2 2
+	gouraud
+	{
+		translate -2 0 0
+		rotate Y 10
+		rotate X 33
+		obj "diamond"
+	}
+
+	phong
+	{
+		translate 1 0 0
+		rotate Y -10
+		rotate X 33
+		obj "diamond"
+	}
+
+	flat
+	{
+		translate 4 0 0
+		rotate Y -28
+		rotate X 33
+		obj "diamond"
+	}
+}

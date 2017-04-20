@@ -1,0 +1,43 @@
+ambient (0.1, 0.1, 0.1)
+depth 0 300 (0, 0, 0)
+
+{
+	translate 0, 0, -10
+	
+	camera -1 -1 1 1 0.1 300
+}
+
+{
+	translate 5 0 40
+	light 1 1 1 1 0.001
+}
+
+gouraud
+{
+	translate -85 -40 180
+	scale 40 40 40
+	rotate Y 180
+	rotate Y 10
+	#rotate X -10
+	obj "sportsCar"
+}
+
+phong
+{
+	translate 25 -40 180
+	scale 40 40 40
+	rotate Y 180
+	rotate Y -5
+	#rotate X -10
+	obj "sportsCar"
+}
+
+flat
+{
+	translate 145 -40 180
+	scale 40 40 40
+	rotate Y 180
+	rotate Y -10
+	#rotate X -10
+	obj "sportsCar"
+}
