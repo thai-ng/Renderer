@@ -1,6 +1,6 @@
 ambient (0.1, 0.1, 0.1)
-#surface (1, 1, 1) 0.0 0.0
-depth 0 300 (0, 0, 0)
+surface (1, 1, 1) 0.8 4.0
+depth 0 100 (0, 0, 0)
 
 {
 	translate 0, 0, -10
@@ -9,21 +9,25 @@ depth 0 300 (0, 0, 0)
 	#light 0.5 0.5 0.5 1 0.001
 }
 
+#green
 {
 	translate -17 -4 -20
-	light 0.7 0.0 .7 1 0.001
+	light 0 0.7 0 1 0.001
 }
 
+#blue
 {
 	translate 3 16 -20
-	light 0 0.7 0.7 1 0.001
+	light 0 0 0.7 1 0.001
 }
 
+#red
 {
 	translate 23 -4 -20
-	light 0.7 0.7 0 1 0.001
+	light 0.7 0 0 1 0.001
 }
 
+#white
 {
 	translate 3 -4 -10
 	#light 1 1 1 1 0.0001
@@ -53,18 +57,5 @@ gouraud
 	{
 		scale 0.09 0.09 0.09
 		obj "teapot"
-	}
-}
-
-phong
-flat
-{
-	translate 0 0 7
-	{
-		scale 0.15 0.15 0.15
-		#scale 2 2 2
-		rotate Y -40
-		#rotate X 30
-		#obj "teapot"
 	}
 }
