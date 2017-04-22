@@ -13,3 +13,7 @@
 /x64/Debug
 /x64/Release
 /release
+/emscripten-build/test.js
+/emscripten-build/test.html.mem
+/emscripten-build/test.html
+/emscripten-build/test.data
